@@ -123,7 +123,7 @@ alias_context() {
     --cluster="${old_cluster}" \
     --user="${old_user}" \
 
-  echo "Aliased ${old_name} as ${new_name}." >&2
+  echo "Aliased \"${old_name}\" as \"${new_name}\"." >&2
 }
 
 main() {
