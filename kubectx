@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+# kubectx(1) is a utility to manage and switch between kubectl contexts.
 
 # Copyright 2017 Google Inc.
 #
@@ -14,127 +16,137 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+[[ -n $DEBUG ]] && set -x
+
 set -eou pipefail
 
-KUBECONFIG="${KUBECONFIG:-${HOME}/.kube/config}"
 KUBECTX="${HOME}/.kube/kubectx"
 
-function usage {
-	cat <<"EOF"
+usage() {
+  cat <<"EOF"
 USAGE:
   kubectx                   : list the contexts
   kubectx <NAME>            : switch to context
   kubectx -                 : switch to the previous context
   kubectx <NEW_NAME>=<NAME> : create alias for context
-  kubectx -h|--help         : show this message
+  kubectx -h,--help         : show this message
 EOF
+  exit 1
 }
 
-function current_context {
-	kubectl config view -o=jsonpath='{.current-context}'
+current_context() {
+  kubectl config view -o=jsonpath='{.current-context}'
 }
 
-function get_contexts {
-	kubectl config view \
-		-o=jsonpath='{range .contexts[*].name}{@}{"\n"}{end}'
+get_contexts() {
+  kubectl config view \
+    -o=jsonpath='{range .contexts[*].name}{@}{"\n"}{end}'
 }
 
-function list_contexts {
-	set -u pipefail
-	local cur="$(current_context)"
-	local bold=$(tput bold)
-	local yellow=$(tput setaf 3)
-	local normal=$(tput sgr0)
+list_contexts() {
+  set -u pipefail
+  local cur="$(current_context)"
+  local bold=$(tput bold)
+  local yellow=$(tput setaf 3)
+  local normal=$(tput sgr0)
 
-	for c in $(get_contexts); do
-		if [[ "$c" = "$cur" ]]; then
-			echo "${bold}${yellow}$c${normal}"
-		else
-			echo "$c"
-		fi
-	done
+  for c in $(get_contexts); do
+  if [[ "${c}" = "${cur}" ]]; then
+    echo "${bold}${yellow}$c${normal}"
+  else
+    echo "$c"
+  fi
+  done
 }
 
-function read_context {
-	if [[ -f "$KUBECTX" ]]; then
-		cat "$KUBECTX"
-	fi
+read_context() {
+  if [[ -f "${KUBECTX}" ]]; then
+    cat "${KUBECTX}"
+  fi
 }
 
-function save_context {
-	local prev="$(read_context)"
-	if [[ "$prev" != "$1" ]]; then
-		printf %s "$1" > "$KUBECTX"
-	fi
+save_context() {
+  local prev="$(read_context)"
+  if [[ "${prev}" != "${1}" ]]; then
+    printf %s "${1}" > "${KUBECTX}"
+  fi
 }
 
-function switch_context {
-	kubectl config use-context "$1"
+switch_context() {
+  kubectl config use-context "${1}"
 }
 
-function set_context {
-	set -e
-	local prev="$(kubectl config current-context)"
+set_context() {
+  local prev="$(current_context)"
 
-	switch_context "$1"
+  switch_context "${1}"
 
-	if [[ -n "$prev" ]]; then
-		save_context "$prev"
-	fi
+  # BUG(ahmetb) handle saved == $1, should be noop
+  if [[ -n "${prev}" ]]; then
+    save_context "${prev}"
+  fi
 }
 
-function swap_context {
-	set -e
-	local ctx="$(read_context)"
-	if [[ -z "$ctx" ]]; then
-		echo "No previous context found."
-		exit 1
-	fi
-	set_context "$ctx"
+swap_context() {
+  set -e
+  local ctx="$(read_context)"
+  if [[ -z "${ctx}" ]]; then
+    echo "error: No previous context found." >&2
+    exit 1
+  fi
+  set_context "${ctx}"
 }
 
-function user_of_context {
-	kubectl config view \
-		-o=jsonpath="{.contexts[?(@.name==\"${1}\")].context.user}"
+user_of_context() {
+  kubectl config view \
+    -o=jsonpath="{.contexts[?(@.name==\"${1}\")].context.user}"
 }
 
-function cluster_of_context {
-	kubectl config view \
-		-o=jsonpath="{.contexts[?(@.name==\"${1}\")].context.cluster}"
+cluster_of_context() {
+  kubectl config view \
+    -o=jsonpath="{.contexts[?(@.name==\"${1}\")].context.cluster}"
 }
 
-function alias_context {
-	local old_name="$1"
-	local new_name="$2"
+alias_context() {
+  local old_name="${1}"
+  local new_name="${2}"
 
-	local old_user="$(user_of_context $old_name)"
-	local old_cluster="$(cluster_of_context $old_name)"
+  local old_user="$(user_of_context "${old_name}")"
+  local old_cluster="$(cluster_of_context "${old_name}")"
 
-	if [[ -z "$old_user" || -z "$old_cluster" ]]; then
-		echo "Cannot retrieve context ${old_name}".
-		exit 1
-	fi
+  if [[ -z "$old_user" || -z "$old_cluster" ]]; then
+    echo "error: Cannot retrieve context ${old_name}."  >&2
+    exit 1
+  fi
 
-	kubectl config set-context "${new_name}" \
-		--cluster="${old_cluster}" \
-		--user="${old_user}" \
+  kubectl config set-context "${new_name}" \
+    --cluster="${old_cluster}" \
+    --user="${old_user}" \
 
-	echo "Aliased ${old_name} as ${new_name}."
+  echo "Aliased ${old_name} as ${new_name}." >&2
 }
 
+main() {
+  if [[ "$#" -eq 0 ]]; then
+    list_contexts
+  elif [[ "$#" -eq 1 ]]; then
+    if [[ "${1}" == "-" ]]; then
+      swap_context
+    elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
+      usage
+    elif [[ "${1}" =~ -(.*) ]]; then
+      echo "error: unrecognized flag" >&2; usage
+    elif [[ "${1}" =~ (.+)=(.+) ]]; then
+      alias_context "${BASH_REMATCH[2]}" "${BASH_REMATCH[1]}"
+    else
+      set_context "${1}"
+    fi
+  elif [[ "$#" -gt 1 ]]; then
+    echo "error: too many flags" >&2
+    usage
+  else
+    usage
+   fi
+}
 
-if [[ "$#" -eq 0 ]]; then
-	list_contexts
-elif [[ "$#" -eq 1 ]]; then
-	if [[ "$1" = '-h' || "$1" = '--help' ]]; then
-		usage
-	elif [[ "$1" = "-" ]]; then
-		swap_context
-	elif [[ "$1" =~ (.+)=(.+) ]]; then
-		alias_context "${BASH_REMATCH[2]}" "${BASH_REMATCH[1]}"
-	else
-		set_context "$1"
-	fi
-else
-	usage
-fi
+main "$@"
