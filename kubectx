@@ -22,10 +22,11 @@ KUBECTX="${HOME}/.kube/kubectx"
 function usage {
 	cat <<"EOF"
 USAGE:
-  kubectx               : list the contexts
-  kubectx <NAME>        : switch to context
-  kubectx -             : switch to the previous context
-  kubectx -h|--help     : show this message
+  kubectx                   : list the contexts
+  kubectx <NAME>            : switch to context
+  kubectx -                 : switch to the previous context
+  kubectx <NEW_NAME>=<NAME> : create alias for context
+  kubectx -h|--help         : show this message
 EOF
 }
 
@@ -34,7 +35,8 @@ function current_context {
 }
 
 function get_contexts {
-	kubectl config get-contexts | awk '{print $2}' | tail -n +2
+	kubectl config view \
+		-o=jsonpath='{range .contexts[*].name}{@}{"\n"}{end}'
 }
 
 function list_contexts {
@@ -91,6 +93,36 @@ function swap_context {
 	set_context "$ctx"
 }
 
+function user_of_context {
+	kubectl config view \
+		-o=jsonpath="{.contexts[?(@.name==\"${1}\")].context.user}"
+}
+
+function cluster_of_context {
+	kubectl config view \
+		-o=jsonpath="{.contexts[?(@.name==\"${1}\")].context.cluster}"
+}
+
+function alias_context {
+	local old_name="$1"
+	local new_name="$2"
+
+	local old_user="$(user_of_context $old_name)"
+	local old_cluster="$(cluster_of_context $old_name)"
+
+	if [[ -z "$old_user" || -z "$old_cluster" ]]; then
+		echo "Cannot retrieve context ${old_name}".
+		exit 1
+	fi
+
+	kubectl config set-context "${new_name}" \
+		--cluster="${old_cluster}" \
+		--user="${old_user}" \
+
+	echo "Aliased ${old_name} as ${new_name}."
+}
+
+
 if [[ "$#" -eq 0 ]]; then
 	list_contexts
 elif [[ "$#" -eq 1 ]]; then
@@ -98,6 +130,8 @@ elif [[ "$#" -eq 1 ]]; then
 		usage
 	elif [[ "$1" = "-" ]]; then
 		swap_context
+	elif [[ "$1" =~ (.+)=(.+) ]]; then
+		alias_context "${BASH_REMATCH[2]}" "${BASH_REMATCH[1]}"
 	else
 		set_context "$1"
 	fi
