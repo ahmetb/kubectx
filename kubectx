@@ -46,15 +46,15 @@ get_contexts() {
 list_contexts() {
   set -u pipefail
   local cur="$(current_context)"
-  local bold=$(tput bold)
   local yellow=$(tput setaf 3)
+  local darkbg=$(tput setab 0)
   local normal=$(tput sgr0)
 
   for c in $(get_contexts); do
   if [[ "${c}" = "${cur}" ]]; then
-    echo "${bold}${yellow}$c${normal}"
+    echo "${darkbg}${yellow}${c}${normal}"
   else
-    echo "$c"
+    echo "${c}"
   fi
   done
 }
@@ -66,8 +66,9 @@ read_context() {
 }
 
 save_context() {
-  local prev="$(read_context)"
-  if [[ "${prev}" != "${1}" ]]; then
+  local saved="$(read_context)"
+
+  if [[ "${saved}" != "${1}" ]]; then
     printf %s "${1}" > "${KUBECTX}"
   fi
 }
@@ -81,8 +82,7 @@ set_context() {
 
   switch_context "${1}"
 
-  # BUG(ahmetb) handle saved == $1, should be noop
-  if [[ -n "${prev}" ]]; then
+  if [[ "${prev}" != "${1}" ]]; then
     save_context "${prev}"
   fi
 }
