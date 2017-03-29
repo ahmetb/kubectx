@@ -28,6 +28,12 @@ Context "dublin" set.
 Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
 ```
 
+## Help wanted
+
+[ ] bash completion
+[ ] zsh completion
+[ ] homebrew formula/tap
+
 -----
 
 Disclaimer: This is not an official Google product.

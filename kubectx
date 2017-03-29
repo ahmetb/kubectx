@@ -19,6 +19,7 @@
 [[ -n $DEBUG ]] && set -x
 
 set -eou pipefail
+IFS=$'\n\t'
 
 KUBECTX="${HOME}/.kube/kubectx"
 
