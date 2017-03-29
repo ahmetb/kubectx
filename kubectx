@@ -129,6 +129,9 @@ alias_context() {
 main() {
   if [[ "$#" -eq 0 ]]; then
     list_contexts
+  elif [[ "$#" -gt 1 ]]; then
+    echo "error: too many flags" >&2
+    usage
   elif [[ "$#" -eq 1 ]]; then
     if [[ "${1}" == "-" ]]; then
       swap_context
@@ -141,12 +144,9 @@ main() {
     else
       set_context "${1}"
     fi
-  elif [[ "$#" -gt 1 ]]; then
-    echo "error: too many flags" >&2
-    usage
   else
     usage
-   fi
+  fi
 }
 
 main "$@"
