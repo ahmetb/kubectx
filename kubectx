@@ -134,7 +134,7 @@ main() {
       swap_context
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
-    elif [[ "${1}" =~ -(.*) ]]; then
+    elif [[ "${1}" =~ ^-(.*) ]]; then
       echo "error: unrecognized flag" >&2; usage
     elif [[ "${1}" =~ (.+)=(.+) ]]; then
       alias_context "${BASH_REMATCH[2]}" "${BASH_REMATCH[1]}"
