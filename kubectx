@@ -29,9 +29,28 @@ USAGE:
 EOF
 }
 
+function current_context {
+	kubectl config view -o=jsonpath='{.current-context}'
+}
+
+function get_contexts {
+	kubectl config get-contexts | awk '{print $2}' | tail -n +2
+}
+
 function list_contexts {
 	set -u pipefail
-	kubectl config get-contexts | awk '{print $2}' | tail -n +2
+	local cur="$(current_context)"
+	local bold=$(tput bold)
+	local yellow=$(tput setaf 3)
+	local normal=$(tput sgr0)
+
+	for c in $(get_contexts); do
+		if [[ "$c" = "$cur" ]]; then
+			echo "${bold}${yellow}$c${normal}"
+		else
+			echo "$c"
+		fi
+	done
 }
 
 function read_context {
