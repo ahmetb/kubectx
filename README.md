@@ -30,9 +30,9 @@ Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
 
 ## Help wanted
 
-[ ] bash completion
-[ ] zsh completion
-[ ] homebrew formula/tap
+- [ ] bash completion
+- [ ] zsh completion
+- [ ] homebrew formula/tap
 
 -----
 
