@@ -11,6 +11,9 @@ USAGE:
   kubectx -h,--help         : show this message
 ```
 
+Purpose of this project is to provide an utility and facilitate discussion
+about how `kubectl` can manage contexts better.
+
 ## Example
 
 ```
