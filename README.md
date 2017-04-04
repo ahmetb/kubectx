@@ -31,11 +31,11 @@ Context "dublin" set.
 Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
 ```
 
-## Help wanted
+[**Set up `bash` completion &rarr;**](completion/README.md)
 
-- [ ] bash completion
-- [ ] zsh completion
-- [ ] homebrew formula/tap
+### Help wanted
+
+[ ] homebrew formula/tap
 
 -----
 
