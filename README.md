@@ -35,7 +35,7 @@ Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
 
 ### Help wanted
 
-[ ] homebrew formula/tap that installs the script and completions
+- [ ] homebrew formula/tap that installs the script and completions
 
 -----
 
