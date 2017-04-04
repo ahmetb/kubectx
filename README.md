@@ -16,7 +16,7 @@ about how `kubectl` can manage contexts better.
 
 ## Example
 
-```
+```sh
 $ kubectx minikube
 Switched to context "minikube".
 
@@ -31,11 +31,11 @@ Context "dublin" set.
 Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
 ```
 
-[**Set up `bash` completion &rarr;**](completion/README.md)
+[Set up `bash` and `zsh` completion &rarr;](completion/README.md)
 
 ### Help wanted
 
-[ ] homebrew formula/tap
+[ ] homebrew formula/tap that installs the script and completions
 
 -----
 
