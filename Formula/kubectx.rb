@@ -19,6 +19,6 @@ class Kubectx < Formula
   end
 
   test do
-    system "kubectx", "--help"
+    system "which", "kubectx"
   end
 end
