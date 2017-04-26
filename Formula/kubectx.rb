@@ -2,7 +2,7 @@ class Kubectx < Formula
   desc "Tool that can switch between kubectl contexts easily and create aliases"
   homepage "https://github.com/ahmetb/kubectx"
   url "https://github.com/ahmetb/kubectx/archive/v0.2.0.tar.gz"
-  sha256 "9fb6557416e4be3ef7e9701527f89fa73a1a0545a3cafbe6bed7527061c6cfb7"
+  sha256 "28069aff84aaba1aa38f42d3b27e64e460a5c0651fb56b1748f44fd832d912e3"
 
   bottle :unneeded
 
