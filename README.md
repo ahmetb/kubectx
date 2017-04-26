@@ -14,7 +14,7 @@ USAGE:
 Purpose of this project is to provide an utility and facilitate discussion
 about how `kubectl` can manage contexts better.
 
-## Example
+## Usage
 
 ```sh
 $ kubectx minikube
@@ -31,11 +31,23 @@ Context "dublin" set.
 Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
 ```
 
-[Set up `bash` and `zsh` completion &rarr;](completion/README.md)
+`kubectx` also supports <kbd>Tab</kbd> completion, which helps with long context
+names.
 
-### Help wanted
+## Installation
 
-- [ ] homebrew formula/tap that installs the script and completions
+For macOS:
+
+> Use [Homebrew](https://brew.sh/) package manager:
+>
+>      brew tap ahmetb/kubectx https://github.com/ahmetb/kubectx.git
+>      brew install kubectx
+> this will also set up bash/zsh completion scripts automatically.
+
+Other platforms:
+
+> Download the `kubectx` script, make it executable and add it to your PATH. You
+> can also install bash/zsh [completion scripts](completion/) manually.
 
 -----
 
