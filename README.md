@@ -72,7 +72,7 @@ names.
 
 ## Installation
 
-For macOS:
+**For macOS:**
 
 > Use [Homebrew](https://brew.sh/) package manager:
 >
@@ -80,7 +80,10 @@ For macOS:
 >      brew install kubectx
 > this will also set up bash/zsh completion scripts automatically.
 
-Other platforms:
+Running `brew install` with `--with-short-names` will install tools with names
+`kctx` and `kns` to prevent prefix collision with `kubectl` name.
+
+**Other platforms:**
 
 > Download the `kubectx` script, make it executable and add it to your PATH. You
 > can also install bash/zsh [completion scripts](completion/) manually.
