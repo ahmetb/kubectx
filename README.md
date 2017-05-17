@@ -35,8 +35,8 @@ Context "dublin" set.
 Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
 ```
 
-`kubectx` also supports <kbd>Tab</kbd> completion, which helps with long context
-names.
+`kubectx` supports <kbd>Tab</kbd> completion on bash/zsh shells to help with 
+long context names. You don't have to remember full context names anymore.
 
 -----
 
@@ -65,8 +65,7 @@ Context "test" set.
 Active namespace is "default".
 ```
 
-`kubectx` also supports <kbd>Tab</kbd> completion, which helps with long context
-names.
+`kubens` also supports <kbd>Tab</kbd> completion on bash/zsh shells.
 
 -----
 
