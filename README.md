@@ -1,3 +1,7 @@
+This repository provides both `kubectx` and `kubens` tools. Purpose of this
+project is to provide an utility and facilitate discussion about how `kubectl`
+can manage contexts better.
+
 # kubectx(1)
 
 kubectx is an utility to manage and switch between kubectl(1) contexts.
@@ -14,7 +18,7 @@ USAGE:
 Purpose of this project is to provide an utility and facilitate discussion
 about how `kubectl` can manage contexts better.
 
-## Usage
+### Usage
 
 ```sh
 $ kubectx minikube
@@ -33,6 +37,38 @@ Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
 
 `kubectx` also supports <kbd>Tab</kbd> completion, which helps with long context
 names.
+
+-----
+
+# kubens(1)
+
+kubens is an utility to switch between Kubernetes namespaces.
+
+```
+USAGE:
+  kubens                    : list the namespaces
+  kubens <NAME>             : change the active namespace
+  kubens -                  : switch to the previous namespace
+  kubens -h,--help          : show this message
+```
+
+
+### Usage
+
+```sh
+$ kubens kube-system
+Context "test" set.
+Active namespace is "kube-system".
+
+$ kubens -
+Context "test" set.
+Active namespace is "default".
+```
+
+`kubectx` also supports <kbd>Tab</kbd> completion, which helps with long context
+names.
+
+-----
 
 ## Installation
 

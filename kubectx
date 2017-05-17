@@ -21,6 +21,13 @@
 set -eou pipefail
 IFS=$'\n\t'
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+if [[ -f "${SCRIPT_DIR}/utils.bash" ]]; then
+  source "${SCRIPT_DIR}/utils.bash"
+else
+  source "${SCRIPT_DIR}/../include/utils.bash"
+fi
+
 KUBECTX="${HOME}/.kube/kubectx"
 
 usage() {
@@ -33,14 +40,6 @@ USAGE:
   kubectx -h,--help         : show this message
 EOF
   exit 1
-}
-
-current_context() {
-  kubectl config view -o=jsonpath='{.current-context}'
-}
-
-get_contexts() {
-  kubectl config get-contexts --output=name
 }
 
 list_contexts() {
@@ -88,7 +87,6 @@ set_context() {
 }
 
 swap_context() {
-  set -e
   local ctx="$(read_context)"
   if [[ -z "${ctx}" ]]; then
     echo "error: No previous context found." >&2
@@ -138,7 +136,8 @@ main() {
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
     elif [[ "${1}" =~ ^-(.*) ]]; then
-      echo "error: unrecognized flag" >&2; usage
+      echo "error: unrecognized flag \"${1}\"" >&2
+      usage
     elif [[ "${1}" =~ (.+)=(.+) ]]; then
       alias_context "${BASH_REMATCH[2]}" "${BASH_REMATCH[1]}"
     else

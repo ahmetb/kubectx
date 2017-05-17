@@ -1,0 +1,144 @@
+#!/bin/bash
+#
+# kubenx(1) is a utility to switch between Kubernetes namespaces.
+
+# Copyright 2017 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[[ -n $DEBUG ]] && set -x
+
+set -eou pipefail
+IFS=$'\n\t'
+
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+if [[ -f "${SCRIPT_DIR}/utils.bash" ]]; then
+  source "${SCRIPT_DIR}/utils.bash"
+else
+  source "${SCRIPT_DIR}/../include/utils.bash"
+fi
+
+KUBENS_DIR="${HOME}/.kube/kubens"
+
+usage() {
+  cat <<"EOF"
+USAGE:
+  kubens                    : list the namespaces in the current context
+  kubens <NAME>             : change the active namespace of current context
+  kubens -                  : switch to the previous namespace in this context
+  kubens -h,--help          : show this message
+EOF
+  exit 1
+}
+
+current_namespace() {
+  local cur_ctx=$(current_context)
+  ns="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")"
+  if [[ -z "${ns}" ]]; then
+    echo "default"
+  else
+    echo "${ns}"
+  fi
+}
+
+namespace_file() {
+  local ctx="${1}"
+  echo "${KUBENS_DIR}/${ctx}"
+}
+
+read_namespace() {
+  local f="$(namespace_file "${1}")"
+  [[ -f "${f}" ]] && cat "${f}"
+}
+
+save_namespace() {
+  mkdir -p "${KUBENS_DIR}"
+  local f="$(namespace_file "${1}")"
+  local saved="$(read_namespace "${1}")"
+
+  if [[ "${saved}" != "${2}" ]]; then
+    printf %s "${2}" > "${f}"
+  fi
+}
+
+switch_namespace() {
+  local ctx="${1}"
+  kubectl config set-context "${ctx}" --namespace="${2}"
+  echo "Active namespace is \"${2}\".">&2
+}
+
+set_namespace() {
+  local ctx="$(current_context)"
+  local prev="$(current_namespace)"
+
+  if grep -q ^"${1}"\$ <(get_namespaces); then
+    switch_namespace "${ctx}" "${1}"
+
+    if [[ "${prev}" != "${1}" ]]; then
+      save_namespace "${ctx}" "${prev}"
+    fi
+  else
+    echo "error: no namespace exists with name \"${1}\".">&2
+    exit 1
+  fi
+}
+
+list_namespaces() {
+  local cur="$(current_namespace)"
+
+  local yellow=$(tput setaf 3)
+  local darkbg=$(tput setab 0)
+  local normal=$(tput sgr0)
+
+  for c in $(get_namespaces); do
+    if [[ "${c}" = "${cur}" ]]; then
+      echo "${darkbg}${yellow}${c}${normal}"
+    else
+      echo "${c}"
+    fi
+  done
+}
+
+swap_namespace() {
+  local ctx="$(current_context)"
+  local ns="$(read_namespace "${ctx}")"
+  if [[ -z "${ns}" ]]; then
+    echo "error: No previous namespace found for current context." >&2
+    exit 1
+  fi
+  set_namespace "${ns}"
+}
+
+main() {
+  if [[ "$#" -eq 0 ]]; then
+    list_namespaces
+  elif [[ "$#" -eq 1 ]]; then
+    if [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
+      usage
+    elif [[ "${1}" == "-" ]]; then
+      swap_namespace
+    elif [[ "${1}" =~ ^-(.*) ]]; then
+      echo "error: unrecognized flag \"${1}\"" >&2
+      usage
+    elif [[ "${1}" =~ (.+)=(.+) ]]; then
+      alias_context "${BASH_REMATCH[2]}" "${BASH_REMATCH[1]}"
+    else
+      set_namespace "${1}"
+    fi
+  else
+    echo "error: too many flags" >&2
+    usage
+  fi
+}
+
+main "$@"
