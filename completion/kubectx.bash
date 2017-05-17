@@ -5,4 +5,4 @@ _kube_contexts()
   COMPREPLY=( $(compgen -W "- $(kubectl config get-contexts --output='name')" -- $curr_arg ) );
 }
 
-complete -F _kube_contexts kubectx
+complete -F _kube_contexts kubectx kctx

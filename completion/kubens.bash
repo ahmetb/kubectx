@@ -5,4 +5,4 @@ _kube_namespaces()
   COMPREPLY=( $(compgen -W "- $(kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}')" -- $curr_arg ) );
 }
 
-complete -F _kube_namespaces kubens
+complete -F _kube_namespaces kubens kns
