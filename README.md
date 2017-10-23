@@ -98,3 +98,9 @@ Running `brew install` with `--with-short-names` will install tools with names
 -----
 
 Disclaimer: This is not an official Google product.
+
+
+#### Stargazers over time
+
+[![Stargazers over time](https://starcharts.herokuapp.com/ahmetb/kubectx.svg)](https://starcharts.herokuapp.com/ahmetb/kubectx)
+
