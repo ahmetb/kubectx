@@ -1,6 +1,11 @@
-This repository provides both `kubectx` and `kubens` tools. Purpose of this
-project is to provide an utility and facilitate discussion about how `kubectl`
-can manage contexts better.
+This repository provides both `kubectx` and `kubens` tools.
+
+
+**`kubectx`** help you switch between clusters back and forth:
+![kubectx demo GIF](img/kubectx-demo.gif)
+
+**`kubens`** help you switch between Kubernetes namespaces smoothly:
+![kubens demo GIF](img/kubens-demo.gif)
 
 # kubectx(1)
 
@@ -14,9 +19,6 @@ USAGE:
   kubectx <NEW_NAME>=<NAME> : create alias for context
   kubectx -h,--help         : show this message
 ```
-
-Purpose of this project is to provide an utility and facilitate discussion
-about how `kubectl` can manage contexts better.
 
 ### Usage
 
