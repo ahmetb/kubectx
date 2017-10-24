@@ -39,6 +39,7 @@ USAGE:
   kubectx <NAME>            : switch to context
   kubectx -                 : switch to the previous context
   kubectx <NEW_NAME>=<NAME> : create alias for context
+  kubectx -c,--current      : get current context
   kubectx -h,--help         : show this message
 EOF
   exit 1
@@ -58,6 +59,10 @@ list_contexts() {
     echo "${c}"
   fi
   done
+}
+
+get_context() {
+  echo "$(current_context)"
 }
 
 read_context() {
@@ -135,6 +140,8 @@ main() {
   elif [[ "$#" -eq 1 ]]; then
     if [[ "${1}" == "-" ]]; then
       swap_context
+    elif [[ "${1}" == '-c' || "${1}" == '--current' ]]; then
+      get_context
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
     elif [[ "${1}" =~ ^-(.*) ]]; then
