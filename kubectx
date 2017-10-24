@@ -62,15 +62,7 @@ list_contexts() {
 }
 
 get_context() {
-  set -u pipefail
-  local cur="$(current_context)"
-
-  for c in $(get_contexts); do
-  if [[ "${c}" = "${cur}" ]]; then
-    echo "${c}"
-    break
-  fi
-  done
+  echo "$(current_context)"
 }
 
 read_context() {
