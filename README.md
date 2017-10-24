@@ -12,6 +12,7 @@ USAGE:
   kubectx <NAME>            : switch to context
   kubectx -                 : switch to the previous context
   kubectx <NEW_NAME>=<NAME> : create alias for context
+  kubectx -c,--current      : get current context
   kubectx -h,--help         : show this message
 ```
 
@@ -33,6 +34,9 @@ Switched to context "minikube".
 $ kubectx dublin=gke_ahmetb_europe-west1-b_dublin
 Context "dublin" set.
 Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
+
+$ kubectx -c
+dublin
 ```
 
 `kubectx` supports <kbd>Tab</kbd> completion on bash/zsh shells to help with 
