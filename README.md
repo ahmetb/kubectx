@@ -14,9 +14,9 @@ kubectx is an utility to manage and switch between kubectl(1) contexts.
 ```
 USAGE:
   kubectx                   : list the contexts
-  kubectx <NAME>            : switch to context
+  kubectx <NAME>            : switch to context <NAME>
   kubectx -                 : switch to the previous context
-  kubectx <NEW_NAME>=<NAME> : create alias for context
+  kubectx <NEW_NAME>=<NAME> : rename context <NAME> to <NEW_NAME>
   kubectx -h,--help         : show this message
 ```
 
