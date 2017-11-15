@@ -103,8 +103,10 @@ Since `kubectx`/`kubens` are written in Bash, they can run in shells that suppor
 
 -----
 
-| User Testimonials |
-| ----------------- |
+#### User Testimonials 
+
+| What are others saying about kubectx? | 
+| ---- |
 | _“Thank you for kubectx & kubens - I use them all the time & have them in my k8s toolset to maintain happiness :) ”_ – [@pbouwer](https://twitter.com/pbouwer/status/925896377929949184) |
 | _“I can't imagine working without kubectx and especially kubens anymore. It's pure gold.”_ – [@timoreimann](https://twitter.com/timoreimann/status/925801946757419008) |
 | _“I'm liking kubectx from @ahmetb, makes it super-easy to switch #Kubernetes contexts [...]”_ &mdash; [@lizrice](https://twitter.com/lizrice/status/928556415517589505) | 
