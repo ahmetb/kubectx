@@ -92,10 +92,14 @@ Running `brew install` with `--with-short-names` will install tools with names
 
 **Other platforms:**
 
-- Download the `kubectx` script
-- Add it somewhere in your PATH
-- Make it executable (`chmod +x`)
-- You can also install bash/zsh [completion scripts](completion/) manually.
+Since `kubectx`/`kubens` are written in Bash, they can run in shells that support POSIX standards.
+
+- Download the `kubectx`, `kubens` and `utils.bash` scripts
+- Either:
+  - save them all to soemwhere in your `PATH`,
+  - or save them to a directory, then create symlinks to `kubectx`/`kubens` from somewhere in your `PATH`, like `/usr/local/bin`
+- Make `kubectx` and `kubens` executable (`chmod +x ...`)
+- You’re on your own to install bash/zsh [completion scripts](completion/) manually.
 
 -----
 
