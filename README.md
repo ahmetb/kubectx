@@ -103,7 +103,7 @@ Since `kubectx`/`kubens` are written in Bash, they can run in shells that suppor
 
 -----
 
-#### User Testimonials 
+####  Users
 
 | What are others saying about kubectx? | 
 | ---- |
