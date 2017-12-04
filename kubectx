@@ -36,6 +36,7 @@ usage() {
   cat <<"EOF"
 USAGE:
   kubectx                   : list the contexts
+  kubectx -nc               : list the contexts without colors
   kubectx <NAME>            : switch to context <NAME>
   kubectx -                 : switch to the previous context
   kubectx <NEW_NAME>=<NAME> : rename context <NAME> to <NEW_NAME>
@@ -45,6 +46,7 @@ EOF
 }
 
 list_contexts() {
+  color=$1; shift
   set -u pipefail
   local cur="$(current_context)"
   local yellow=$(tput setaf 3)
@@ -53,7 +55,11 @@ list_contexts() {
 
   for c in $(get_contexts); do
   if [[ "${c}" = "${cur}" ]]; then
-    echo "${darkbg}${yellow}${c}${normal}"
+    if [ "${colors}" = true ]; then
+      echo "${darkbg}${yellow}${c}${normal}"
+    else
+      echo "${c}"
+    fi
   else
     echo "${c}"
   fi
@@ -124,7 +130,8 @@ rename_context() {
 
 main() {
   if [[ "$#" -eq 0 ]]; then
-    list_contexts
+    colors=true
+    list_contexts $colors
   elif [[ "$#" -gt 1 ]]; then
     echo "error: too many flags" >&2
     usage
@@ -133,6 +140,9 @@ main() {
       swap_context
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
+    elif [[ "${1}" == "-nc" ]]; then
+      colors=false
+      list_contexts $colors
     elif [[ "${1}" =~ ^-(.*) ]]; then
       echo "error: unrecognized flag \"${1}\"" >&2
       usage
