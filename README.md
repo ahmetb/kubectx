@@ -96,7 +96,7 @@ Since `kubectx`/`kubens` are written in Bash, they can run in shells that suppor
 
 - Download the `kubectx`, `kubens` and `utils.bash` scripts
 - Either:
-  - save them all to soemwhere in your `PATH`,
+  - save them all to somewhere in your `PATH`,
   - or save them to a directory, then create symlinks to `kubectx`/`kubens` from somewhere in your `PATH`, like `/usr/local/bin`
 - Make `kubectx` and `kubens` executable (`chmod +x ...`)
 - You’re on your own to install bash/zsh [completion scripts](completion/) manually.
