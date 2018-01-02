@@ -77,18 +77,21 @@ Active namespace is "default".
 
 :tada: kubectx is now in Homebrew! :confetti_ball:
 
-> Use the [Homebrew](https://brew.sh/) package manager:
->
->     brew install kubectx
->
-> this will also set up bash/zsh completion scripts automatically.
+Use the [Homebrew](https://brew.sh/) package manager:
 
-Running `brew install` with `--with-short-names` will install tools with names
-`kctx` and `kns` to prevent prefix collision with `kubectl` name.
+    brew install kubectx
+    
+This command will set up bash/zsh completion scripts automatically.
 
-> Note: If you installed kubectx before it was accepted to Homebrew core
+> **Note:** Running `brew install` with `--with-short-names` will install tools with names
+> `kctx` and `kns` to prevent prefix collision with `kubectl` name.
+
+> **Note:** If you installed kubectx before it was accepted to Homebrew core
 > repository, reinstall with:
 > `brew untap ahmetb/kubectx && brew uninstall --force kubectx && brew update && brew install kubectx`
+
+> **Note:** If you like to add context/namespace info to your shell prompt (`$PS1`),
+> try out [kube-ps1](https://github.com/jonmosco/kube-ps1).
 
 **Other platforms:**
 
