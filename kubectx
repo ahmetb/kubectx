@@ -38,7 +38,6 @@ USAGE:
   kubectx                   : list the contexts
   kubectx <NAME>            : switch to context <NAME>
   kubectx -                 : switch to the previous context
-  kubectx -p,--pipe         : disable colors, usefull when piping commands 
   kubectx <NEW_NAME>=<NAME> : rename context <NAME> to <NEW_NAME>
   kubectx -h,--help         : show this message
 EOF
