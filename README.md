@@ -73,36 +73,33 @@ Active namespace is "default".
 
 ## Installation
 
-**For macOS:**
+**For macOS:** :tada: kubectx is now in Homebrew! 
 
-:tada: kubectx is now in Homebrew! :confetti_ball:
-
-Use the [Homebrew](https://brew.sh/) package manager:
+:confetti_ball: Use the [Homebrew](https://brew.sh/) package manager:
 
     brew install kubectx
     
 This command will set up bash/zsh completion scripts automatically.
 
-> **Note:** Running `brew install` with `--with-short-names` will install tools with names
-> `kctx` and `kns` to prevent prefix collision with `kubectl` name.
 
-> **Note:** If you installed kubectx before it was accepted to Homebrew core
-> repository, reinstall with:
-> `brew untap ahmetb/kubectx && brew uninstall --force kubectx && brew update && brew install kubectx`
+- Running `brew install` with `--with-short-names` will install tools with names
+`kctx` and `kns` to prevent prefix collision with `kubectl` name.
 
-> **Note:** If you like to add context/namespace info to your shell prompt (`$PS1`),
-> try out [kube-ps1](https://github.com/jonmosco/kube-ps1).
+- If you like to add context/namespace info to your shell prompt (`$PS1`),
+  I recommend trying out [kube-ps1](https://github.com/jonmosco/kube-ps1).
 
 **Other platforms:**
 
-Since `kubectx`/`kubens` are written in Bash, they can run in shells that support POSIX standards.
+Since `kubectx`/`kubens` are written in Bash, you should be able to instal
+them to any POSIX environment that has Bash installed.
 
-- Download the `kubectx`, `kubens` and `utils.bash` scripts
+- Download the `kubectx`, `kubens` and `utils.bash` scripts.
 - Either:
   - save them all to somewhere in your `PATH`,
-  - or save them to a directory, then create symlinks to `kubectx`/`kubens` from somewhere in your `PATH`, like `/usr/local/bin`
+  - or save them to a directory, then create symlinks to `kubectx`/`kubens` from
+    somewhere in your `PATH`, like `/usr/local/bin`
 - Make `kubectx` and `kubens` executable (`chmod +x ...`)
-- You’re on your own to install bash/zsh [completion scripts](completion/) manually.
+- Figure out how to install bash/zsh [completion scripts](completion/).
 
 -----
 
