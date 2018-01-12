@@ -73,7 +73,7 @@ Active namespace is "default".
 
 ## Installation
 
-**For macOS:** :tada: kubectx is now in Homebrew! 
+**macOS:**
 
 :confetti_ball: Use the [Homebrew](https://brew.sh/) package manager:
 
@@ -88,7 +88,7 @@ This command will set up bash/zsh completion scripts automatically.
 - If you like to add context/namespace info to your shell prompt (`$PS1`),
   I recommend trying out [kube-ps1](https://github.com/jonmosco/kube-ps1).
 
-**Other platforms:**
+**Linux:**
 
 Since `kubectx`/`kubens` are written in Bash, you should be able to instal
 them to any POSIX environment that has Bash installed.
