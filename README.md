@@ -37,7 +37,7 @@ Context "dublin" set.
 Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
 ```
 
-`kubectx` supports <kbd>Tab</kbd> completion on bash/zsh shells to help with 
+`kubectx` supports <kbd>Tab</kbd> completion on bash/zsh/fish shells to help with 
 long context names. You don't have to remember full context names anymore.
 
 -----
@@ -67,7 +67,7 @@ Context "test" set.
 Active namespace is "default".
 ```
 
-`kubens` also supports <kbd>Tab</kbd> completion on bash/zsh shells.
+`kubens` also supports <kbd>Tab</kbd> completion on bash/zsh/fish shells.
 
 -----
 
@@ -79,7 +79,7 @@ Active namespace is "default".
 
     brew install kubectx
     
-This command will set up bash/zsh completion scripts automatically.
+This command will set up bash/zsh/fish completion scripts automatically.
 
 
 - Running `brew install` with `--with-short-names` will install tools with names
@@ -99,7 +99,7 @@ them to any POSIX environment that has Bash installed.
   - or save them to a directory, then create symlinks to `kubectx`/`kubens` from
     somewhere in your `PATH`, like `/usr/local/bin`
 - Make `kubectx` and `kubens` executable (`chmod +x ...`)
-- Figure out how to install bash/zsh [completion scripts](completion/).
+- Figure out how to install bash/zsh/fish [completion scripts](completion/).
 
 -----
 
