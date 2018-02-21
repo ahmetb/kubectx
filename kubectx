@@ -38,6 +38,7 @@ USAGE:
   kubectx                   : list the contexts
   kubectx <NAME>            : switch to context <NAME>
   kubectx -                 : switch to the previous context
+  kubectx -c                : show current context
   kubectx <NEW_NAME>=<NAME> : rename context <NAME> to <NEW_NAME>
   kubectx -h,--help         : show this message
 EOF
@@ -133,6 +134,8 @@ main() {
       swap_context
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
+    elif [[ "${1}" == '-c' ]]; then
+      current_context
     elif [[ "${1}" =~ ^-(.*) ]]; then
       echo "error: unrecognized flag \"${1}\"" >&2
       usage
