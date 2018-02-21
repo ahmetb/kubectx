@@ -98,9 +98,12 @@ set_namespace() {
 list_namespaces() {
   local cur="$(current_namespace)"
 
-  local yellow=$(tput setaf 3)
-  local darkbg=$(tput setab 0)
-  local normal=$(tput sgr0)
+  local yellow darkbg normal
+  if [[ -t 1 ]]; then
+    yellow=$(tput setaf 3)
+    darkbg=$(tput setab 0)
+    normal=$(tput sgr0)
+  fi
 
   for c in $(get_namespaces); do
     if [[ "${c}" = "${cur}" ]]; then
