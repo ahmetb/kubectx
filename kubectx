@@ -21,15 +21,6 @@
 set -eou pipefail
 IFS=$'\n\t'
 
-SCRIPT_DIR="$(dirname "$( readlink -f "${0}" 2>/dev/null || \
-  python -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "${0}" )")"
-
-if [[ -f "${SCRIPT_DIR}/utils.bash" ]]; then
-  source "${SCRIPT_DIR}/utils.bash"
-else
-  source "${SCRIPT_DIR}/../include/utils.bash"
-fi
-
 KUBECTX="${HOME}/.kube/kubectx"
 
 usage() {
@@ -42,6 +33,14 @@ USAGE:
   kubectx -h,--help         : show this message
 EOF
   exit 1
+}
+
+current_context() {
+  kubectl config view -o=jsonpath='{.current-context}'
+}
+
+get_contexts() {
+  kubectl config get-contexts -o=name | sort -n
 }
 
 list_contexts() {
