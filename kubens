@@ -21,15 +21,6 @@
 set -eou pipefail
 IFS=$'\n\t'
 
-SCRIPT_DIR="$(dirname "$( readlink -f "${0}" 2>/dev/null || \
-  python -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "${0}" )")"
-
-if [[ -f "${SCRIPT_DIR}/utils.bash" ]]; then
-  source "${SCRIPT_DIR}/utils.bash"
-else
-  source "${SCRIPT_DIR}/../include/utils.bash"
-fi
-
 KUBENS_DIR="${HOME}/.kube/kubens"
 
 usage() {
@@ -51,6 +42,14 @@ current_namespace() {
   else
     echo "${ns}"
   fi
+}
+
+current_context() {
+  kubectl config view -o=jsonpath='{.current-context}'
+}
+
+get_namespaces() {
+  kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
 }
 
 namespace_file() {

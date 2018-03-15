@@ -37,7 +37,7 @@ Context "dublin" set.
 Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
 ```
 
-`kubectx` supports <kbd>Tab</kbd> completion on bash/zsh/fish shells to help with 
+`kubectx` supports <kbd>Tab</kbd> completion on bash/zsh/fish shells to help with
 long context names. You don't have to remember full context names anymore.
 
 -----
@@ -78,7 +78,7 @@ Active namespace is "default".
 :confetti_ball: Use the [Homebrew](https://brew.sh/) package manager:
 
     brew install kubectx
-    
+
 This command will set up bash/zsh/fish completion scripts automatically.
 
 
@@ -93,7 +93,7 @@ This command will set up bash/zsh/fish completion scripts automatically.
 Since `kubectx`/`kubens` are written in Bash, you should be able to instal
 them to any POSIX environment that has Bash installed.
 
-- Download the `kubectx`, `kubens` and `utils.bash` scripts.
+- Download the `kubectx`, and `kubens` scripts.
 - Either:
   - save them all to somewhere in your `PATH`,
   - or save them to a directory, then create symlinks to `kubectx`/`kubens` from
@@ -105,11 +105,11 @@ them to any POSIX environment that has Bash installed.
 
 ####  Users
 
-| What are others saying about kubectx? | 
+| What are others saying about kubectx? |
 | ---- |
 | _“Thank you for kubectx & kubens - I use them all the time & have them in my k8s toolset to maintain happiness :) ”_ – [@pbouwer](https://twitter.com/pbouwer/status/925896377929949184) |
 | _“I can't imagine working without kubectx and especially kubens anymore. It's pure gold.”_ – [@timoreimann](https://twitter.com/timoreimann/status/925801946757419008) |
-| _“I'm liking kubectx from @ahmetb, makes it super-easy to switch #Kubernetes contexts [...]”_ &mdash; [@lizrice](https://twitter.com/lizrice/status/928556415517589505) | 
+| _“I'm liking kubectx from @ahmetb, makes it super-easy to switch #Kubernetes contexts [...]”_ &mdash; [@lizrice](https://twitter.com/lizrice/status/928556415517589505) |
 | _“Also using it on a daily basis. This and my zsh config that shows me the current k8s context 😉”_ – [@puja108](https://twitter.com/puja108/status/928742521139810305) |
 | _“Lately I've found myself using the kubens command more than kubectx. Both very useful though :-)”_ – [@stuartleeks](https://twitter.com/stuartleeks/status/928562850464907264) |
 | _“yeah kubens rocks!”_ – [@embano1](https://twitter.com/embano1/status/928698440732815360) |
