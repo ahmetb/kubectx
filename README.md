@@ -101,6 +101,14 @@ them to any POSIX environment that has Bash installed.
 - Make `kubectx` and `kubens` executable (`chmod +x ...`)
 - Figure out how to install bash/zsh/fish [completion scripts](completion/).
 
+Example installation steps:
+
+``` bash
+sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
+sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
+sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+```
+
 -----
 
 ####  Users
