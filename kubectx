@@ -45,10 +45,13 @@ get_contexts() {
 
 list_contexts() {
   set -u pipefail
-  local cur="$(current_context)"
-  local yellow=$(tput setaf 3)
-  local darkbg=$(tput setab 0)
-  local normal=$(tput sgr0)
+  local cur
+  cur="$(current_context)"
+
+  local yellow darkbg normal
+  yellow=$(tput setaf 3)
+  darkbg=$(tput setab 0)
+  normal=$(tput sgr0)
 
   for c in $(get_contexts); do
   if [[ "${c}" = "${cur}" ]]; then
@@ -66,7 +69,8 @@ read_context() {
 }
 
 save_context() {
-  local saved="$(read_context)"
+  local saved
+  saved="$(read_context)"
 
   if [[ "${saved}" != "${1}" ]]; then
     printf %s "${1}" > "${KUBECTX}"
@@ -78,7 +82,8 @@ switch_context() {
 }
 
 set_context() {
-  local prev="$(current_context)"
+  local prev
+  prev="$(current_context)"
 
   switch_context "${1}"
 
@@ -88,7 +93,8 @@ set_context() {
 }
 
 swap_context() {
-  local ctx="$(read_context)"
+  local ctx
+  ctx="$(read_context)"
   if [[ -z "${ctx}" ]]; then
     echo "error: No previous context found." >&2
     exit 1
@@ -110,8 +116,9 @@ rename_context() {
   local old_name="${1}"
   local new_name="${2}"
 
-  local old_user="$(user_of_context "${old_name}")"
-  local old_cluster="$(cluster_of_context "${old_name}")"
+  local old_user old_cluster
+  old_user="$(user_of_context "${old_name}")"
+  old_cluster="$(cluster_of_context "${old_name}")"
 
   if [[ -z "$old_user" || -z "$old_cluster" ]]; then
     echo "error: Cannot retrieve context ${old_name}."  >&2

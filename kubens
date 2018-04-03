@@ -35,7 +35,8 @@ EOF
 }
 
 current_namespace() {
-  local cur_ctx=$(current_context)
+  local cur_ctx
+  cur_ctx="$(current_context)"
   ns="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")"
   if [[ -z "${ns}" ]]; then
     echo "default"
@@ -58,14 +59,16 @@ namespace_file() {
 }
 
 read_namespace() {
-  local f="$(namespace_file "${1}")"
+  local f
+  f="$(namespace_file "${1}")"
   [[ -f "${f}" ]] && cat "${f}"
 }
 
 save_namespace() {
   mkdir -p "${KUBENS_DIR}"
-  local f="$(namespace_file "${1}")"
-  local saved="$(read_namespace "${1}")"
+  local f saved
+  f="$(namespace_file "${1}")"
+  saved="$(read_namespace "${1}")"
 
   if [[ "${saved}" != "${2}" ]]; then
     printf %s "${2}" > "${f}"
@@ -79,8 +82,9 @@ switch_namespace() {
 }
 
 set_namespace() {
-  local ctx="$(current_context)"
-  local prev="$(current_namespace)"
+  local ctx prev
+  ctx="$(current_context)"
+  prev="$(current_namespace)"
 
   if grep -q ^"${1}"\$ <(get_namespaces); then
     switch_namespace "${ctx}" "${1}"
@@ -95,13 +99,15 @@ set_namespace() {
 }
 
 list_namespaces() {
-  local cur="$(current_namespace)"
+  local yellow darkbg normal
+  yellow=$(tput setaf 3)
+  darkbg=$(tput setab 0)
+  normal=$(tput sgr0)
 
-  local yellow=$(tput setaf 3)
-  local darkbg=$(tput setab 0)
-  local normal=$(tput sgr0)
-
-  for c in $(get_namespaces); do
+  local cur ns_list
+  cur="$(current_namespace)"
+  ns_list=$(get_namespaces)
+  for c in $ns_list; do
     if [[ "${c}" = "${cur}" ]]; then
       echo "${darkbg}${yellow}${c}${normal}"
     else
@@ -111,8 +117,9 @@ list_namespaces() {
 }
 
 swap_namespace() {
-  local ctx="$(current_context)"
-  local ns="$(read_namespace "${ctx}")"
+  local ctx ns
+  ctx="$(current_context)"
+  ns="$(read_namespace "${ctx}")"
   if [[ -z "${ns}" ]]; then
     echo "error: No previous namespace found for current context." >&2
     exit 1
