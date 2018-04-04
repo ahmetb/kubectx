@@ -17,6 +17,7 @@ USAGE:
   kubectx <NAME>            : switch to context <NAME>
   kubectx -                 : switch to the previous context
   kubectx <NEW_NAME>=<NAME> : rename context <NAME> to <NEW_NAME>
+  kubectx <NEW_NAME>=.      : rename current-context to <NEW_NAME>
   kubectx -h,--help         : show this message
 ```
 
