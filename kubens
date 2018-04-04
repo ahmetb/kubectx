@@ -53,8 +53,12 @@ get_namespaces() {
   kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
 }
 
+escape_context_name() {
+  echo "${1//\//-}"
+}
+
 namespace_file() {
-  local ctx="${1}"
+  local ctx="$(escape_context_name "${1}")"
   echo "${KUBENS_DIR}/${ctx}"
 }
 
@@ -62,6 +66,7 @@ read_namespace() {
   local f
   f="$(namespace_file "${1}")"
   [[ -f "${f}" ]] && cat "${f}"
+  return 0
 }
 
 save_namespace() {
