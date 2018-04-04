@@ -31,6 +31,10 @@ USAGE:
   kubectx -                 : switch to the previous context
   kubectx <NEW_NAME>=<NAME> : rename context <NAME> to <NEW_NAME>
   kubectx <NEW_NAME>=.      : rename current-context to <NEW_NAME>
+  kubectx -d <NAME>         : delete context <NAME> ('.' for current-context)
+                              (this command won't delete the user/cluster entry
+                              that is used by the context)
+
   kubectx -h,--help         : show this message
 EOF
   exit 1
@@ -137,18 +141,37 @@ rename_context() {
   fi
 
   if context_exists "${new_name}"; then
-    echo "Context \"${new_name}\" exists, deleting." >&2
+    echo "Context \"${new_name}\" exists, deleting..." >&2
     kubectl config delete-context "${new_name}" 1>/dev/null 2>&1
   fi
 
   kubectl config rename-context "${old_name}" "${new_name}"
 }
 
+delete_context() {
+  local ctx
+  ctx="${1}"
+  if [[ "${ctx}" == "." ]]; then
+    ctx="$(current_context)"
+  fi
+  echo "Deleting context \"${ctx}\"..." >&2
+  kubectl config delete-context "${ctx}"
+}
+
 main() {
   if [[ "$#" -eq 0 ]]; then
     list_contexts
+  elif [[ "${1}" == "-d" ]]; then
+    if [[ "$#" -lt 2 ]]; then
+      echo "error: missing context NAME" >&2
+      usage
+    elif [[ "$#" -gt 2 ]]; then
+      echo "error: too many arguments" >&2
+      usage
+    fi
+    delete_context "${2}"
   elif [[ "$#" -gt 1 ]]; then
-    echo "error: too many flags" >&2
+    echo "error: too many arguments" >&2
     usage
   elif [[ "$#" -eq 1 ]]; then
     if [[ "${1}" == "-" ]]; then
