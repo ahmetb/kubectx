@@ -1,10 +1,10 @@
 This repository provides both `kubectx` and `kubens` tools.
 
 
-**`kubectx`** help you switch between clusters back and forth:
+**`kubectx`** helps you switch between clusters back and forth:
 ![kubectx demo GIF](img/kubectx-demo.gif)
 
-**`kubens`** help you switch between Kubernetes namespaces smoothly:
+**`kubens`** helps you switch between Kubernetes namespaces smoothly:
 ![kubens demo GIF](img/kubens-demo.gif)
 
 # kubectx(1)
@@ -18,7 +18,9 @@ USAGE:
   kubectx -                 : switch to the previous context
   kubectx <NEW_NAME>=<NAME> : rename context <NAME> to <NEW_NAME>
   kubectx <NEW_NAME>=.      : rename current-context to <NEW_NAME>
-  kubectx -h,--help         : show this message
+  kubectx -d <NAME>         : delete context <NAME> ('.' for current-context)
+                              (this command won't delete the user/cluster entry
+                              that is used by the context)
 ```
 
 ### Usage
@@ -52,7 +54,6 @@ USAGE:
   kubens                    : list the namespaces
   kubens <NAME>             : change the active namespace
   kubens -                  : switch to the previous namespace
-  kubens -h,--help          : show this message
 ```
 
 
