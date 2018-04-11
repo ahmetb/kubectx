@@ -113,7 +113,7 @@ list_namespaces() {
   cur="$(current_namespace)"
   ns_list=$(get_namespaces)
   for c in $ns_list; do
-    if [[ "${c}" = "${cur}" ]]; then
+    if [[ -t 1 && "${c}" = "${cur}" ]]; then
       echo "${darkbg}${yellow}${c}${normal}"
     else
       echo "${c}"
