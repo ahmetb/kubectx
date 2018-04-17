@@ -59,7 +59,7 @@ list_contexts() {
   normal=$(tput sgr0)
 
   for c in $(get_contexts); do
-  if [[ "${c}" = "${cur}" ]]; then
+  if [[ -t 1 && "${c}" = "${cur}" ]]; then
     echo "${darkbg}${yellow}${c}${normal}"
   else
     echo "${c}"
