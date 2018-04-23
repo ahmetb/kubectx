@@ -29,6 +29,7 @@ USAGE:
   kubectx                   : list the contexts
   kubectx <NAME>            : switch to context <NAME>
   kubectx -                 : switch to the previous context
+  kubectx -c,--current      : show the current context
   kubectx <NEW_NAME>=<NAME> : rename context <NAME> to <NEW_NAME>
   kubectx <NEW_NAME>=.      : rename current-context to <NEW_NAME>
   kubectx -d <NAME>         : delete context <NAME> ('.' for current-context)
@@ -176,6 +177,8 @@ main() {
   elif [[ "$#" -eq 1 ]]; then
     if [[ "${1}" == "-" ]]; then
       swap_context
+    elif [[ "${1}" == '-c' || "${1}" == '--current' ]]; then
+      current_context
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
     elif [[ "${1}" =~ ^-(.*) ]]; then
