@@ -75,7 +75,7 @@ Active namespace is "default".
 
 ## Installation
 
-**macOS:**
+### macOS
 
 :confetti_ball: Use the [Homebrew](https://brew.sh/) package manager:
 
@@ -90,7 +90,7 @@ This command will set up bash/zsh/fish completion scripts automatically.
 - If you like to add context/namespace info to your shell prompt (`$PS1`),
   I recommend trying out [kube-ps1](https://github.com/jonmosco/kube-ps1).
 
-**Linux:**
+### Linux
 
 Since `kubectx`/`kubens` are written in Bash, you should be able to instal
 them to any POSIX environment that has Bash installed.
@@ -110,6 +110,9 @@ sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
 sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
 sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
 ```
+#### Arch 
+
+An unofficial [AUR package](https://aur.archlinux.org/packages/kubectx) `kubectx` is available. Install instructions can be found on the [Arch wiki](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_packages).
 
 -----
 
