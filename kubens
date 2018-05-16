@@ -132,6 +132,12 @@ swap_namespace() {
   set_namespace "${ns}"
 }
 
+create_namespace() {
+    local namespace="$1"
+    kubectl create namespace "$namespace"
+    set_namespace "$namespace"
+}
+
 main() {
   if [[ "$#" -eq 0 ]]; then
     list_namespaces
@@ -148,6 +154,8 @@ main() {
     else
       set_namespace "${1}"
     fi
+  elif [[ "$#" -eq 2 ]] && [[ "$1" == "-c" ]]; then
+    create_namespace "$2"
   else
     echo "error: too many flags" >&2
     usage
