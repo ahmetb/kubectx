@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # kubenx(1) is a utility to switch between Kubernetes namespaces.
 

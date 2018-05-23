@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # kubectx(1) is a utility to manage and switch between kubectl contexts.
 
