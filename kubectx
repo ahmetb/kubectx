@@ -26,14 +26,14 @@ KUBECTX="${HOME}/.kube/kubectx"
 usage() {
   cat <<"EOF"
 USAGE:
-  kubectx                   : list the contexts
-  kubectx <NAME>            : switch to context <NAME>
-  kubectx -                 : switch to the previous context
-  kubectx <NEW_NAME>=<NAME> : rename context <NAME> to <NEW_NAME>
-  kubectx <NEW_NAME>=.      : rename current-context to <NEW_NAME>
-  kubectx -d <NAME>         : delete context <NAME> ('.' for current-context)
-                              (this command won't delete the user/cluster entry
-                              that is used by the context)
+  kubectx                       : list the contexts
+  kubectx <NAME>                : switch to context <NAME>
+  kubectx -                     : switch to the previous context
+  kubectx <NEW_NAME>=<NAME>     : rename context <NAME> to <NEW_NAME>
+  kubectx <NEW_NAME>=.          : rename current-context to <NEW_NAME>
+  kubectx -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
+                                  (this command won't delete the user/cluster entry
+                                  that is used by the context)
 
   kubectx -h,--help         : show this message
 EOF
@@ -148,6 +148,13 @@ rename_context() {
   kubectl config rename-context "${old_name}" "${new_name}"
 }
 
+delete_contexts() {
+  IFS=' ' read -ra CTXS <<< "${1}"
+  for i in "${CTXS[@]}"; do
+    delete_context "${i}"
+  done
+}
+
 delete_context() {
   local ctx
   ctx="${1}"
@@ -165,11 +172,8 @@ main() {
     if [[ "$#" -lt 2 ]]; then
       echo "error: missing context NAME" >&2
       usage
-    elif [[ "$#" -gt 2 ]]; then
-      echo "error: too many arguments" >&2
-      usage
     fi
-    delete_context "${2}"
+    delete_contexts "${@:2}"
   elif [[ "$#" -gt 1 ]]; then
     echo "error: too many arguments" >&2
     usage
