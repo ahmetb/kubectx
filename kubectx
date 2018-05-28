@@ -60,7 +60,7 @@ list_contexts() {
 
   for c in $(get_contexts); do
   if [[ -t 1 && "${c}" = "${cur}" ]]; then
-    echo "${darkbg}${yellow}${c}${normal}"
+    echo "* ${darkbg}${yellow}${c}${normal}"
   else
     echo "${c}"
   fi
