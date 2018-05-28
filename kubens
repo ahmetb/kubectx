@@ -114,7 +114,7 @@ list_namespaces() {
   ns_list=$(get_namespaces)
   for c in $ns_list; do
     if [[ -t 1 && "${c}" = "${cur}" ]]; then
-      echo "${darkbg}${yellow}${c}${normal}"
+      echo "* ${darkbg}${yellow}${c}${normal}"
     else
       echo "${c}"
     fi
