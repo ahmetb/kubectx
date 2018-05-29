@@ -73,6 +73,21 @@ Active namespace is "default".
 
 -----
 
+### Highlight Current Context
+By default, current context is highlighted by yellow foreground & black background
+
+It is configurable by setting environment variables `KUBECTX_CURRENT_FGCOLOR` & `KUBECTX_CURRENT_BGCOLOR`
+
+To change foreground colour to Blue for highlighting current context:
+
+`export KUBECTX_CURRENT_FGCOLOR=$(tput setaf 6)`
+
+To change background colour to White for highlighting current context:
+
+`export KUBECTX_CURRENT_FGCOLOR=$(tput setaf 7)`
+
+Refer color codes [here](https://linux.101hacks.com/ps1-examples/prompt-color-using-tput/)
+
 ## Installation
 
 ### macOS
