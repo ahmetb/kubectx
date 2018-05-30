@@ -54,6 +54,7 @@ USAGE:
   kubens                    : list the namespaces
   kubens <NAME>             : change the active namespace
   kubens -                  : switch to the previous namespace
+  kubens -c,--current       : show the current namespace
 ```
 
 
