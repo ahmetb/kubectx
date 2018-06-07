@@ -34,6 +34,7 @@ USAGE:
   kubectx -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
                                   (this command won't delete the user/cluster entry
                                   that is used by the context)
+  kubectx -i <PATH> [<PATH...>] : import a kubeconfig file into the current kubeconfig
 
   kubectx -h,--help         : show this message
 EOF
@@ -84,6 +85,63 @@ save_context() {
 
 switch_context() {
   kubectl config use-context "${1}"
+}
+
+import_configs() {
+  for i in "$(echo "${1}" | tr ' ' '\n' | xargs realpath | sort | uniq)"; do
+    echo "Importing kubeconfig from $i:" >&2
+    import_config "${i}"
+  done
+}
+
+import_config() {
+  local cfg
+  cfg="${1}"
+
+  set +e
+  # get contexts that need to be renamed
+  local duplicate_names
+  duplicate_names="$(grep -Fxf <(kubectl config get-contexts -o name | sort) <(kubectl --kubeconfig "${cfg}" config get-contexts -o name | sort))"
+
+  # names that don't collide
+  local good_names
+  good_names="$(diff --changed-group-format='%>' --unchanged-group-format='' <(kubectl config get-contexts -o name | sort) <(kubectl --kubeconfig "${cfg}" config get-contexts -o name | sort))"
+  set -e
+
+
+  # in case of a collision, use this prefix
+  local prefix
+  prefix="$(basename "${cfg}")-$(sha256sum < "${cfg}" | head -c 12)-"
+
+  # don't touch the original config file, copy to temp location
+  local tmpfile
+  tmpfile="$(mktemp)"
+  cp "${cfg}" "${tmpfile}"
+
+  # rename contexts in the the new location
+  for name in `echo ${duplicate_names}`; do
+    local new_name="${prefix}${name}"
+    KUBECONFIG="${tmpfile}" kubectl config rename-context "${name}" "${new_name}" &> /dev/null
+    good_names="${good_names}\n${new_name}"
+  done
+
+  local dest
+  dest="$(mktemp)"
+
+  # merge the user's config + the new config
+  KUBECONFIG="${KUBECONFIG:-$HOME/.kube/config}"
+  # create .kube dir if this is the first ever invocation
+  mkdir -p $HOME/.kube &> /dev/null
+  KUBECONFIG=${KUBECONFIG}:${tmpfile} kubectl config view --flatten > "${dest}"
+
+  # replace user's config
+  cp "${dest}" ${KUBECONFIG}
+
+  # cleanup
+  rm -fr "${tmpfile}" "${dest}"
+
+  # show list of newly imported contexts
+  echo -e "${good_names}" | sed '/^$/d' | sed 's/^/  + /'
 }
 
 set_context() {
@@ -174,6 +232,12 @@ main() {
       usage
     fi
     delete_contexts "${@:2}"
+  elif [[ "${1}" == "-i" ]]; then
+    if [[ "$#" -lt 2 ]]; then
+      echo "error: missing PATH to kubeconfig" >&2
+      usage
+    fi
+    import_configs "${@:2}"
   elif [[ "$#" -gt 1 ]]; then
     echo "error: too many arguments" >&2
     usage
