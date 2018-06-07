@@ -73,21 +73,6 @@ Active namespace is "default".
 
 -----
 
-### Highlight Current Context
-By default, current context is highlighted by yellow foreground & black background
-
-It is configurable by setting environment variables `KUBECTX_CURRENT_FGCOLOR` & `KUBECTX_CURRENT_BGCOLOR`
-
-To change foreground colour to Blue for highlighting current context:
-
-`export KUBECTX_CURRENT_FGCOLOR=$(tput setaf 6)`
-
-To change background colour to White for highlighting current context:
-
-`export KUBECTX_CURRENT_FGCOLOR=$(tput setaf 7)`
-
-Refer color codes [here](https://linux.101hacks.com/ps1-examples/prompt-color-using-tput/)
-
 ## Installation
 
 ### macOS
@@ -130,6 +115,19 @@ sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
 An unofficial [AUR package](https://aur.archlinux.org/packages/kubectx) `kubectx`
 is available. Install instructions can be found on the [Arch 
 wiki](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_packages).
+
+-----
+
+### Customizing current context colors
+
+If you like to customize the colors indicating the current namespace or context, set the environment variables `KUBECTX_CURRENT_FGCOLOR` and `KUBECTX_CURRENT_BGCOLOR`:
+
+```
+export KUBECTX_CURRENT_FGCOLOR=$(tput setaf 6) # blue text
+export KUBECTX_CURRENT_BGCOLOR=$(tput setaf 7) # white background
+```
+
+Refer color codes [here](https://linux.101hacks.com/ps1-examples/prompt-color-using-tput/)
 
 -----
 
