@@ -109,12 +109,16 @@ list_namespaces() {
   darkbg=$(tput setab 0)
   normal=$(tput sgr0)
 
+  local cur_ctx_fg cur_ctx_bg
+  cur_ctx_fg=${KUBECTX_CURRENT_FGCOLOR:-$yellow}
+  cur_ctx_bg=${KUBECTX_CURRENT_BGCOLOR:-$darkbg}
+
   local cur ns_list
   cur="$(current_namespace)"
   ns_list=$(get_namespaces)
   for c in $ns_list; do
     if [[ -t 1 && "${c}" = "${cur}" ]]; then
-      echo "${darkbg}${yellow}${c}${normal}"
+      echo "${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
     else
       echo "${c}"
     fi

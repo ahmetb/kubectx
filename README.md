@@ -118,6 +118,19 @@ wiki](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_packa
 
 -----
 
+### Customizing current context colors
+
+If you like to customize the colors indicating the current namespace or context, set the environment variables `KUBECTX_CURRENT_FGCOLOR` and `KUBECTX_CURRENT_BGCOLOR`:
+
+```
+export KUBECTX_CURRENT_FGCOLOR=$(tput setaf 6) # blue text
+export KUBECTX_CURRENT_BGCOLOR=$(tput setaf 7) # white background
+```
+
+Refer color codes [here](https://linux.101hacks.com/ps1-examples/prompt-color-using-tput/)
+
+-----
+
 ####  Users
 
 | What are others saying about kubectx? |
