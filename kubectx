@@ -63,7 +63,7 @@ list_contexts() {
   cur_ctx_bg=${KUBECTX_CURRENT_BGCOLOR:-$darkbg}
 
   for c in $(get_contexts); do
-  if [[ -t 1 && "${c}" = "${cur}" ]]; then
+  if [[ -t 1 && -z "${NO_COLOR:-}" && "${c}" = "${cur}" ]]; then
     echo "${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
   else
     echo "${c}"
