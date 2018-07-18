@@ -110,6 +110,13 @@ sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
 sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
 sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
 ```
+
+Also available as a Debian package (for [Debian Buster (testing)](https://packages.debian.org/buster/kubectx) and [Sid (unstable)](https://packages.debian.org/sid/kubectx)):
+
+``` bash
+sudo apt install kubectx
+```
+
 #### Arch Linux
 
 An unofficial [AUR package](https://aur.archlinux.org/packages/kubectx) `kubectx`
