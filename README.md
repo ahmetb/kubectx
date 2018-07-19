@@ -125,7 +125,6 @@ Available as a Debian package for [Debian Buster (testing)](https://packages.deb
 sudo apt install kubectx
 ```
 
-
 -----
 
 ### Customizing current context colors
