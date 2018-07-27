@@ -62,12 +62,14 @@ list_contexts() {
   cur_ctx_fg=${KUBECTX_CURRENT_FGCOLOR:-$yellow}
   cur_ctx_bg=${KUBECTX_CURRENT_BGCOLOR:-$darkbg}
 
+  var="0"
   for c in $(get_contexts); do
-  if [[ -t 1 && -z "${NO_COLOR:-}" && "${c}" = "${cur}" ]]; then
-    echo "${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
-  else
-    echo "${c}"
-  fi
+    if [[ -t 1 && -z "${NO_COLOR:-}" && "${c}" == "${cur}" ]]; then
+      echo "${var}: ${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
+    else
+      echo "${var}: ${c}"
+    fi
+    var=$((var + 1))
   done
 }
 
@@ -82,7 +84,7 @@ save_context() {
   saved="$(read_context)"
 
   if [[ "${saved}" != "${1}" ]]; then
-    printf %s "${1}" > "${KUBECTX}"
+    printf %s "${1}" >"${KUBECTX}"
   fi
 }
 
@@ -94,10 +96,20 @@ set_context() {
   local prev
   prev="$(current_context)"
 
-  switch_context "${1}"
-
-  if [[ "${prev}" != "${1}" ]]; then
-    save_context "${prev}"
+  re='^[0-9]+$'
+  if ! [[ "${1}" =~ $re ]]; then
+    switch_context "${1}"
+    if [[ "${prev}" != "${1}" ]]; then
+      save_context "${prev}"
+    fi
+  else
+    var=0
+    for c in $(get_contexts); do
+      if [ "$var" == "${1}" ]; then
+        switch_context "$c"
+      fi
+      var=$((var + 1))
+    done
   fi
 }
 
@@ -140,7 +152,7 @@ rename_context() {
   old_user="$(user_of_context "${old_name}")"
   old_cluster="$(cluster_of_context "${old_name}")"
   if [[ -z "$old_user" || -z "$old_cluster" ]]; then
-    echo "error: Cannot retrieve context ${old_name}."  >&2
+    echo "error: Cannot retrieve context ${old_name}." >&2
     exit 1
   fi
 
@@ -153,7 +165,7 @@ rename_context() {
 }
 
 delete_contexts() {
-  IFS=' ' read -ra CTXS <<< "${1}"
+  IFS=' ' read -ra CTXS <<<"${1}"
   for i in "${CTXS[@]}"; do
     delete_context "${i}"
   done
