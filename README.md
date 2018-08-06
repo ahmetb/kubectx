@@ -129,14 +129,15 @@ sudo apt install kubectx
 
 ### Customizing current context colors
 
-If you like to customize the colors indicating the current namespace or context, set the environment variables `KUBECTX_CURRENT_FGCOLOR` and `KUBECTX_CURRENT_BGCOLOR`:
+If you like to customize the colors indicating the current namespace or context, set the environment variables `KUBECTX_CURRENT_FGCOLOR` and `KUBECTX_CURRENT_BGCOLOR` (refer color codes [here](https://linux.101hacks.com/ps1-examples/prompt-color-using-tput/)):
 
 ```
 export KUBECTX_CURRENT_FGCOLOR=$(tput setaf 6) # blue text
 export KUBECTX_CURRENT_BGCOLOR=$(tput setaf 7) # white background
 ```
 
-Refer color codes [here](https://linux.101hacks.com/ps1-examples/prompt-color-using-tput/)
+Colors in the output can be disabled by setting the 
+[`NO_COLOR`](http://no-color.org/) environment variable.
 
 -----
 
