@@ -89,6 +89,17 @@ switch_context() {
   kubectl config use-context "${1}"
 }
 
+choose_context_interactive() {
+  local choice
+  choice="$(FZF_DEFAULT_COMMAND='kubectx' fzf --ansi || true)"
+  if [[ -z "${choice}" ]]; then
+    echo 2>&1 "error: you did not choose any of the options"
+    exit 1
+  else
+    set_context "${choice}"
+  fi
+}
+
 set_context() {
   local prev
   prev="$(current_context)"
@@ -170,7 +181,11 @@ delete_context() {
 
 main() {
   if [[ "$#" -eq 0 ]]; then
-    list_contexts
+    if [[ -t 1 && "$(type fzf &>/dev/null; echo $?)" -eq 0 ]]; then
+      choose_context_interactive
+    else
+      list_contexts
+    fi
   elif [[ "${1}" == "-d" ]]; then
     if [[ "$#" -lt 2 ]]; then
       echo "error: missing context NAME" >&2
