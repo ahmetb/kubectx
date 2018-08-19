@@ -31,7 +31,6 @@ USAGE:
   kubens -                  : switch to the previous namespace in this context
   kubens -h,--help          : show this message
 EOF
-  exit 1
 }
 
 current_namespace() {
@@ -147,6 +146,7 @@ main() {
     elif [[ "${1}" =~ ^-(.*) ]]; then
       echo "error: unrecognized flag \"${1}\"" >&2
       usage
+      exit 1
     elif [[ "${1}" =~ (.+)=(.+) ]]; then
       alias_context "${BASH_REMATCH[2]}" "${BASH_REMATCH[1]}"
     else
@@ -155,6 +155,7 @@ main() {
   else
     echo "error: too many flags" >&2
     usage
+    exit 1
   fi
 }
 

@@ -37,7 +37,6 @@ USAGE:
 
   kubectx -h,--help         : show this message
 EOF
-  exit 1
 }
 
 current_context() {
@@ -176,11 +175,13 @@ main() {
     if [[ "$#" -lt 2 ]]; then
       echo "error: missing context NAME" >&2
       usage
+      exit 1
     fi
     delete_contexts "${@:2}"
   elif [[ "$#" -gt 1 ]]; then
     echo "error: too many arguments" >&2
     usage
+    exit 1
   elif [[ "$#" -eq 1 ]]; then
     if [[ "${1}" == "-" ]]; then
       swap_context
@@ -189,6 +190,7 @@ main() {
     elif [[ "${1}" =~ ^-(.*) ]]; then
       echo "error: unrecognized flag \"${1}\"" >&2
       usage
+      exit 1
     elif [[ "${1}" =~ (.+)=(.+) ]]; then
       rename_context "${BASH_REMATCH[2]}" "${BASH_REMATCH[1]}"
     else
@@ -196,6 +198,7 @@ main() {
     fi
   else
     usage
+    exit 1
   fi
 }
 
