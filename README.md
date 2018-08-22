@@ -127,7 +127,17 @@ sudo apt install kubectx
 
 -----
 
-### Customizing current context colors
+### Interactive mode
+
+If you want `kubectx` and `kubens` commands to present you an interactive menu
+with fuzzy searching, you just need to [install
+`fzf`](https://github.com/junegunn/fzf) in your PATH.
+
+![kubectx interactive search with fzf](img/kubectx-interactive.gif)
+
+-----
+
+### Customizing colors
 
 If you like to customize the colors indicating the current namespace or context, set the environment variables `KUBECTX_CURRENT_FGCOLOR` and `KUBECTX_CURRENT_BGCOLOR` (refer color codes [here](https://linux.101hacks.com/ps1-examples/prompt-color-using-tput/)):
 
@@ -136,7 +146,7 @@ export KUBECTX_CURRENT_FGCOLOR=$(tput setaf 6) # blue text
 export KUBECTX_CURRENT_BGCOLOR=$(tput setaf 7) # white background
 ```
 
-Colors in the output can be disabled by setting the 
+Colors in the output can be disabled by setting the
 [`NO_COLOR`](http://no-color.org/) environment variable.
 
 -----
