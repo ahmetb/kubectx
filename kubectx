@@ -121,18 +121,6 @@ swap_context() {
   set_context "${ctx}"
 }
 
-user_of_context() {
-  # TODO(ahmetb) no longer used, consider deleting
-  kubectl config view \
-    -o=jsonpath="{.contexts[?(@.name==\"${1}\")].context.user}"
-}
-
-cluster_of_context() {
-  # TODO(ahmetb) no longer used, consider deleting
-  kubectl config view \
-    -o=jsonpath="{.contexts[?(@.name==\"${1}\")].context.cluster}"
-}
-
 context_exists() {
   grep -q ^"${1}"\$ <(kubectl config get-contexts -o=name)
 }
@@ -145,15 +133,6 @@ rename_context() {
     old_name="$(current_context)"
   fi
 
-  # TODO(ahmetb) old_user and old_cluster are no longer used, clean up
-  local old_user old_cluster
-  old_user="$(user_of_context "${old_name}")"
-  old_cluster="$(cluster_of_context "${old_name}")"
-  if [[ -z "$old_user" || -z "$old_cluster" ]]; then
-    echo "error: Cannot retrieve context ${old_name}."  >&2
-    exit 1
-  fi
-
   if context_exists "${new_name}"; then
     echo "Context \"${new_name}\" exists, deleting..." >&2
     kubectl config delete-context "${new_name}" 1>/dev/null 2>&1
@@ -163,8 +142,7 @@ rename_context() {
 }
 
 delete_contexts() {
-  IFS=' ' read -ra CTXS <<< "${1}"
-  for i in "${CTXS[@]}"; do
+  for i in "${@}"; do
     delete_context "${i}"
   done
 }
