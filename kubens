@@ -21,6 +21,7 @@
 set -eou pipefail
 IFS=$'\n\t'
 
+SELF_CMD="$0"
 KUBENS_DIR="${HOME}/.kube/kubens"
 
 usage() {
@@ -95,7 +96,7 @@ choose_namespace_interactive() {
   fi
 
   local choice
-  choice="$(FZF_DEFAULT_COMMAND='kubens' fzf --ansi || true)"
+  choice="$(FZF_DEFAULT_COMMAND="${SELF_CMD}" fzf --ansi || true)"
   if [[ -z "${choice}" ]]; then
     echo 2>&1 "error: you did not choose any of the options"
     exit 1
