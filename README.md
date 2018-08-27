@@ -101,7 +101,12 @@ them to any POSIX environment that has Bash installed.
   - or save them to a directory, then create symlinks to `kubectx`/`kubens` from
     somewhere in your `PATH`, like `/usr/local/bin`
 - Make `kubectx` and `kubens` executable (`chmod +x ...`)
-- Figure out how to install bash/zsh/fish [completion scripts](completion/).
+- Figure out how to install bash/zsh/fish [completion scripts](completion/).  
+  - For zsh:
+   ```bash
+   sudo ln kubectx/completion/kubectx.zsh /usr/share/zsh/functions/Completion/Zsh/_kubectx.zsh
+   sudo ln kubectx/completion/kubens.zsh /usr/share/zsh/functions/Completion/Zsh/_kubens.zsh`
+   ```
 
 Example installation steps:
 
