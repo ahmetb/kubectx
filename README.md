@@ -135,6 +135,9 @@ with fuzzy searching, you just need to [install
 
 ![kubectx interactive search with fzf](img/kubectx-interactive.gif)
 
+If you have `fzf` installed, but want to opt out of using this feature, set the environment variable `KUBECTX_IGNORE_FZF=1`.
+
+
 -----
 
 ### Customizing colors
