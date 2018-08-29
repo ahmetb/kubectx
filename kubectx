@@ -160,7 +160,7 @@ delete_context() {
 
 main() {
   if [[ "$#" -eq 0 ]]; then
-    if [[ -t 1 &&  -z "${NO_FZF:-}" && "$(type fzf &>/dev/null; echo $?)" -eq 0 ]]; then
+    if [[ -t 1 &&  -z "${NO_FZF:-}" && -z "${NO_FZF_KUBECTX:-}" && "$(type fzf &>/dev/null; echo $?)" -eq 0 ]]; then
       choose_context_interactive
     else
       list_contexts
