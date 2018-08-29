@@ -104,8 +104,8 @@ them to any POSIX environment that has Bash installed.
 - Figure out how to install bash/zsh/fish [completion scripts](completion/).  
   - For zsh:
    ```bash
-   sudo ln kubectx/completion/kubectx.zsh /usr/share/zsh/functions/Completion/Zsh/_kubectx.zsh
-   sudo ln kubectx/completion/kubens.zsh /usr/share/zsh/functions/Completion/Zsh/_kubens.zsh`
+   sudo ln -s kubectx/completion/kubectx.zsh /usr/share/zsh/functions/Completion/Zsh/_kubectx.zsh
+   sudo ln -s kubectx/completion/kubens.zsh /usr/share/zsh/functions/Completion/Zsh/_kubens.zsh`
    ```
 
 Example installation steps:
