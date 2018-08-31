@@ -157,7 +157,7 @@ swap_namespace() {
 
 main() {
   if [[ "$#" -eq 0 ]]; then
-    if [[ -t 1 && "$(type fzf &>/dev/null; echo $?)" -eq 0 ]]; then
+    if [[ -t 1 && -z ${KUBECTX_IGNORE_FZF:-} && "$(type fzf &>/dev/null; echo $?)" -eq 0 ]]; then
       choose_namespace_interactive
     else
       list_namespaces
