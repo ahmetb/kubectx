@@ -101,8 +101,21 @@ them to any POSIX environment that has Bash installed.
   - or save them to a directory, then create symlinks to `kubectx`/`kubens` from
     somewhere in your `PATH`, like `/usr/local/bin`
 - Make `kubectx` and `kubens` executable (`chmod +x ...`)
-- Figure out how to install bash/zsh/fish [completion scripts](completion/).
-
+- Install bash/zsh/fish [completion scripts](completion/).  
+  - For zsh:  
+    The completion scripts have to be in a path that belongs to `$fpath`. Either link or copy them to an existing folder.  
+    If using oh-my-zsh you can do as follows:
+    ```bash
+    mkdir -p ~/.oh-my-zsh/completions
+    chmod -R 755 ~/.oh-my-zsh/completions
+    ln -s /opt/kubectx/completion/kubens.zsh ~/.oh-my-zsh/completions/_kubens.zsh
+    ln -s /opt/kubectx/completion/kubens.zsh ~/.oh-my-zsh/completions/_kubectx.zsh
+    ```  
+    Note that the leading underscore seems to be a convention.  
+    If not using oh-my-zsh, you could link to `/usr/share/zsh/functions/Completion` (might require sudo), depending on the `$fpath` of your zsh installation.  
+    In case of error, calling `compaudit` might help.
+  - For bash/fish: Figure out how to install completion scripts and please document here
+  
 Example installation steps:
 
 ``` bash
