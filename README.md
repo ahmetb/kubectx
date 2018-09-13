@@ -119,7 +119,7 @@ them to any POSIX environment that has Bash installed.
     git clone https://github.com/ahmetb/kubectx.git ~/.kubectx
     cat << FOE >> ~/.bashrc
     #kubectx and kubens
-    export PATH=~/.kubectx:$PATH
+    export PATH=~/.kubectx:\$PATH
     . ~/.kubectx/*.bash
     FOE
     ```
