@@ -114,7 +114,16 @@ them to any POSIX environment that has Bash installed.
     Note that the leading underscore seems to be a convention.  
     If not using oh-my-zsh, you could link to `/usr/share/zsh/functions/Completion` (might require sudo), depending on the `$fpath` of your zsh installation.  
     In case of error, calling `compaudit` might help.
-  - For bash/fish: Figure out how to install completion scripts and please document here
+  - For bash:
+    ```bash
+    git clone https://github.com/ahmetb/kubectx.git ~/.kubectx
+    cat << FOE >> ~/.bashrc
+    #kubectx and kubens
+    export PATH=~/.kubectx:$PATH
+    . ~/.kubectx/*.bash
+    FOE
+    ```
+  - For fish: Figure out how to install completion scripts and please document here
   
 Example installation steps:
 
