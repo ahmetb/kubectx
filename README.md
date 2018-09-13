@@ -120,7 +120,7 @@ them to any POSIX environment that has Bash installed.
     cat << FOE >> ~/.bashrc
     #kubectx and kubens
     export PATH=~/.kubectx:\$PATH
-    . ~/.kubectx/*.bash
+    . ~/.kubectx/completion/*.bash
     FOE
     . ~/.bashrc
     ```
