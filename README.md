@@ -122,6 +122,7 @@ them to any POSIX environment that has Bash installed.
     export PATH=~/.kubectx:\$PATH
     . ~/.kubectx/*.bash
     FOE
+    . ~/.bashrc
     ```
   - For fish: Figure out how to install completion scripts and please document here
   
