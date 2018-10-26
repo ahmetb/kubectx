@@ -22,7 +22,7 @@ set -eou pipefail
 IFS=$'\n\t'
 
 SELF_CMD="$0"
-KUBECTX="${HOME}/.kube/kubectx"
+KUBECTX="${XDG_CACHE_HOME:-$HOME/.kube}/kubectx"
 
 usage() {
   cat <<"EOF"
