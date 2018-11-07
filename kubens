@@ -34,10 +34,16 @@ USAGE:
 EOF
 }
 
+exit_err() {
+   echo >&2 "${1}"
+   exit 1
+}
+
 current_namespace() {
   local cur_ctx
-  cur_ctx="$(current_context)"
-  ns="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")"
+  cur_ctx="$(current_context)" || exit_err "error getting current context"
+  ns="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")" \
+     || exit_err "error getting current namespace"
   if [[ -z "${ns}" ]]; then
     echo "default"
   else
@@ -107,8 +113,8 @@ choose_namespace_interactive() {
 
 set_namespace() {
   local ctx prev
-  ctx="$(current_context)"
-  prev="$(current_namespace)"
+  ctx="$(current_context)" || exit_err "error getting current context"
+  prev="$(current_namespace)" || exit_error "error getting current namespace"
 
   if grep -q ^"${1}"\$ <(get_namespaces); then
     switch_namespace "${ctx}" "${1}"
@@ -133,8 +139,9 @@ list_namespaces() {
   cur_ctx_bg=${KUBECTX_CURRENT_BGCOLOR:-$darkbg}
 
   local cur ns_list
-  cur="$(current_namespace)"
-  ns_list=$(get_namespaces)
+  cur="$(current_namespace)" || exit_err "error getting current namespace"
+  ns_list=$(get_namespaces) || exit_err "error getting namespace list"
+
   for c in $ns_list; do
     if [[ -t 1 && -z "${NO_COLOR:-}" && "${c}" = "${cur}" ]]; then
       echo "${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
@@ -146,7 +153,7 @@ list_namespaces() {
 
 swap_namespace() {
   local ctx ns
-  ctx="$(current_context)"
+  ctx="$(current_context)" || exit_err "error getting current context"
   ns="$(read_namespace "${ctx}")"
   if [[ -z "${ns}" ]]; then
     echo "error: No previous namespace found for current context." >&2
