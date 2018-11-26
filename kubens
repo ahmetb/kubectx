@@ -41,9 +41,11 @@ exit_err() {
 
 current_namespace() {
   local cur_ctx
+
   cur_ctx="$(current_context)" || exit_err "error getting current context"
-  ns="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")" \
+  ns="$($KUBECTL config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")" \
      || exit_err "error getting current namespace"
+
   if [[ -z "${ns}" ]]; then
     echo "default"
   else
@@ -52,11 +54,11 @@ current_namespace() {
 }
 
 current_context() {
-  kubectl config view -o=jsonpath='{.current-context}'
+  $KUBECTL config view -o=jsonpath='{.current-context}'
 }
 
 get_namespaces() {
-  kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
+  $KUBECTL get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
 }
 
 escape_context_name() {
@@ -88,7 +90,7 @@ save_namespace() {
 
 switch_namespace() {
   local ctx="${1}"
-  kubectl config set-context "${ctx}" --namespace="${2}"
+  $KUBECTL config set-context "${ctx}" --namespace="${2}"
   echo "Active namespace is \"${2}\".">&2
 }
 
@@ -163,10 +165,15 @@ swap_namespace() {
 }
 
 main() {
-  if ! hash kubectl 2>/dev/null; then
-   echo >&2 "kubectl is not installed"
-   exit 1
+  if hash kubectl 2>/dev/null; then
+    KUBECTL=kubectl
+  elif hash kubectl.exe  2>/dev/null; then
+    KUBECTL=kubectl.exe
+  else
+    echo >&2 "kubectl is not installed"
+    exit 1
   fi
+
   if [[ "$#" -eq 0 ]]; then
     if [[ -t 1 && -z ${KUBECTX_IGNORE_FZF:-} && "$(type fzf &>/dev/null; echo $?)" -eq 0 ]]; then
       choose_namespace_interactive
