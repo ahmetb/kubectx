@@ -2,6 +2,9 @@ language: bash
 before_script:
 - git clone https://github.com/sstephenson/bats.git
 - (cd bats && sudo ./install.sh /usr/local)
+- curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+- chmod +x kubectl
+- sudo mv kubectl /usr/local/bin/
 script:
 - cd tests
 - /usr/local/bin/bats kubectx.sh
