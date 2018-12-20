@@ -1,3 +1,5 @@
+https://travis-ci.org/feloy/kubectx.svg?branch=master
+
 This repository provides both `kubectx` and `kubens` tools.
 
 
