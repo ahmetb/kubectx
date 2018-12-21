@@ -127,8 +127,13 @@ them to any POSIX environment that has Bash installed.
     export PATH=~/.kubectx:\$PATH
     FOE
     ```
-  - For fish: Figure out how to install completion scripts and please document here
-  
+  - For fish:
+    ```fish
+    mkdir -p ~/.config/fish/completions
+    ln -s /opt/kubectx/completion/kubectx.fish ~/.config/fish/completions/
+    ln -s /opt/kubectx/completion/kubens.fish ~/.config/fish/completions/
+    ```
+
 Example installation steps:
 
 ``` bash
