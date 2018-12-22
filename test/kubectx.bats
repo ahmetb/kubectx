@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-COMMAND=../kubectx
+COMMAND="$BATS_TEST_DIRNAME/../kubectx"
 
 @test "--help should not fail" {
   run ${COMMAND} --help
