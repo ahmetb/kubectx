@@ -69,11 +69,11 @@ list_contexts() {
   cur_ctx_bg=${KUBECTX_CURRENT_BGCOLOR:-$darkbg}
 
   for c in $ctx_list; do
-  if [[ -t 1 && -z "${NO_COLOR:-}" && "${c}" = "${cur}" ]]; then
-    echo "${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
-  else
-    echo "${c}"
-  fi
+    if [[ (-t 1 || ! -z ${KUBENS_FZF:-}) && -z "${NO_COLOR:-}" && "${c}" = "${cur}" ]]; then
+      echo "${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
+    else
+      echo "${c}"
+    fi
   done
 }
 
@@ -98,7 +98,7 @@ switch_context() {
 
 choose_context_interactive() {
   local choice
-  choice="$(FZF_DEFAULT_COMMAND="${SELF_CMD}" fzf --ansi || true)"
+  choice="$(KUBENS_FZF=1 FZF_DEFAULT_COMMAND="${SELF_CMD}" fzf --ansi || true)"
   if [[ -z "${choice}" ]]; then
     echo 2>&1 "error: you did not choose any of the options"
     exit 1
