@@ -6,3 +6,12 @@ before_install:
   - sudo chmod +x /usr/bin/kubectl 
 script:
   - bats test/
+deploy:
+  provider: releases
+  api_key: "GITHUB_TOKEN" # has to be defined in Travis
+  file:
+    - "kubectx"
+    - "kubens"
+  skip_cleanup: true
+  on:
+    tags: true
