@@ -1,0 +1,18 @@
+# config with one context
+
+apiVersion: v1
+clusters:
+- cluster:
+    server: ""
+  name: cluster1
+contexts:
+- context:
+    cluster: cluster1
+    user: user1
+  name: user1@cluster1
+current-context: ""
+kind: Config
+preferences: {}
+users:
+- name: user1
+  user: {}
