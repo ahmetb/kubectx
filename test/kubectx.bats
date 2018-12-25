@@ -4,6 +4,16 @@ COMMAND="$BATS_TEST_DIRNAME/../kubectx"
 
 load common
 
+@test "no kubectl detected" {
+  OLDPATH="$PATH"
+  PATH=/bin
+  run ${COMMAND}
+  echo "$output"
+  [ "$status" -eq 1 ]
+  [[ "$output" = "kubectl is not installed" ]]
+  PATH="$OLDPATH"
+}
+
 @test "--help should not fail" {
   run ${COMMAND} --help
   echo "$output"
@@ -25,7 +35,14 @@ load common
   [[ "$output" = "error: No previous context found." ]]
 }
 
-@test "create one context and list contexts" {
+@test "list contexts when no kubeconfig exists" {
+  run ${COMMAND}
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [[ "$output" = "" ]]
+}
+
+@test "get one context and list contexts" {
   use_config config1
 
   run ${COMMAND}
@@ -34,7 +51,7 @@ load common
   [[ "$output" = "user1@cluster1" ]]
 }
 
-@test "create two contexts and list contexts" {
+@test "get two contexts and list contexts" {
   use_config config2
 
   run ${COMMAND}
@@ -44,7 +61,7 @@ load common
   [[ "$output" = *"user2@cluster1"* ]]
 }
 
-@test "create two contexts and select contexts" {
+@test "get two contexts and select contexts" {
   use_config config2
 
   run ${COMMAND} user1@cluster1
@@ -60,7 +77,7 @@ load common
   [[ "$(get_context)" = "user2@cluster1" ]]
 }
 
-@test "create two contexts and switch between contexts" {
+@test "get two contexts and switch between contexts" {
   use_config config2
 
   run ${COMMAND} user1@cluster1
@@ -86,4 +103,112 @@ load common
   [ "$status" -eq 0 ]
   echo "$(get_context)"
   [[ "$(get_context)" = "user2@cluster1" ]]
+}
+
+@test "get one context and switch to non existent context" {
+  use_config config1
+
+  run ${COMMAND} "unknown-context"
+  echo "$output"
+  [ "$status" -eq 1 ]
+}
+
+@test "rename context" {
+  use_config config2
+
+  run ${COMMAND} "new-context=user1@cluster1"
+  echo "$output"
+  [ "$status" -eq 0 ]
+
+  run ${COMMAND}
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [[ ! "$output" = *"user1@cluster1"* ]]
+  [[ "$output" = *"new-context"* ]]
+  [[ "$output" = *"user2@cluster1"* ]]
+}
+
+@test "rename current context" {
+  use_config config2
+
+  run ${COMMAND} user2@cluster1
+  echo "$output"
+  [ "$status" -eq 0 ]
+
+  run ${COMMAND} new-context=.
+  echo "$output"
+  [ "$status" -eq 0 ]
+
+  run ${COMMAND}
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [[ ! "$output" = *"user2@cluster1"* ]]
+  [[ "$output" = *"user1@cluster1"* ]]
+  [[ "$output" = *"new-context"* ]]
+}
+
+@test "delete context" {
+  use_config config2
+
+  run ${COMMAND} -d "user1@cluster1"
+  echo "$output"
+  [ "$status" -eq 0 ]
+
+  run ${COMMAND}
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [[ ! "$output" = "user1@cluster1" ]]
+  [[ "$output" = "user2@cluster1" ]]
+}
+
+@test "delete current context" {
+  use_config config2
+
+  run ${COMMAND} user2@cluster1
+  echo "$output"
+  [ "$status" -eq 0 ]
+
+  run ${COMMAND} -d .
+  echo "$output"
+  [ "$status" -eq 0 ]
+
+  run ${COMMAND}
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [[ ! "$output" = "user2@cluster1" ]]
+  [[ "$output" = "user1@cluster1" ]]
+}
+
+@test "delete non existent context" {
+  use_config config1
+
+  run ${COMMAND} -d "unknown-context"
+  echo "$output"
+  [ "$status" -eq 1 ]
+}
+
+@test "delete several contexts" {
+  use_config config2
+
+  run ${COMMAND} -d "user1@cluster1" "user2@cluster1"
+  echo "$output"
+  [ "$status" -eq 0 ]
+
+  run ${COMMAND}
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [[ "$output" = "" ]]
+}
+
+@test "delete several contexts including a non existent one" {
+  use_config config2
+
+  run ${COMMAND} -d "user1@cluster1" "non-existent" "user2@cluster1"
+  echo "$output"
+  [ "$status" -eq 1 ]
+
+  run ${COMMAND}
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [[ "$output" = "user2@cluster1" ]]
 }
