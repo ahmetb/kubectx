@@ -104,7 +104,9 @@ choose_namespace_interactive() {
   fi
 
   local choice
-  choice="$(FZF_DEFAULT_COMMAND="${SELF_CMD}" fzf --ansi || true)"
+  choice="$(_KUBECTX_FORCE_COLOR=1 \
+    FZF_DEFAULT_COMMAND="${SELF_CMD}" \
+    fzf --ansi || true)"
   if [[ -z "${choice}" ]]; then
     echo 2>&1 "error: you did not choose any of the options"
     exit 1
@@ -145,11 +147,17 @@ list_namespaces() {
   ns_list=$(get_namespaces) || exit_err "error getting namespace list"
 
   for c in $ns_list; do
-    if [[ -t 1 && -z "${NO_COLOR:-}" && "${c}" = "${cur}" ]]; then
+  if [[ -n "${_KUBECTX_FORCE_COLOR:-}" || \
+       -t 1 && -z "${NO_COLOR:-}" ]]; then
+    # colored output mode
+    if [[ "${c}" = "${cur}" ]]; then
       echo "${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
     else
       echo "${c}"
     fi
+  else
+    echo "${c}"
+  fi
   done
 }
 
