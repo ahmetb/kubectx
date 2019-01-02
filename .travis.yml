@@ -5,5 +5,5 @@ before_install:
   - sudo curl -fsSL -o /usr/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kubectl
   - sudo chmod +x /usr/bin/kubectl 
 script:
-  - echo "kubectx tests:"; bats test/kubectx.bats
-  - echo "kubens tests:"; bats test/kubens.bats
+  - bats test/kubectx.bats
+  - bats test/kubens.bats
