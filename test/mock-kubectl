@@ -5,9 +5,8 @@
 set -eou pipefail
 
 if [[ $@ == *'get namespaces'* ]]; then
-  echo "default"
-  echo "kube-public"
-  echo "kube-system"
+  echo "ns1"
+  echo "ns2"
 else
   kubectl $@
 fi

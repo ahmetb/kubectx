@@ -8,19 +8,19 @@ load common
 @test "--help should not fail" {
   run ${COMMAND} --help
   echo "$output">&2
-  [ "$status" -eq 0 ]
+  [[ "$status" -eq 0 ]]
 }
 
 @test "-h should not fail" {
   run ${COMMAND} -h
   echo "$output">&2
-  [ "$status" -eq 0 ]
+  [[ "$status" -eq 0 ]]
 }
 
 @test "list namespaces when no kubeconfig exists" {
   run ${COMMAND}
   echo "$output"
-  [ "$status" -eq "1" ]
+  [[ "$status" -eq 1 ]]
   [[ "$output" = *"current-context is not set"* ]]
 }
 
@@ -30,29 +30,28 @@ load common
 
   run ${COMMAND}
   echo "$output"
-  [ "$status" -eq 0 ]
-  [[ "$output" = *"default"* ]]
-  [[ "$output" = *"kube-public"* ]]
-  [[ "$output" = *"kube-system"* ]]
+  [[ "$status" -eq 0 ]]
+  [[ "$output" = *"ns1"* ]]
+  [[ "$output" = *"ns2"* ]]
 }
 
-@test "switch to existent namespace" {
+@test "switch to existing namespace" {
   use_config config1
   switch_context user1@cluster1
 
-  run ${COMMAND} "kube-public"
+  run ${COMMAND} "ns1"
   echo "$output"
-  [ "$status" -eq 0 ]
-  [[ "$output" = *'Active namespace is "kube-public"'* ]]
+  [[ "$status" -eq 0 ]]
+  [[ "$output" = *'Active namespace is "ns1"'* ]]
 }
 
-@test "switch to non-existent namespace" {
+@test "switch to non-existing namespace" {
   use_config config1
   switch_context user1@cluster1
 
   run ${COMMAND} "unknown-namespace"
   echo "$output"
-  [ "$status" -eq 1 ]
+  [[ "$status" -eq 1 ]]
   [[ "$output" = *'no namespace exists with name "unknown-namespace"'* ]]
 }
 
@@ -60,29 +59,29 @@ load common
   use_config config1
   switch_context user1@cluster1
 
-  run ${COMMAND} kube-public
+  run ${COMMAND} ns1
   echo "$output"
-  [ "$status" -eq 0 ]
+  [[ "$status" -eq 0 ]]
   echo "$(get_namespace)"
-  [[ "$(get_namespace)" = "kube-public" ]]
+  [[ "$(get_namespace)" = "ns1" ]]
 
-  run ${COMMAND} kube-system
+  run ${COMMAND} ns2
   echo "$output"
-  [ "$status" -eq 0 ]
+  [[ "$status" -eq 0 ]]
   echo "$(get_namespace)"
-  [[ "$(get_namespace)" = "kube-system" ]]
-
-  run ${COMMAND} -
-  echo "$output"
-  [ "$status" -eq 0 ]
-  echo "$(get_namespace)"
-  [[ "$(get_namespace)" = "kube-public" ]]
+  [[ "$(get_namespace)" = "ns2" ]]
 
   run ${COMMAND} -
   echo "$output"
-  [ "$status" -eq 0 ]
+  [[ "$status" -eq 0 ]]
   echo "$(get_namespace)"
-  [[ "$(get_namespace)" = "kube-system" ]]
+  [[ "$(get_namespace)" = "ns1" ]]
+
+  run ${COMMAND} -
+  echo "$output"
+  [[ "$status" -eq 0 ]]
+  echo "$(get_namespace)"
+  [[ "$(get_namespace)" = "ns2" ]]
 }
 
 @test "switch to previous namespace when none exists" {
@@ -91,7 +90,7 @@ load common
 
   run ${COMMAND} -
   echo "$output"
-  [ "$status" -eq 1 ]
+  [[ "$status" -eq 1 ]]
   [[ "$output" = *"No previous namespace found for current context"* ]]
 }
 
@@ -100,6 +99,6 @@ load common
 
   run ${COMMAND} -
   echo "$output"
-  [ "$status" -eq 1 ]
+  [[ "$status" -eq 1 ]]
   [[ "$output" = *"current-context is not set"* ]]
 }
