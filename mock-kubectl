@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+[[ -n $DEBUG ]] && set -x
+
+set -eou pipefail
+
+if hash kubectl 2>/dev/null; then
+  KUBECTL=kubectl
+elif hash kubectl.exe  2>/dev/null; then
+  KUBECTL=kubectl.exe
+else
+  set -u
+  echo >&2 "kubectl is not installed"
+  exit 1
+fi
+
+if [[ $@ == *' namespaces '* ]]; then
+  echo "default"
+  echo "kube-public"
+  echo "kube-system"
+else
+  ${KUBECTL} $@
+fi
