@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 COMMAND="${BATS_TEST_DIRNAME}/../kubens"
-export KUBECTL="$BATS_TEST_DIRNAME/../mock-kubectl"
+export KUBECTL="$BATS_TEST_DIRNAME/../test/mock-kubectl"
 
 load common
 
@@ -21,7 +21,7 @@ load common
   run ${COMMAND}
   echo "$output"
   [ "$status" -eq "1" ]
-  [[ "$output" = *"error: current-context is not set"* ]]
+  [[ "$output" = *"current-context is not set"* ]]
 }
 
 @test "list namespaces" {
@@ -46,14 +46,14 @@ load common
   [[ "$output" = *'Active namespace is "kube-public"'* ]]
 }
 
-@test "switch to non existent namespace" {
+@test "switch to non-existent namespace" {
   use_config config1
   switch_context user1@cluster1
 
-  run ${COMMAND} "unknown-context"
+  run ${COMMAND} "unknown-namespace"
   echo "$output"
   [ "$status" -eq 1 ]
-  [[ "$output" = 'error: no namespace exists with name "unknown-context".' ]]
+  [[ "$output" = *'no namespace exists with name "unknown-namespace"'* ]]
 }
 
 @test "switch between namespaces" {
@@ -92,7 +92,7 @@ load common
   run ${COMMAND} -
   echo "$output"
   [ "$status" -eq 1 ]
-  [[ "$output" = "error: No previous namespace found for current context." ]]
+  [[ "$output" = *"No previous namespace found for current context"* ]]
 }
 
 @test "switch to namespace when current context is empty" {
@@ -101,5 +101,5 @@ load common
   run ${COMMAND} -
   echo "$output"
   [ "$status" -eq 1 ]
-  [[ "$output" = *"error: current-context is not set"* ]]
+  [[ "$output" = *"current-context is not set"* ]]
 }

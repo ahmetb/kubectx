@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+[[ -n $DEBUG ]] && set -x
+
+set -eou pipefail
+
+if [[ $@ == *'get namespaces'* ]]; then
+  echo "default"
+  echo "kube-public"
+  echo "kube-system"
+else
+  kubectl $@
+fi

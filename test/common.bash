@@ -18,26 +18,11 @@ use_config() {
 # wrappers around "kubectl config" command
 
 get_namespace() {
-  local cur_ctx
-
-  cur_ctx="$(get_context)" || exit_err "error getting current context"
-  ns="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")" \
-     || exit_err "error getting current namespace"
-
-  if [[ -z "${ns}" ]]; then
-    echo "default"
-  else
-    echo "${ns}"
-  fi
+  kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(get_context)\")].context.namespace}"
 }
 
 get_context() {
-  kubectl config view -o=jsonpath='{.current-context}'
-}
-
-exit_err() {
-  echo >&2 "${1}"
-  exit 1
+  kubectl config current-context
 }
 
 switch_context() {

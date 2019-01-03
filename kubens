@@ -173,19 +173,16 @@ swap_namespace() {
 }
 
 main() {
-  set +u
-  if [[ ! -z "$KUBECTL" ]]; then
+  if [[ "${KUBECTL:-}" ]]; then
     true
   elif hash kubectl 2>/dev/null; then
     KUBECTL=kubectl
   elif hash kubectl.exe  2>/dev/null; then
     KUBECTL=kubectl.exe
   else
-    set -u
     echo >&2 "kubectl is not installed"
     exit 1
   fi
-  set -u
 
   if [[ "$#" -eq 0 ]]; then
     if [[ -t 1 && -z ${KUBECTX_IGNORE_FZF:-} && "$(type fzf &>/dev/null; echo $?)" -eq 0 ]]; then
