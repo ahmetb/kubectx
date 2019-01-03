@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+[[ -n $DEBUG ]] && set -x
+
+set -eou pipefail
+
+if [[ $@ == *'get namespaces'* ]]; then
+  echo "ns1"
+  echo "ns2"
+else
+  kubectl $@
+fi

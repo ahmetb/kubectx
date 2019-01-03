@@ -17,6 +17,14 @@ use_config() {
 
 # wrappers around "kubectl config" command
 
+get_namespace() {
+  kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(get_context)\")].context.namespace}"
+}
+
 get_context() {
-    kubectl config current-context
+  kubectl config current-context
+}
+
+switch_context() {
+  kubectl config use-context "${1}"
 }
