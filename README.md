@@ -83,10 +83,6 @@ Active namespace is "default".
 
 This command will set up bash/zsh/fish completion scripts automatically.
 
-
-- Running `brew install` with `--with-short-names` will install tools with names
-`kctx` and `kns` to prevent prefix collision with `kubectl` name.
-
 - If you like to add context/namespace info to your shell prompt (`$PS1`),
   I recommend trying out [kube-ps1](https://github.com/jonmosco/kube-ps1).
 
