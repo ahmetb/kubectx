@@ -37,7 +37,12 @@ USAGE:
                                   that is used by the context)
 
   kubectx -h,--help         : show this message
+  kubectx -v,--version      : show version and exit
 EOF
+}
+
+print_version() {
+  echo "Installed version: v0.6.3"
 }
 
 exit_err() {
@@ -202,6 +207,8 @@ main() {
   elif [[ "$#" -eq 1 ]]; then
     if [[ "${1}" == "-" ]]; then
       swap_context
+    elif [[ "${1}" == '-v' || "${1}" == '--version' ]]; then
+      print_version
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
     elif [[ "${1}" =~ ^-(.*) ]]; then
