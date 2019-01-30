@@ -9,7 +9,7 @@ This repository provides both `kubectx` and `kubens` tools.
 
 # kubectx(1)
 
-kubectx is an utility to manage and switch between kubectl(1) contexts.
+kubectx is a utility to manage and switch between kubectl(1) contexts.
 
 ```
 USAGE:
@@ -47,7 +47,7 @@ long context names. You don't have to remember full context names anymore.
 
 # kubens(1)
 
-kubens is an utility to switch between Kubernetes namespaces.
+kubens is a utility to switch between Kubernetes namespaces.
 
 ```
 USAGE:
@@ -88,7 +88,7 @@ This command will set up bash/zsh/fish completion scripts automatically.
 
 ### Linux
 
-Since `kubectx`/`kubens` are written in Bash, you should be able to instal
+Since `kubectx`/`kubens` are written in Bash, you should be able to install
 them to any POSIX environment that has Bash installed.
 
 - Download the `kubectx`, and `kubens` scripts.
