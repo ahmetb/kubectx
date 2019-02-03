@@ -23,6 +23,7 @@ IFS=$'\n\t'
 
 SELF_CMD="$0"
 KUBENS_DIR="${XDG_CACHE_HOME:-$HOME/.kube}/kubens"
+KUBENS_VERSION=""
 
 usage() {
   cat <<"EOF"
@@ -37,7 +38,7 @@ EOF
 }
 
 print_version() {
-  echo "Installed version: v0.6.3"
+  echo "Installed version: ${KUBENS_VERSION}"
 }
 
 exit_err() {

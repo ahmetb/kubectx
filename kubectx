@@ -23,6 +23,7 @@ IFS=$'\n\t'
 
 SELF_CMD="$0"
 KUBECTX="${XDG_CACHE_HOME:-$HOME/.kube}/kubectx"
+KUBECTX_VERSION=""
 
 usage() {
   cat <<"EOF"
@@ -42,7 +43,7 @@ EOF
 }
 
 print_version() {
-  echo "Installed version: v0.6.3"
+  echo "Installed version: ${KUBECTX_VERSION}"
 }
 
 exit_err() {
