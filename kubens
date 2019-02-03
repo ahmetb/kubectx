@@ -23,7 +23,7 @@ IFS=$'\n\t'
 
 SELF_CMD="$0"
 KUBENS_DIR="${XDG_CACHE_HOME:-$HOME/.kube}/kubens"
-KUBENS_VERSION=""
+KUBENS_VERSION="git-ed6755a95c824b729100c0b9324a4f91d61d90f3"
 
 usage() {
   cat <<"EOF"
