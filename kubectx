@@ -23,6 +23,8 @@ IFS=$'\n\t'
 
 SELF_CMD="$0"
 KUBECTX="${XDG_CACHE_HOME:-$HOME/.kube}/kubectx"
+
+# Do not edit. This line will be automatically updated by a git post-receive hook
 KUBECTX_VERSION="git-ed6755a95c824b729100c0b9324a4f91d61d90f3"
 
 usage() {
