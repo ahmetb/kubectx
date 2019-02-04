@@ -36,7 +36,7 @@ USAGE:
                                   (this command won't delete the user/cluster entry
                                   that is used by the context)
 
-  kubectx -h,--help         : show this message
+  kubectx -h,--help             : show this message
 EOF
 }
 
