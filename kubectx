@@ -148,6 +148,11 @@ rename_context() {
     old_name="$(current_context)"
   fi
 
+  if ! context_exists "${old_name}"; then
+    echo "error: Context \"${old_name}\" not found, can't rename it." >&2
+    exit 1
+  fi
+
   if context_exists "${new_name}"; then
     echo "Context \"${new_name}\" exists, deleting..." >&2
     $KUBECTL config delete-context "${new_name}" 1>/dev/null 2>&1
