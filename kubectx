@@ -21,8 +21,11 @@
 set -eou pipefail
 IFS=$'\n\t'
 
-SELF_CMD="$0"
-KUBECTX="${XDG_CACHE_HOME:-$HOME/.kube}/kubectx"
+KUBECTX_PREVIOUS_VALUE="${XDG_CACHE_HOME:-$HOME/.kube}/kubectx"
+KUBECTX_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.kube}/cache/kubectx"
+[[ ! -d ${KUBECTX_CACHE_DIR} ]] && mkdir -p ${KUBECTX_CACHE_DIR}
+CONTEXT_LIST_CACHE="${KUBECTX_CACHE_DIR}/context_list"
+SELF_CMD="cat ${CONTEXT_LIST_CACHE}"
 
 usage() {
   cat <<"EOF"
@@ -50,7 +53,7 @@ current_context() {
 }
 
 get_contexts() {
-  $KUBECTL config get-contexts -o=name | sort -n
+  $KUBECTL config get-contexts -o=name | sort -n | tee ${CONTEXT_LIST_CACHE}
 }
 
 list_contexts() {
@@ -84,8 +87,8 @@ list_contexts() {
 }
 
 read_context() {
-  if [[ -f "${KUBECTX}" ]]; then
-    cat "${KUBECTX}"
+  if [[ -f "${KUBECTX_PREVIOUS_VALUE}" ]]; then
+    cat "${KUBECTX_PREVIOUS_VALUE}"
   fi
 }
 
@@ -94,7 +97,7 @@ save_context() {
   saved="$(read_context)"
 
   if [[ "${saved}" != "${1}" ]]; then
-    printf %s "${1}" > "${KUBECTX}"
+    printf %s "${1}" > "${KUBECTX_PREVIOUS_VALUE}"
   fi
 }
 
@@ -102,11 +105,23 @@ switch_context() {
   $KUBECTL config use-context "${1}"
 }
 
+context_list_count() {
+  if [[ -f ${CONTEXT_LIST_CACHE} ]]
+  then
+    echo $(($(cat ${CONTEXT_LIST_CACHE} | wc -l) + 2))
+  else
+    echo "100%"
+  fi
+}
+
 choose_context_interactive() {
+  list_contexts > /dev/null
+  HEIGHT="$(context_list_count)"
+
   local choice
   choice="$(_KUBECTX_FORCE_COLOR=1 \
     FZF_DEFAULT_COMMAND="${SELF_CMD}" \
-    fzf --ansi || true)"
+    fzf --ansi --height ${HEIGHT} || true)"
   if [[ -z "${choice}" ]]; then
     echo 2>&1 "error: you did not choose any of the options"
     exit 1
