@@ -212,3 +212,13 @@ load common
   [ "$status" -eq 0 ]
   [[ "$output" = "user2@cluster1" ]]
 }
+
+@test "setup callback" {
+  use_config config1
+
+  export KUBECTX_CALLBACK="${PWD}/test/callback_script"
+  run ${COMMAND} user1@cluster1
+  echo "$output"
+  [ -f "${PWD}/callback_test_file" ]
+}
+
