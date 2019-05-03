@@ -100,6 +100,7 @@ save_context() {
 
 switch_context() {
   $KUBECTL config use-context "${1}"
+  switch_callback "${1}"
 }
 
 choose_context_interactive() {
@@ -112,6 +113,17 @@ choose_context_interactive() {
     exit 1
   else
     set_context "${choice}"
+  fi
+}
+
+switch_callback() {
+  if [ ! -z "${KUBECTX_CALLBACK:-}" ]; then
+    if hash "${KUBECTX_CALLBACK}" 2> /dev/null; then
+      ${KUBECTX_CALLBACK} "${1}"
+    else
+      echo >&2 "callback script ($KUBECTX_CALLBACK) not found"
+      exit 1
+    fi
   fi
 }
 

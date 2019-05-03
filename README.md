@@ -181,6 +181,16 @@ Colors in the output can be disabled by setting the
 
 -----
 
+### Custom callback script
+
+If you like to setup custom callback script on context change, you can export `KUBECTX_CALLBACK`. The script will be invoked on any context change. Callback script can take one parameter - context name.
+
+```
+export KUBECTX_CALLBACK="/usr/local/bin/check_env"
+```
+
+-----
+
 ####  Users
 
 | What are others saying about kubectx? |
