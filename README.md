@@ -1,3 +1,11 @@
+# `kubectx` + `kubens`: Power tools for kubectl
+
+![Latest GitHub release](https://img.shields.io/github/release/ahmetb/kubectx.svg)
+![GitHub stars](https://img.shields.io/github/stars/ahmetb/kubectx.svg?label=github%20stars)
+![Travis (.org) branch](https://img.shields.io/travis/ahmetb/kubectx/master.svg)
+![Proudly written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4.svg)
+
+
 This repository provides both `kubectx` and `kubens` tools.
 
 
