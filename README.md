@@ -148,9 +148,11 @@ sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
 
 #### Arch Linux
 
-An unofficial [AUR package](https://aur.archlinux.org/packages/kubectx) of `kubectx`
-is available. Install instructions can be found on the [Arch 
-wiki](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_packages).
+Available as official Arch Linux package. Install it via:
+
+```bash
+sudo pacman -S kubectx
+```
 
 #### Debian/Ubuntu
 
