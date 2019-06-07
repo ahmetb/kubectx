@@ -24,6 +24,10 @@ IFS=$'\n\t'
 SELF_CMD="$0"
 KUBENS_DIR="${XDG_CACHE_HOME:-$HOME/.kube}/kubens"
 
+exec {STDIN}>&0
+exec {STDOUT}>&1
+exec {STDERR}>&2
+
 usage() {
   cat <<"EOF"
 USAGE:
@@ -58,6 +62,15 @@ current_context() {
 }
 
 get_namespaces() {
+  $KUBECTL get namespaces 2>/dev/null 1>/dev/null
+  if [[ $? -ne 0 ]]; then
+    $KUBECTL get namespaces >&$STDOUT 2>&$STDERR <&$STDIN
+
+    if [[ $? -ne 0 ]]; then
+      return $?
+    fi
+  fi
+
   $KUBECTL get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
 }
 
