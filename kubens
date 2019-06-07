@@ -62,16 +62,19 @@ current_context() {
 }
 
 get_namespaces() {
-  $KUBECTL auth can-i get namespaces 1>/dev/null 2>/dev/null
-  if [[ $? -ne 0 ]]; then
-    $KUBECTL auth can-i get namespaces --quiet 1>&$STDOUT 2>&$STDERR <&$STDIN
-
-    if [[ $? -ne 0 ]]; then
-      return $?
-    fi
+  name_jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
+  namespaces=$($KUBECTL get namespaces -o=jsonpath="${name_jsonpath}" 2>/dev/null)
+  if [[ $? -eq 0 ]]; then
+    echo "${namespaces}"
+    return 0
   fi
 
-  $KUBECTL get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
+  $KUBECTL auth can-i get namespaces --quiet 1>&$STDOUT 2>&$STDERR <&$STDIN
+  if [[ $? -ne 0 ]]; then
+    return $?
+  fi
+
+  $KUBECTL get namespaces -o=jsonpath="${name_jsonpath}"
 }
 
 escape_context_name() {
