@@ -24,6 +24,9 @@ IFS=$'\n\t'
 SELF_CMD="$0"
 KUBENS_DIR="${XDG_CACHE_HOME:-$HOME/.kube}/kubens"
 
+# Assign the main process' standard streams to variables so that they can be
+# used to invoke kubectl interactively while in a function. Interactively
+# invoking kubectl allows any configured client-go auth plugins to trigger.
 exec {STDIN}>&0
 exec {STDOUT}>&1
 exec {STDERR}>&2
@@ -63,12 +66,20 @@ current_context() {
 
 get_namespaces() {
   name_jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'
-  namespaces=$($KUBECTL get namespaces -o=jsonpath="${name_jsonpath}" 2>/dev/null)
+  namespaces="$($KUBECTL get namespaces -o=jsonpath="${name_jsonpath}" 2>/dev/null)"
   if [[ $? -eq 0 ]]; then
     echo "${namespaces}"
     return 0
   fi
 
+  # If kubectl fails to get namespaces it might be due to the need authenticate
+  # with the cluster via a client-go authentication plugin. Auth plugins are
+  # only triggered when kubectl is invoked with an interactive STDOUT, so the
+  # original get namespaces attempt won't trigger them.
+  #
+  # This auth attempt with interactive standard streams will trigger any
+  # existing auth plugins. If the auth is successful then the subsequent get
+  # namespaces attempt will succeed and return the necessary namespace output.
   $KUBECTL auth can-i get namespaces --quiet 1>&$STDOUT 2>&$STDERR <&$STDIN
   if [[ $? -ne 0 ]]; then
     return $?
