@@ -85,7 +85,9 @@ Active namespace is "default".
 
 ### macOS
 
-:confetti_ball: Use the [Homebrew](https://brew.sh/) package manager:
+#### Homebrew
+
+:confetti_ball: If you use [Homebrew](https://brew.sh/) you can install like this:
 
     brew install kubectx
 
@@ -93,6 +95,12 @@ This command will set up bash/zsh/fish completion scripts automatically.
 
 - If you like to add context/namespace info to your shell prompt (`$PS1`),
   I recommend trying out [kube-ps1](https://github.com/jonmosco/kube-ps1).
+
+#### MacPorts
+
+If you use [MacPorts](https://www.macports.org) you can install like this:
+
+    sudo port install kubectx
 
 ### Linux
 
