@@ -104,10 +104,11 @@ switch_context() {
 }
 
 choose_context_interactive() {
+  local partial_name="${1:-}"
   local choice
   choice="$(_KUBECTX_FORCE_COLOR=1 \
     FZF_DEFAULT_COMMAND="${SELF_CMD}" \
-    fzf --ansi || true)"
+    fzf --ansi --query="$partial_name" || true)"
   if [[ -z "${choice}" ]]; then
     echo 2>&1 "error: you did not choose any of the options"
     exit 1
@@ -120,7 +121,7 @@ set_context() {
   local prev
   prev="$(current_context)" || exit_err "error getting current context"
 
-  switch_context "${1}"
+  switch_context "${1}" || return 1
 
   if [[ "${prev}" != "${1}" ]]; then
     save_context "${prev}"
@@ -188,8 +189,13 @@ main() {
     exit 1
   fi
 
+  local interactive
+  if [[ -t 1 &&  -z "${KUBECTX_IGNORE_FZF:-}" && "$(type fzf &>/dev/null; echo $?)" -eq 0 ]]; then
+    interactive=y
+  fi
+
   if [[ "$#" -eq 0 ]]; then
-    if [[ -t 1 &&  -z "${KUBECTX_IGNORE_FZF:-}" && "$(type fzf &>/dev/null; echo $?)" -eq 0 ]]; then
+    if [[ -n "${interactive:-}" ]]; then
       choose_context_interactive
     else
       list_contexts
@@ -222,7 +228,12 @@ main() {
     elif [[ "${1}" =~ (.+)=(.+) ]]; then
       rename_context "${BASH_REMATCH[2]}" "${BASH_REMATCH[1]}"
     else
-      set_context "${1}"
+      if [[ -n "${interactive:-}" ]]; then
+        echo doing it
+        set_context "$1" || choose_context_interactive "$1"
+      else
+        set_context "$1"
+      fi
     fi
   else
     usage
