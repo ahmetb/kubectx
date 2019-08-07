@@ -27,14 +27,16 @@ KUBECTX="${XDG_CACHE_HOME:-$HOME/.kube}/kubectx"
 usage() {
   cat <<"EOF"
 USAGE:
-  kubectx                       : list the contexts
-  kubectx <NAME>                : switch to context <NAME>
-  kubectx -                     : switch to the previous context
-  kubectx <NEW_NAME>=<NAME>     : rename context <NAME> to <NEW_NAME>
-  kubectx <NEW_NAME>=.          : rename current-context to <NEW_NAME>
-  kubectx -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
-                                  (this command won't delete the user/cluster entry
-                                  that is used by the context)
+  kubectx                           : list the contexts
+  kubectx <NAME>                    : switch to context <NAME>
+  kubectx -                         : switch to the previous context
+  kubectx <NEW_NAME>=<NAME>         : rename context <NAME> to <NEW_NAME>
+  kubectx <NEW_NAME>=.              : rename current-context to <NEW_NAME>
+  kubectx -d <NAME> [<NAME...>]     : delete context <NAME> ('.' for current-context)
+                                      (this command won't delete the user/cluster entry
+                                      that is used by the context)
+  kubectx -D                        : deletes all context
+          --exclude <NAME> [<NAME>] : (optional) excludes the context from deletion
 
   kubectx -h,--help             : show this message
 EOF
@@ -167,6 +169,18 @@ delete_contexts() {
   done
 }
 
+exclude_from_ctx_list() {
+  local ctx
+  ctx=$(list_contexts) || "error getting context list"
+
+  # Remove the excluded context from the list one by one
+  for e in ${@}; do
+    ctx_list=`echo ${ctx} | sed "s/\b$e\b//g"`
+  done
+
+  echo $ctx_list
+}
+
 delete_context() {
   local ctx
   ctx="${1}"
@@ -200,6 +214,17 @@ main() {
       exit 1
     fi
     delete_contexts "${@:2}"
+  elif [[ "${1}" == "-D" ]]; then
+    if [[ "$#" -lt 2 ]]; then
+      delete_contexts $(list_contexts)
+    elif [[ "$#" -eq 2 ]] ||
+         [[ "${2}" != "--exclude" ]]; then
+      echo "error: missing context NAME" >&2
+      usage
+      exit 1
+    else
+      delete_contexts $(exclude_from_ctx_list "${@:3}")
+    fi
   elif [[ "$#" -gt 1 ]]; then
     echo "error: too many arguments" >&2
     usage
