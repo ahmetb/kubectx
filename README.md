@@ -191,7 +191,7 @@ If you like to customize the colors indicating the current namespace or context,
 
 ```
 export KUBECTX_CURRENT_FGCOLOR=$(tput setaf 6) # blue text
-export KUBECTX_CURRENT_BGCOLOR=$(tput setaf 7) # white background
+export KUBECTX_CURRENT_BGCOLOR=$(tput setab 7) # white background
 ```
 
 Colors in the output can be disabled by setting the
