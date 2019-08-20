@@ -28,6 +28,8 @@ usage() {
   cat <<"EOF"
 USAGE:
   kubectx                       : list the contexts
+  kubectx -a <KUBECONFIG FILE>  : add cluster to ~/.kube/config file
+  kubectx -u                    : unset current context
   kubectx <NAME>                : switch to context <NAME>
   kubectx -                     : switch to the previous context
   kubectx <NEW_NAME>=<NAME>     : rename context <NAME> to <NEW_NAME>
@@ -36,7 +38,6 @@ USAGE:
                                   (this command won't delete the user/cluster entry
                                   that is used by the context)
   kubectx -l	                : list all contexts
-  kubectx -u	                : unset current context
 
   kubectx -h,--help             : show this message
 EOF
@@ -53,6 +54,10 @@ current_context() {
 
 get_contexts() {
   $KUBECTL config get-contexts -o=name | sort -n
+}
+
+get_clusters() {
+  $KUBECTL config get-clusters | sort -n
 }
 
 list_contexts() {
@@ -142,6 +147,28 @@ context_exists() {
   grep -q ^"${1}"\$ <($KUBECTL config get-contexts -o=name)
 }
 
+add_context(){
+  new_context=$1
+  if test -f "$new_context"; then
+    if test `find "$new_context" -mmin +5`
+    then
+      echo "File $new_context is too old, is it correct?"
+    else
+      export KUBECONFIG=~/.kube/config:$new_context
+      $KUBECTL config view --flatten --merge  > /tmp/config
+      cp /tmp/config /home/chiaretto/.kube/config
+      echo "Context added..." >&2
+      unset KUBECONFIG
+    fi
+  else
+      echo "File $new_context not found"
+  fi
+}
+
+cluster_exists() {
+  grep -q ^"${1}"\$ <($KUBECTL config get-clusters -o=name)
+}
+
 rename_context() {
   local old_name="${1}"
   local new_name="${2}"
@@ -166,6 +193,7 @@ rename_context() {
 delete_contexts() {
   for i in "${@}"; do
     delete_context "${i}"
+    delete_cluster "${i}"
   done
 }
 
@@ -177,6 +205,13 @@ delete_context() {
   fi
   echo "Deleting context \"${ctx}\"..." >&2
   $KUBECTL config delete-context "${ctx}"
+}
+
+delete_cluster() {
+  local cluster
+  cluster="${1}"
+  echo "Deleting cluster \"${cluster}\"..." >&2
+  $KUBECTL config delete-cluster "${cluster}"
 }
 
 unset_current_context() {
@@ -207,6 +242,13 @@ main() {
       exit 1
     fi
     delete_contexts "${@:2}"
+    elif [[ "${1}" == "-a" ]]; then
+    if [[ "$#" -lt 2 ]]; then
+      echo "error: missing new context file" >&2
+      usage
+      exit 1
+    fi
+    add_context "${@:2}"
   elif [[ "$#" -gt 1 ]]; then
     echo "error: too many arguments" >&2
     usage
@@ -217,7 +259,7 @@ main() {
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
     elif [[ "${1}" == '-u' ]]; then
-      unset_current_context
+      unset_current_context     
     elif [[ "${1}" == '-l' ]]; then
       list_contexts
     elif [[ "${1}" =~ ^-(.*) ]]; then
