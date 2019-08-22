@@ -30,6 +30,7 @@ USAGE:
   kubectx                       : list the contexts
   kubectx <NAME>                : switch to context <NAME>
   kubectx -                     : switch to the previous context
+  kubectx -c                    : prints the current context only
   kubectx <NEW_NAME>=<NAME>     : rename context <NAME> to <NEW_NAME>
   kubectx <NEW_NAME>=.          : rename current-context to <NEW_NAME>
   kubectx -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
@@ -193,6 +194,13 @@ main() {
     else
       list_contexts
     fi
+  elif [[ "${1}" == "-c" ]]; then
+    if [[ "$#" -ne 1 ]]; then
+      echo "error: too many arguments" >&2
+      usage
+      exit 1
+    fi
+    current_context
   elif [[ "${1}" == "-d" ]]; then
     if [[ "$#" -lt 2 ]]; then
       echo "error: missing context NAME" >&2
