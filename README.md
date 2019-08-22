@@ -63,6 +63,7 @@ USAGE:
   kubens                    : list the namespaces
   kubens <NAME>             : change the active namespace
   kubens -                  : switch to the previous namespace
+  kubens -c                 : print only the current namespace in the current context
 ```
 
 
