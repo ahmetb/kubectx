@@ -113,6 +113,33 @@ load common
   [ "$status" -eq 1 ]
 }
 
+@test "-c/--current fails when no context set" {
+  use_config config1
+
+  run "${COMMAND}" -c
+  echo "$output"
+  [ $status -eq 1 ]
+  run "${COMMAND}" --current
+  echo "$output"
+  [ $status -eq 1 ]
+}
+
+@test "-c/--current prints the current context" {
+  use_config config1
+
+  run "${COMMAND}" user1@cluster1
+  [ $status -eq 0 ]
+
+  run "${COMMAND}" -c
+  echo "$output"
+  [ $status -eq 0 ]
+  [[ "$output" = "user1@cluster1" ]]
+  run "${COMMAND}" --current
+  echo "$output"
+  [ $status -eq 0 ]
+  [[ "$output" = "user1@cluster1" ]]
+}
+
 @test "rename context" {
   use_config config2
 
