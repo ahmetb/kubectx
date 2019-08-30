@@ -102,3 +102,43 @@ load common
   [[ "$status" -eq 1 ]]
   [[ "$output" = *"current-context is not set"* ]]
 }
+
+@test "-c/--current works when no namespace is set on context" {
+  use_config config1
+  switch_context user1@cluster1
+
+  run ${COMMAND} "-c"
+  echo "$output"
+  [[ "$status" -eq 0 ]]
+  [[ "$output" = "default" ]]
+  run ${COMMAND} "--current"
+  echo "$output"
+  [[ "$status" -eq 0 ]]
+  [[ "$output" = "default" ]]
+}
+
+@test "-c/--current prints the namespace after it is set" {
+  use_config config1
+  switch_context user1@cluster1
+  ${COMMAND} ns1
+
+  run ${COMMAND} "-c"
+  echo "$output"
+  [[ "$status" -eq 0 ]]
+  [[ "$output" = "ns1" ]]
+  run ${COMMAND} "--current"
+  echo "$output"
+  [[ "$status" -eq 0 ]]
+  [[ "$output" = "ns1" ]]
+}
+
+@test "-c/--current fails when current context is not set" {
+  use_config config1
+  run ${COMMAND} -c
+  echo "$output"
+  [[ "$status" -eq 1 ]]
+
+  run ${COMMAND} --current
+  echo "$output"
+  [[ "$status" -eq 1 ]]
+}
