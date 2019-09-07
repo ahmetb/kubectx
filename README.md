@@ -106,6 +106,62 @@ If you use [MacPorts](https://www.macports.org) you can install like this:
 
 ### Linux
 
+#### Zsh
+
+Open your .zshrc file and add the following lines:
+
+```sh
+alias install_kubectx_kubens='curl "https://raw.githubusercontent.com/ahmetb/kubectx/master/kubectx" --create-dirs -o ~/Downloads/kubectx/kubectx \
+  && curl "https://raw.githubusercontent.com/ahmetb/kubectx/master/kubens" --create-dirs -o ~/Downloads/kubectx/kubens \
+  && sudo mv ~/Downloads/kubectx/kubectx /usr/local/bin/kubectx \
+  && sudo mv ~/Downloads/kubectx/kubens /usr/local/bin/kubens \
+  && sudo chmod +x /usr/local/bin/kubectx \
+  && sudo chmod +x /usr/local/bin/kubens \
+  && curl "https://raw.githubusercontent.com/ahmetb/kubectx/master/completion/kubectx.zsh" --create-dirs -o ~/Downloads/kubectx/completions/_kubectx.zsh \
+  && sudo chmod 766 ~/Downloads/kubectx/completions/_kubectx.zsh \
+  && curl "https://raw.githubusercontent.com/ahmetb/kubectx/master/completion/kubens.zsh" --create-dirs -o ~/Downloads/kubectx/completions/_kubens.zsh \
+  && sudo chmod 766 ~/Downloads/kubectx/completions/_kubens.zsh'
+```
+
+Note: You can select any folder to download the files.
+
+Then save your .zshrc file and source it:
+
+```sh
+source ~/.zshrc
+```
+
+Run the new alias to download and install kubectx and kubens:
+
+```sh
+install_kubectx_kubens
+```
+
+Now that we have kubectx and kubens installed, we are going to add ZSH auto completion.
+
+Edit your .zshrc file again and add the following lines:
+
+```sh
+fpath=(~/Downloads/kubectx/completions $fpath)
+autoload -Uz compinit
+for dump in ~/.zcompdump(N.mh+24); do
+  compinit
+done
+compinit -C
+```
+
+_compinit can make your terminal load really slow so the lines above makes the compinit run once a day to check the cached .zcompdump to see if it needs regenerating._
+
+Save your .zshrc file and source it again:
+
+```sh
+source ~/.zshrc
+```
+
+If you need to update kubectx and kubens the next time, you only need to run install_kubectx_kubens again.
+
+#### Other Installation instructions for Linux
+
 Since `kubectx`/`kubens` are written in Bash, you should be able to install
 them to any POSIX environment that has Bash installed.
 
