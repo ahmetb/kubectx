@@ -125,9 +125,9 @@ them to any POSIX environment that has Bash installed.
     ln -s /opt/kubectx/completion/kubectx.zsh ~/.oh-my-zsh/completions/_kubectx.zsh
     ln -s /opt/kubectx/completion/kubens.zsh ~/.oh-my-zsh/completions/_kubens.zsh
     ```  
-    Note that the leading underscore seems to be a convention.  
-    If not using oh-my-zsh, you could link to `/usr/share/zsh/functions/Completion` (might require sudo), depending on the `$fpath` of your zsh installation.  
-    If completion doesn't work, try running `autoload -U compinit && compinit`. In case of error, calling `compaudit` might help.
+    Note that the leading underscore seems to be a convention. If completion doesn't work, add `autoload -U compinit && compinit` to your `.zshrc` (similar to [`zsh-completions`](https://github.com/zsh-users/zsh-completions/blob/master/README.md#oh-my-zsh)).
+    If not using oh-my-zsh, you could link to `/usr/share/zsh/functions/Completion` (might require sudo), depending on the `$fpath` of your zsh installation.
+    In case of error, calling `compaudit` might help.
   - For bash:
     ```bash
     git clone https://github.com/ahmetb/kubectx.git ~/.kubectx
