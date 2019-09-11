@@ -21,14 +21,19 @@ kubectx is a utility to manage and switch between kubectl(1) contexts.
 
 ```
 USAGE:
-  kubectx                   : list the contexts
-  kubectx <NAME>            : switch to context <NAME>
-  kubectx -                 : switch to the previous context
-  kubectx <NEW_NAME>=<NAME> : rename context <NAME> to <NEW_NAME>
-  kubectx <NEW_NAME>=.      : rename current-context to <NEW_NAME>
-  kubectx -d <NAME>         : delete context <NAME> ('.' for current-context)
-                              (this command won't delete the user/cluster entry
-                              that is used by the context)
+  kubectx                       : list the contexts
+  kubectx -a <KUBECONFIG FILE>  : add cluster to ~/.kube/config file
+  kubectx -u                    : unset current context
+  kubectx <NAME>                : switch to context <NAME>
+  kubectx -                     : switch to the previous context
+  kubectx <NEW_NAME>=<NAME>     : rename context <NAME> to <NEW_NAME>
+  kubectx <NEW_NAME>=.          : rename current-context to <NEW_NAME>
+  kubectx -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
+                                  (this command won't delete the user/cluster entry
+                                  that is used by the context)
+  kubectx -l                    : list all contexts
+
+  kubectx -h,--help             : show this message
 ```
 
 ### Usage
