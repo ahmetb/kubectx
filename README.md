@@ -52,6 +52,8 @@ Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
 `kubectx` supports <kbd>Tab</kbd> completion on bash/zsh/fish shells to help with
 long context names. You don't have to remember full context names anymore.
 
+[Learn how to specify multiple kubeconfig files using KUBECONFIG environment variable or —kubeconfig option](ttps://kubernetes.io/docs/reference/kubectl/cheatsheet/#kubectl-context-and-configuration)
+
 -----
 
 # kubens(1)
