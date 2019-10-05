@@ -172,6 +172,45 @@ Available as a Debian package for [Debian Buster (testing)](https://packages.deb
 sudo apt install kubectx
 ```
 
+### ZSH
+
+`kubectx` can be automatically loaded as a ZSH plugin by any framework that supports [oh-my-zsh](github.com/robbyrussell/oh-my-zsh) compatible plugins.
+
+#### zgen
+
+If you're using [zgen](https://github.com/tarjoilija/zgen):
+
+1. Add `zgen load ahmetb/kubectx` to your `.zshrc` along with your other `zgen load` commands.
+2. `zgen reset && zgen save`. `zgen` will automatically clone the `git` repository the next time you start a terminal session.
+
+#### Antigen
+
+If you're using [Antigen](https://github.com/zsh-users/antigen):
+
+1. Add `antigen bundle ahmetb/kubectx` to your `.zshrc` where you've listed your other plugins.
+2. Close and reopen your terminal window to start a new session and Antigen will automatically clone and load the plugin for you. Alternatively, you can run `antigen bundle ahmetb/kubectx` in a running shell to have `antigen` automatically clone and load the new plugin immediately.
+
+#### oh-my-zsh
+
+If you're using [oh-my-zsh](github.com/robbyrussell/oh-my-zsh):
+
+1. In the terminal, change to _oh-my-zsh_'s custom plugin directory:
+
+    `cd ~/.oh-my-zsh/custom/plugins/`
+
+2. Clone the repository into a new `kubectx` directory:
+
+    `git clone https://github.com/ahmetb/kubectx.git kubectx`
+
+3. Edit your `~/.zshrc` and add `kubectx` – same as clone directory – to the list of plugins to enable:
+
+    `plugins=( ... kubectx )`
+
+4. Then, restart your terminal application to **refresh context** and use the plugin. Alternatively, you can source your current shell configuration:
+
+    `source ~/.zshrc`
+
+
 -----
 
 ### Interactive mode
