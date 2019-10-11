@@ -3,7 +3,9 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq bats
   - sudo curl -fsSL -o /usr/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kubectl
-  - sudo chmod +x /usr/bin/kubectl 
+  - sudo chmod +x /usr/bin/kubectl
 script:
   - bats test/kubectx.bats
   - bats test/kubens.bats
+  - shellcheck kubectx
+  - shellcheck kubens
