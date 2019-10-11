@@ -32,7 +32,6 @@ USAGE:
   kubectx -u                    : unset current context
   kubectx <NAME>                : switch to context <NAME>
   kubectx -                     : switch to the previous context
-  kubectx -c, --current         : show the current context name
   kubectx <NEW_NAME>=<NAME>     : rename context <NAME> to <NEW_NAME>
   kubectx <NEW_NAME>=.          : rename current-context to <NEW_NAME>
   kubectx -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
@@ -249,11 +248,6 @@ main() {
   elif [[ "$#" -eq 1 ]]; then
     if [[ "${1}" == "-" ]]; then
       swap_context
-    elif [[ "${1}" == '-c' || "${1}" == '--current' ]]; then
-      # we don't call current_context here for two reasons:
-      # - it does not fail when current-context property is not set
-      # - it does not return a trailing newline
-      kubectl config current-context
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
     elif [[ "${1}" == '-u' ]]; then
