@@ -31,6 +31,11 @@ USAGE:
                               (this command won't delete the user/cluster entry
                               that is used by the context)
 ```
+### Config
+config more k8s cluster for local process cluster k8s object;`.kube/config,.kube/config-2` is k8s cluster context config file;
+```
+export KUBECONFIG=$KUBECONFIG:$HOME/.kube/config:$HOME/.kube/config-2
+```
 
 ### Usage
 
