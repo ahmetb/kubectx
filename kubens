@@ -22,16 +22,21 @@ set -eou pipefail
 IFS=$'\n\t'
 
 SELF_CMD="$0"
+SELF="kubens"
+if [[ "$(basename "$0")" == kubectl-* ]]; then # invoked as plugin
+  SELF="kubectl ns"
+fi
+
 KUBENS_DIR="${XDG_CACHE_HOME:-$HOME/.kube}/kubens"
 
 usage() {
-  cat <<"EOF"
+  cat <<EOF
 USAGE:
-  kubens                    : list the namespaces in the current context
-  kubens <NAME>             : change the active namespace of current context
-  kubens -                  : switch to the previous namespace in this context
-  kubens -c, --current      : show the current namespace
-  kubens -h,--help          : show this message
+  $SELF                    : list the namespaces in the current context
+  $SELF <NAME>             : change the active namespace of current context
+  $SELF -                  : switch to the previous namespace in this context
+  $SELF -c, --current      : show the current namespace
+  $SELF -h,--help          : show this message
 EOF
 }
 
