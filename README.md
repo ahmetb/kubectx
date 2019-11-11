@@ -7,6 +7,7 @@
 
 
 This repository provides both `kubectx` and `kubens` tools.
+[Install &rarr;](#installation)
 
 
 **`kubectx`** helps you switch between clusters back and forth:
@@ -84,6 +85,31 @@ Active namespace is "default".
 -----
 
 ## Installation
+
+There are several installation options:
+
+- As kubectl plugins (macOS/Linux)
+- macOS
+  - Homebrew (recommended)
+  - MacPorts
+- Linux
+  - manual installation/upgrades
+  - Arch Linux
+  - Debian/Ubuntu
+
+### Kubectl Plugins (macOS and Linux)
+
+You can install and use [Krew](https://github.com/kubernetes-sigs/krew/) kubectl
+plugin manager to get `kubectx` and `kubens`. **NOTE:** This will not install
+shell completion scripts, if you want those, choose another installation method
+below.
+
+```sh
+kubectl krew install ctx
+kubectl krew install ns
+```
+
+After installing, the tools will be available as `kubectl ctx` and `kubectl ns`.
 
 ### macOS
 
