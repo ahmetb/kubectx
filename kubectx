@@ -22,14 +22,16 @@ set -eou pipefail
 IFS=$'\n\t'
 
 SELF_CMD="$0"
-SELF="kubectx"
-if [[ "$(basename "$0")" == kubectl-* ]]; then # invoked as plugin
-  SELF="kubectl ctx"
-fi
 
 KUBECTX="${XDG_CACHE_HOME:-$HOME/.kube}/kubectx"
 
 usage() {
+  local SELF
+  SELF="kubectx"
+  if [[ "$(basename "$0")" == kubectl-* ]]; then # invoked as plugin
+    SELF="kubectl ctx"
+  fi
+
   cat <<EOF
 USAGE:
   $SELF                       : list the contexts
