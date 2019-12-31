@@ -239,3 +239,26 @@ load common
   [ "$status" -eq 0 ]
   [[ "$output" = "user2@cluster1" ]]
 }
+
+@test "no selected context" {
+  use_config config1
+
+  run ${COMMAND} -c
+  echo "$output"
+  [ "$status" -eq 1 ]
+  [[ "$output" = "error: current-context is not set" ]]
+
+}
+
+@test "unset selected context" {
+  use_config config3
+
+  run ${COMMAND} -u
+  echo "$output"
+  [ "$status" -eq 0 ]
+
+  run ${COMMAND} -c
+  echo "$output"
+  [ "$status" -eq 1 ]
+  [[ "$output" = "error: current-context is not set" ]]
+}
