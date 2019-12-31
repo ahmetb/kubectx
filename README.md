@@ -31,6 +31,7 @@ USAGE:
   kubectx -d <NAME>         : delete context <NAME> ('.' for current-context)
                               (this command won't delete the user/cluster entry
                               that is used by the context)
+  kubectx -u, --unset       : unset the current context
 ```
 
 ### Usage
