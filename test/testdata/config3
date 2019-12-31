@@ -1,4 +1,4 @@
-# config with two contexts
+# config with two contexts and a selected default
 
 apiVersion: v1
 clusters:
