@@ -187,7 +187,7 @@ delete_context() {
 }
 
 unset_context() {
-  echo "Unsetting default context." >&2
+  echo "Unsetting current context." >&2
   $KUBECTL config unset current-context
 }
 
