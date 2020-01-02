@@ -243,6 +243,9 @@ load common
 @test "unset selected context" {
   use_config config2
 
+  run ${COMMAND} user1@cluster1
+  [ "$status" -eq 0 ]
+
   run ${COMMAND} -u
   [ "$status" -eq 0 ]
 
