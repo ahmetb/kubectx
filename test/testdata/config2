@@ -14,7 +14,7 @@ contexts:
     cluster: cluster1
     user: user2
   name: user2@cluster1
-current-context: ""
+current-context: "user1@cluster1"
 kind: Config
 preferences: {}
 users:
