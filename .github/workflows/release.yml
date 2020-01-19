@@ -1,0 +1,36 @@
+name: release
+on:
+  push:
+    branches:
+    - 'release-bot'
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: Install duggan/bats
+      run: |
+        sudo add-apt-repository ppa:duggan/bats --yes && \
+        sudo apt-get update -qq && \
+        sudo apt-get install -qq bats
+    - name: Install kubectl
+      run: |
+        sudo curl -fsSL -o /usr/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kubectl && \
+        sudo chmod +x /usr/bin/kubectl
+    - name: Run kubectx tests
+      run: |
+        basename /usr/bin && \
+        bats test/kubectx.bats && \
+        shellcheck kubectx
+      env:
+        TERM: xterm
+    - name: Run kubens tests
+      run: |
+        basename /usr/bin && \
+        bats test/kubens.bats && \
+        shellcheck kubens   
+      env:
+        TERM: xterm
+     
+
