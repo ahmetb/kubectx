@@ -1,46 +1,29 @@
 name: release
 on:
   push:
-    branches:
-    - 'release-bot'
+    tags:
+    - 'v*.*.*'
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@master
-    - name: Install duggan/bats
-      run: |
-        sudo add-apt-repository ppa:duggan/bats --yes && \
-        sudo apt-get update -qq && \
-        sudo apt-get install -qq bats
-    - name: Install kubectl
-      run: |
-        sudo curl -fsSL -o /usr/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/amd64/kubectl && \
-        sudo chmod +x /usr/bin/kubectl
-    - name: Run kubectx tests
-      run: |
-        basename /usr/bin && \
-        bats test/kubectx.bats && \
-        shellcheck kubectx
-      env:
-        TERM: xterm
-    - name: Run kubens tests
-      run: |
-        basename /usr/bin && \
-        bats test/kubens.bats && \
-        shellcheck kubens   
-      env:
-        TERM: xterm
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: "v0.7.2"
-        release_name: Release "v0.7.2"
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+    - name: Update new version for plugin 'ctx' in krew-index
+      uses: rajatjindal/krew-release-bot@v0.0.31
+      with:
+        krew_template_file: .krew/ctx.yaml
+    - name: Update new version for plugin 'ns' in krew-index
+      uses: rajatjindal/krew-release-bot@v0.0.31
+      with:
+        krew_template_file: .krew/ns.yaml 
 
-        
-     
 

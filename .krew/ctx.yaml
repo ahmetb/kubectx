@@ -1,0 +1,31 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: ctx
+spec:
+  homepage: https://github.com/ahmetb/kubectx
+  shortDescription: Switch between contexts in your kubeconfig
+  version: {{ .TagName }}
+  description: |
+    Also known as "kubectx", a utility to switch between context entries in
+    your kubeconfig file efficiently.
+  caveats: |
+    If fzf is installed on your machine, you can interactively choose
+    between the entries using the arrow keys, or by fuzzy searching
+    as you type.
+    See https://github.com/ahmetb/kubectx for customization and details.
+  platforms:
+  - selector:
+      matchExpressions:
+      - key: os
+        operator: In
+        values:
+        - darwin
+        - linux
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/archive/{{ .TagName }}.tar.gz" .TagName }}
+    bin: kubectx
+    files:
+    - from: kubectx-*/kubectx
+      to: .
+    - from: kubectx-*/LICENSE
+      to: .
