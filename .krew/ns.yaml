@@ -1,0 +1,31 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: ns
+spec:
+  homepage: https://github.com/ahmetb/kubectx
+  shortDescription: Switch between Kubernetes namespaces
+  version: {{ .TagName }}
+  description: |
+    Also known as "kubens", a utility to set your current namespace and switch
+    between them.
+  caveats: |
+    If fzf is installed on your machine, you can interactively choose
+    between the entries using the arrow keys, or by fuzzy searching
+    as you type.
+    See https://github.com/ahmetb/kubectx for customization and details.
+  platforms:
+  - selector:
+      matchExpressions:
+      - key: os
+        operator: In
+        values:
+        - darwin
+        - linux
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/archive/{{ .TagName }}.tar.gz" .TagName }}
+    bin: kubens
+    files:
+    - from: kubectx-*/kubens
+      to: .
+    - from: kubectx-*/LICENSE
+      to: .
