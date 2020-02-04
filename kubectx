@@ -43,6 +43,7 @@ USAGE:
   $SELF -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
                                   (this command won't delete the user/cluster entry
                                   that is used by the context)
+  $SELF -u, --unset           : unset the current context
 
   $SELF -h,--help             : show this message
 EOF
@@ -185,6 +186,11 @@ delete_context() {
   $KUBECTL config delete-context "${ctx}"
 }
 
+unset_context() {
+  echo "Unsetting current context." >&2
+  $KUBECTL config unset current-context
+}
+
 main() {
   if hash kubectl 2>/dev/null; then
     KUBECTL=kubectl
@@ -220,6 +226,8 @@ main() {
       # - it does not fail when current-context property is not set
       # - it does not return a trailing newline
       kubectl config current-context
+    elif [[ "${1}" == '-u' || "${1}" == '--unset' ]]; then
+      unset_context
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
     elif [[ "${1}" =~ ^-(.*) ]]; then
