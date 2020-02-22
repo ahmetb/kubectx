@@ -34,7 +34,8 @@ usage() {
 
   cat <<EOF
 USAGE:
-  $SELF                       : list the contexts
+  $SELF                       : list the contexts, or select interactively if fzf is installed
+  $SELF -l, --list            : list the contexts
   $SELF <NAME>                : switch to context <NAME>
   $SELF -                     : switch to the previous context
   $SELF -c, --current         : show the current context name
@@ -226,6 +227,8 @@ main() {
       # - it does not fail when current-context property is not set
       # - it does not return a trailing newline
       kubectl config current-context
+    elif [[ "${1}" == '-l' || "${1}" == '--list' ]]; then
+      list_contexts
     elif [[ "${1}" == '-u' || "${1}" == '--unset' ]]; then
       unset_context
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
