@@ -18,11 +18,11 @@ jobs:
         tag_name: ${{ github.ref }}
         release_name: Release ${{ github.ref }}
     - name: Update new version for plugin 'ctx' in krew-index
-      uses: rajatjindal/krew-release-bot@v0.0.31
+      uses: rajatjindal/krew-release-bot@v0.0.37
       with:
         krew_template_file: .krew/ctx.yaml
     - name: Update new version for plugin 'ns' in krew-index
-      uses: rajatjindal/krew-release-bot@v0.0.31
+      uses: rajatjindal/krew-release-bot@v0.0.37
       with:
         krew_template_file: .krew/ns.yaml 
 
