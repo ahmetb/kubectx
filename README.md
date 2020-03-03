@@ -142,16 +142,16 @@ them to any POSIX environment that has Bash installed.
   - or save them to a directory, then create symlinks to `kubectx`/`kubens` from
     somewhere in your `PATH`, like `/usr/local/bin`
 - Make `kubectx` and `kubens` executable (`chmod +x ...`)
-- Install bash/zsh/fish [completion scripts](completion/).  
-  - For zsh:  
-    The completion scripts have to be in a path that belongs to `$fpath`. Either link or copy them to an existing folder.  
+- Install bash/zsh/fish [completion scripts](completion/).
+  - For zsh:
+    The completion scripts have to be in a path that belongs to `$fpath`. Either link or copy them to an existing folder.
     If using oh-my-zsh you can do as follows:
     ```bash
     mkdir -p ~/.oh-my-zsh/completions
     chmod -R 755 ~/.oh-my-zsh/completions
     ln -s /opt/kubectx/completion/kubectx.zsh ~/.oh-my-zsh/completions/_kubectx.zsh
     ln -s /opt/kubectx/completion/kubens.zsh ~/.oh-my-zsh/completions/_kubens.zsh
-    ```  
+    ```
     Note that the leading underscore seems to be a convention. If completion doesn't work, add `autoload -U compinit && compinit` to your `.zshrc` (similar to [`zsh-completions`](https://github.com/zsh-users/zsh-completions/blob/master/README.md#oh-my-zsh)).
     If not using oh-my-zsh, you could link to `/usr/share/zsh/functions/Completion` (might require sudo), depending on the `$fpath` of your zsh installation.
     In case of error, calling `compaudit` might help.
@@ -162,8 +162,8 @@ them to any POSIX environment that has Bash installed.
     ln -sf ~/.kubectx/completion/kubens.bash $COMPDIR/kubens
     ln -sf ~/.kubectx/completion/kubectx.bash $COMPDIR/kubectx
     cat << FOE >> ~/.bashrc
-    
-    
+
+
     #kubectx and kubens
     export PATH=~/.kubectx:\$PATH
     FOE
@@ -210,6 +210,11 @@ with fuzzy searching, you just need to [install
 ![kubectx interactive search with fzf](img/kubectx-interactive.gif)
 
 If you have `fzf` installed, but want to opt out of using this feature, set the environment variable `KUBECTX_IGNORE_FZF=1`.
+
+If you want to keep `fzf` interactive mode but need the default behavior of the command, you can do it using Unix composability:
+```
+kubectx | cat
+```
 
 
 -----
