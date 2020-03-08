@@ -38,6 +38,7 @@ USAGE:
   $SELF <NAME>                : switch to context <NAME>
   $SELF -                     : switch to the previous context
   $SELF -c, --current         : show the current context name
+  $SELF -<idx>                : switch to the idx-th context.  
   $SELF <NEW_NAME>=<NAME>     : rename context <NAME> to <NEW_NAME>
   $SELF <NEW_NAME>=.          : rename current-context to <NEW_NAME>
   $SELF -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
@@ -77,18 +78,20 @@ list_contexts() {
   cur_ctx_fg=${KUBECTX_CURRENT_FGCOLOR:-$yellow}
   cur_ctx_bg=${KUBECTX_CURRENT_BGCOLOR:-$darkbg}
 
+  idx=1
   for c in $ctx_list; do
   if [[ -n "${_KUBECTX_FORCE_COLOR:-}" || \
        -t 1 && -z "${NO_COLOR:-}" ]]; then
     # colored output mode
     if [[ "${c}" = "${cur}" ]]; then
-      echo "${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
+      echo "${idx}: ${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
     else
-      echo "${c}"
+      echo "${idx}: ${c}"
     fi
   else
     echo "${c}"
   fi
+  ((idx=idx+1))  
   done
 }
 
@@ -121,6 +124,15 @@ choose_context_interactive() {
     exit 1
   else
     set_context "${choice}"
+  fi
+}
+
+set_context_by_index() {
+  ctxlist=(`get_contexts`)
+  if [ "$1" -gt "0" -a "$1" -le ${#ctxlist[@]} ]; then
+    set_context "${ctxlist[(($1-1))]}"
+  else
+    echo "Invalid index $1"
   fi
 }
 
@@ -230,6 +242,8 @@ main() {
       unset_context
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
+    elif [[ "${1}" =~ -[0-9]+ ]]; then
+      set_context_by_index "`echo $1 | cut -d- -f2`"    
     elif [[ "${1}" =~ ^-(.*) ]]; then
       echo "error: unrecognized flag \"${1}\"" >&2
       usage
