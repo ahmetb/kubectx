@@ -94,9 +94,9 @@ There are several installation options:
   - Homebrew (recommended)
   - MacPorts
 - Linux
-  - manual installation/upgrades
+  - Manual installation/upgrades
   - Arch Linux
-  - Debian/Ubuntu
+  - Debian
 
 ### Kubectl Plugins (macOS and Linux)
 
