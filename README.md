@@ -191,7 +191,7 @@ Available as official Arch Linux package. Install it via:
 sudo pacman -S kubectx
 ```
 
-#### Debian/Ubuntu
+#### Debian
 
 Available as a Debian package for [Debian Buster (testing)](https://packages.debian.org/buster/kubectx), [Sid (unstable)](https://packages.debian.org/sid/kubectx) (_note: if you are unfamiliar with Debian release process and how to enable testing/unstable repos, check the [Debian Wiki](https://wiki.debian.org/DebianReleases)_):
 
