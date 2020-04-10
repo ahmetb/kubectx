@@ -20,15 +20,25 @@ func main() {
 	case ListOp:
 		printListContexts(os.Stdout)
 	case SwitchOp:
-		// TODO implement
-		panic("not implemented")
+		if v.Target == "-" {
+			// TODO implement swap
+			panic("not implemented")
+		}
+		newCtx, err := switchContext(v.Target)
+		if err != nil {
+			printError("faield to switch context: %v", err)
+			os.Exit(1)
+		}
+		fmt.Fprintf(os.Stderr, "Switched to context %q.\n", newCtx)
 	case UnknownOp:
-		fmt.Printf("%s unsupported operation: %s\n",
-			color.RedString("error:"),
-			strings.Join(v.Args, " "))
+		printError("unsupported operation: %s", strings.Join(v.Args, " "))
 		printHelp(os.Stdout)
 		os.Exit(1)
 	default:
 		fmt.Printf("internal error: operation type %T not handled", op)
 	}
+}
+
+func printError(format string, args ...interface{}) {
+	fmt.Fprintf(os.Stderr, color.RedString("error: "+format+"\n"), args...)
 }
