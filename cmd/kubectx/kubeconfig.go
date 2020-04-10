@@ -1,9 +1,11 @@
 package main
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
+
+	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
 )
 
 func kubeconfigPath() (string, error) {
@@ -26,4 +28,16 @@ func kubeconfigPath() (string, error) {
 		return "", errors.New("HOME or USERPROFILE environment variable not set")
 	}
 	return filepath.Join(home, ".kube", "config"), nil
+}
+
+func parseKubeconfig(path string) (kubeconfig, error) {
+	// TODO refactor to accept io.Reader instead of file
+	var v kubeconfig
+
+	f, err := os.Open(path)
+	if err != nil {
+		return v, errors.Wrap(err, "file open error")
+	}
+	err = yaml.NewDecoder(f).Decode(&v)
+	return v, errors.Wrap(err, "yaml parse error")
 }
