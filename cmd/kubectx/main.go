@@ -20,13 +20,15 @@ func main() {
 	case ListOp:
 		printListContexts(os.Stdout)
 	case SwitchOp:
+		var newCtx string
+		var err error
 		if v.Target == "-" {
-		// TODO implement swap
-		panic("not implemented")
-	}
-		newCtx, err := switchContext(v.Target)
+			newCtx, err = swapContext()
+		} else {
+			newCtx, err = switchContext(v.Target)
+		}
 		if err != nil {
-			printError("faield to switch context: %v", err)
+			printError("failed to switch context: %v", err)
 			os.Exit(1)
 		}
 		fmt.Fprintf(os.Stderr, "Switched to context %q.\n", newCtx)
@@ -40,5 +42,5 @@ func main() {
 }
 
 func printError(format string, args ...interface{}) {
-	fmt.Fprintf(os.Stderr, color.RedString("error: "+format+"\n"), args...)
+	fmt.Fprintf(os.Stderr, color.RedString("error: ")+format+"\n", args...)
 }
