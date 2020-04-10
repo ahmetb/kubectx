@@ -13,12 +13,12 @@ func main() {
 	var op Op
 	op = parseArgs(os.Args[1:])
 
+	// TODO consider addin Run() operation to each operation type
 	switch v := op.(type) {
 	case HelpOp:
 		printHelp(os.Stdout)
 	case ListOp:
-		// TODO implement
-		panic("not implemented")
+		printListContexts(os.Stdout)
 	case SwitchOp:
 		// TODO implement
 		panic("not implemented")
