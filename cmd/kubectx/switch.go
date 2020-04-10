@@ -125,7 +125,7 @@ func modifyCurrentContext(rootNode *yaml.Node, name string) error {
 		}
 	}
 
-	// if current-context ==> create new field
+	// if current-context ==> create New field
 	keyNode := &yaml.Node{
 		Kind:  yaml.ScalarNode,
 		Value: "current-context",

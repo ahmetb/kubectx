@@ -26,6 +26,12 @@ type DeleteOp struct {
 	Contexts []string // NAME or '.' to indicate current-context.
 }
 
+// RenameOp indicates intention to rename contexts.
+type RenameOp struct {
+	New string // NAME of New context
+	Old string // NAME of Old context (or '.' for current-context)
+}
+
 // UnknownOp indicates an unsupported flag.
 type UnknownOp struct{ Args []string }
 
@@ -51,6 +57,11 @@ func parseArgs(argv []string) Op {
 		}
 		if v == "--unset" || v == "-u" {
 			return UnsetOp{}
+		}
+
+		new, old, ok := parseRenameSyntax(v) // a=b a=.
+		if ok {
+			return RenameOp{new, old}
 		}
 
 		if strings.HasPrefix(v, "-") && v != "-" {

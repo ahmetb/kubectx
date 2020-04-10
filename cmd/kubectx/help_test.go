@@ -16,6 +16,6 @@ func TestPrintHelp(t *testing.T) {
 	}
 
 	if !strings.HasSuffix(out, "\n") {
-		t.Errorf("does not end with new line; output=%q", out)
+		t.Errorf("does not end with New line; output=%q", out)
 	}
 }
