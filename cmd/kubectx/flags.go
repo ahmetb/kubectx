@@ -18,6 +18,9 @@ type SwitchOp struct {
 	Target string // '-' for back and forth, or NAME
 }
 
+// UnsetOp indicates intention to remove current-context preference.
+type UnsetOp struct{}
+
 // UnknownOp indicates an unsupported flag.
 type UnknownOp struct{ Args []string }
 
@@ -35,6 +38,9 @@ func parseArgs(argv []string) Op {
 		}
 		if v == "--current" || v == "-c" {
 			return CurrentOp{}
+		}
+		if v == "--unset" || v == "-u" {
+			return UnsetOp{}
 		}
 
 		if strings.HasPrefix(v, "-") && v != "-" {
