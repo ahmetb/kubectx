@@ -10,6 +10,9 @@ type HelpOp struct{}
 // ListOp describes listing contexts.
 type ListOp struct{}
 
+// CurrentOp prints the current context
+type CurrentOp struct{}
+
 // SwitchOp indicates intention to switch contexts.
 type SwitchOp struct {
 	Target string // '-' for back and forth, or NAME
@@ -29,6 +32,9 @@ func parseArgs(argv []string) Op {
 		v := argv[0]
 		if v == "--help" || v == "-h" {
 			return HelpOp{}
+		}
+		if v == "--current" || v == "-c" {
+			return CurrentOp{}
 		}
 
 		if strings.HasPrefix(v, "-") && v != "-" {
