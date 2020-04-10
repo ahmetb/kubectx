@@ -3,14 +3,26 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 func main() {
 	// parse command-line flags
-	argv := os.Args[1:]
-	fmt.Printf("%#v\n", argv)
+	var op Op
+	op = parseArgs(os.Args[1:])
 
-	//var op Op
-	//op _= parseArgs(argv) // -> DeleteOp RenameOp HelpOp UnrecognizedFlags
+	switch v := op.(type) {
+	case ListOp:
+		// TODO implement
+		panic("not implemented")
+	case SwitchOp:
+		// TODO implement
+		panic("not implemented")
+	case UnknownOp:
+		fmt.Printf("error: unsupported operation: %s\n", strings.Join(v.Args, " "))
+		// TODO print --help string
+		os.Exit(1)
+	default:
+		fmt.Printf("internal error: operation type %T not handled", op)
+	}
 }
-
