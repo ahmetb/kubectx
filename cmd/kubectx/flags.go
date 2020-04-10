@@ -21,6 +21,11 @@ type SwitchOp struct {
 // UnsetOp indicates intention to remove current-context preference.
 type UnsetOp struct{}
 
+// DeleteOp indicates intention to delete contexts.
+type DeleteOp struct {
+	Contexts []string // NAME or '.' to indicate current-context.
+}
+
 // UnknownOp indicates an unsupported flag.
 type UnknownOp struct{ Args []string }
 
@@ -29,6 +34,11 @@ type UnknownOp struct{ Args []string }
 func parseArgs(argv []string) Op {
 	if len(argv) == 0 {
 		return ListOp{}
+	}
+
+	if argv[0] == "-d" {
+		ctxs := argv[1:]
+		return DeleteOp{ctxs}
 	}
 
 	if len(argv) == 1 {

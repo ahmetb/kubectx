@@ -32,6 +32,11 @@ func main() {
 			printError(err.Error())
 			os.Exit(1)
 		}
+	case DeleteOp:
+		if err := deleteContexts(os.Stderr, v.Contexts); err != nil {
+			printError(err.Error())
+			os.Exit(1)
+		}
 	case SwitchOp:
 		var newCtx string
 		var err error
@@ -56,4 +61,8 @@ func main() {
 
 func printError(format string, args ...interface{}) {
 	fmt.Fprintf(os.Stderr, color.RedString("error: ")+format+"\n", args...)
+}
+
+func printWarning(format string, args ...interface{}) {
+	fmt.Fprintf(os.Stderr, color.YellowString("warning: ")+format+"\n", args...)
 }
