@@ -17,8 +17,16 @@ func main() {
 	switch v := op.(type) {
 	case HelpOp:
 		printHelp(os.Stdout)
+	case CurrentOp:
+		if err := printCurrentContext(os.Stdout); err != nil {
+			printError(err.Error())
+			os.Exit(1)
+		}
 	case ListOp:
-		printListContexts(os.Stdout)
+		if err := printListContexts(os.Stdout); err != nil {
+			printError(err.Error())
+			os.Exit(1)
+		}
 	case SwitchOp:
 		var newCtx string
 		var err error

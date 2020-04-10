@@ -31,7 +31,6 @@ func printListContexts(out io.Writer) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to read kubeconfig file")
 	}
-	_ = cfg
 
 	ctxs := make([]string, 0, len(cfg.Contexts))
 	for _, c := range cfg.Contexts {
