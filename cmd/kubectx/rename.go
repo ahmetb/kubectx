@@ -59,13 +59,13 @@ func renameContexts(old, new string) error {
 		}
 	}
 
+	// TODO the next two functions are always repeated.
 	if err := resetFile(f); err != nil {
 		return err
 	}
 	if err := saveKubeconfigRaw(f, rootNode); err != nil {
 		return errors.Wrap(err, "failed to save modified kubeconfig")
 	}
-
 	return nil
 }
 
