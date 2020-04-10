@@ -4,16 +4,6 @@ COMMAND="$BATS_TEST_DIRNAME/../kubectx"
 
 load common
 
-@test "no kubectl detected" {
-  OLDPATH="$PATH"
-  PATH=/bin
-  run ${COMMAND}
-  echo "$output"
-  [ "$status" -eq 1 ]
-  [[ "$output" = "kubectl is not installed" ]]
-  PATH="$OLDPATH"
-}
-
 @test "--help should not fail" {
   run ${COMMAND} --help
   echo "$output"
@@ -32,7 +22,7 @@ load common
   run ${COMMAND} -
   echo "$output"
   [ "$status" -eq 1 ]
-  [[ "$output" = "error: No previous context found." ]]
+  [[ $output = *"no previous context found" ]]
 }
 
 @test "list contexts when no kubeconfig exists" {

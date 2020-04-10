@@ -43,6 +43,9 @@ func parseKubeconfig(path string) (kubeconfig, error) {
 
 	f, err := os.Open(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return v, nil
+		}
 		return v, errors.Wrap(err, "file open error")
 	}
 	err = yaml.NewDecoder(f).Decode(&v)

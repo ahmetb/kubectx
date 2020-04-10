@@ -26,7 +26,7 @@ func parseRenameSyntax(v string) (string, string, bool) {
 // rename changes the old (NAME or '.' for current-context)
 // to the "new" value. If the old refers to the current-context,
 // current-context preference is also updated.
-func rename(old, new string) error {
+func renameContexts(old, new string) error {
 	f, rootNode, err := openKubeconfig()
 	if err != nil {
 		return nil
