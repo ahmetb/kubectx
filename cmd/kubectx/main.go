@@ -38,7 +38,7 @@ func main() {
 			os.Exit(1)
 		}
 	case RenameOp:
-		if err := rename(v.Old, v.New); err != nil {
+		if err := renameContexts(v.Old, v.New); err != nil {
 			printError("failed to rename: %v", err)
 			os.Exit(1)
 		}
