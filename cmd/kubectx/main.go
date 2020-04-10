@@ -21,9 +21,9 @@ func main() {
 		printListContexts(os.Stdout)
 	case SwitchOp:
 		if v.Target == "-" {
-			// TODO implement swap
-			panic("not implemented")
-		}
+		// TODO implement swap
+		panic("not implemented")
+	}
 		newCtx, err := switchContext(v.Target)
 		if err != nil {
 			printError("faield to switch context: %v", err)

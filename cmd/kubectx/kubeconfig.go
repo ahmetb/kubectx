@@ -19,15 +19,22 @@ func kubeconfigPath() (string, error) {
 		return v, nil
 	}
 
+	home := homeDir()
+	if home == "" {
+		return "", errors.New("HOME or USERPROFILE environment variable not set")
+	}
+
 	// return default path
+	return filepath.Join(home, ".kube", "config"), nil
+}
+
+func homeDir() string {
+	// TODO move tests out of kubeconfigPath to TestHomeDir()
 	home := os.Getenv("HOME")
 	if home == "" {
 		home = os.Getenv("USERPROFILE") // windows
 	}
-	if home == "" {
-		return "", errors.New("HOME or USERPROFILE environment variable not set")
-	}
-	return filepath.Join(home, ".kube", "config"), nil
+	return home
 }
 
 func parseKubeconfig(path string) (kubeconfig, error) {
