@@ -22,6 +22,11 @@ func main() {
 			printError(err.Error())
 			os.Exit(1)
 		}
+	case UnsetOp:
+		if err := unsetContext(); err != nil {
+			printError(err.Error())
+			os.Exit(1)
+		}
 	case ListOp:
 		if err := printListContexts(os.Stdout); err != nil {
 			printError(err.Error())

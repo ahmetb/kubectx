@@ -1,9 +1,6 @@
 package main
 
 import (
-	"io"
-	"os"
-
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 )
@@ -15,20 +12,11 @@ func switchContext(name string) (string, error) {
 		return "", errors.Wrap(err, "failed to determine state file")
 	}
 
-	cfgPath, err := kubeconfigPath()
+	f, kc, err := openKubeconfig()
 	if err != nil {
-		return "", errors.Wrap(err, "cannot determine kubeconfig path")
-	}
-	f, err := os.OpenFile(cfgPath, os.O_RDWR, 0)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to open file")
+		return "", err
 	}
 	defer f.Close()
-
-	kc, err := parseKubeconfigRaw(f)
-	if err != nil {
-		return "", errors.Wrap(err, "yaml parse error")
-	}
 
 	prev := getCurrentContext(kc)
 
@@ -41,12 +29,8 @@ func switchContext(name string) (string, error) {
 		return "", err
 	}
 
-	if err := f.Truncate(0); err != nil {
-		return "", errors.Wrap(err, "failed to truncate")
-	}
-
-	if _, err := f.Seek(0, 0); err != nil {
-		return "", errors.Wrap(err, "failed to seek")
+	if err := resetFile(f); err != nil {
+		return "", err
 	}
 
 	if err := saveKubeconfigRaw(f, kc); err != nil {
@@ -152,18 +136,4 @@ func modifyCurrentContext(rootNode *yaml.Node, name string) error {
 		Tag:   "!!str"}
 	rootNode.Content = append(rootNode.Content, keyNode, valueNode)
 	return nil
-}
-
-func parseKubeconfigRaw(r io.Reader) (*yaml.Node, error) {
-	var v yaml.Node
-	if err := yaml.NewDecoder(r).Decode(&v); err != nil {
-		return nil, err
-	}
-	return v.Content[0], nil
-}
-
-func saveKubeconfigRaw(w io.Writer, rootNode *yaml.Node) error {
-	enc := yaml.NewEncoder(w)
-	enc.SetIndent(2)
-	return enc.Encode(rootNode)
 }
