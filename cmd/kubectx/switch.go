@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"os"
 
@@ -11,6 +10,11 @@ import (
 
 // switchContext switches to specified context name.
 func switchContext(name string) (string, error) {
+	stateFile, err := kubectxFilePath()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to determine state file")
+	}
+
 	cfgPath, err := kubeconfigPath()
 	if err != nil {
 		return "", errors.Wrap(err, "cannot determine kubeconfig path")
@@ -26,8 +30,7 @@ func switchContext(name string) (string, error) {
 		return "", errors.Wrap(err, "yaml parse error")
 	}
 
-	cur := getCurrentContext(kc)
-	fmt.Printf("current-context=%s\n", cur)
+	prev := getCurrentContext(kc)
 
 	if err := modifyCurrentContext(kc, name); err != nil {
 		return "", err
@@ -44,6 +47,13 @@ func switchContext(name string) (string, error) {
 	if err := saveKubeconfigRaw(f, kc); err != nil {
 		return "", errors.Wrap(err, "failed to save kubeconfig")
 	}
+
+	if prev != name {
+		if err := writeLastContext(stateFile, prev); err != nil {
+			return "", errors.Wrap(err, "failed to save previous context name")
+		}
+	}
+
 	return name, nil
 }
 
