@@ -3,6 +3,7 @@ module github.com/ahmetb/kubectx
 go 1.14
 
 require (
+	facette.io/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
 	github.com/fatih/color v1.9.0
 	github.com/google/go-cmp v0.4.0
 	github.com/pkg/errors v0.9.1
