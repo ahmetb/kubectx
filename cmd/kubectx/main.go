@@ -29,12 +29,17 @@ func main() {
 		}
 	case ListOp:
 		if err := printListContexts(os.Stdout); err != nil {
-			printError(err.Error())
+			printError("%v", err)
 			os.Exit(1)
 		}
 	case DeleteOp:
 		if err := deleteContexts(os.Stderr, v.Contexts); err != nil {
-			printError(err.Error())
+			printError("%v", err)
+			os.Exit(1)
+		}
+	case RenameOp:
+		if err := rename(v.Old, v.New); err != nil {
+			printError("failed to rename: %v", err)
 			os.Exit(1)
 		}
 	case SwitchOp:
