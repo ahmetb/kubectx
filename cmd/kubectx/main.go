@@ -28,6 +28,8 @@ func main() {
 			os.Exit(1)
 		}
 	case ListOp:
+		// TODO fzf installed show interactive selection
+
 		if err := printListContexts(os.Stdout); err != nil {
 			printError("%v", err)
 			os.Exit(1)
