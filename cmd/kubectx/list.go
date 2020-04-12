@@ -6,6 +6,7 @@ import (
 
 	"facette.io/natsort"
 	"github.com/fatih/color"
+	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
 )
@@ -26,9 +27,8 @@ type ListOp struct{}
 func (_ ListOp) Run(stdout, _ io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
 	defer kc.Close()
-	_, err := kc.ParseRaw()
-	if err != nil {
-		return err
+	if err := kc.Parse(); err != nil {
+		return errors.Wrap(err, "failed to parse kubeconfig")
 	}
 
 	ctxs := kc.ContextNames()
