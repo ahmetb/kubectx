@@ -64,7 +64,7 @@ func Test_kubectxFilePath(t *testing.T) {
 	defer os.Setenv("HOME", origHome)
 
 	expected := filepath.Join(filepath.FromSlash("/foo/bar"), ".kube", "kubectx")
-	v, err := kubectxFilePath()
+	v, err := kubectxPrevCtxFile()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,7 +81,7 @@ func Test_kubectxFilePath_error(t *testing.T) {
 	defer os.Setenv("HOME", origHome)
 	defer os.Setenv("USERPROFILE", origUserprofile)
 
-	_, err := kubectxFilePath()
+	_, err := kubectxPrevCtxFile()
 	if err == nil {
 		t.Fatal(err)
 	}

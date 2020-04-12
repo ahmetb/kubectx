@@ -17,6 +17,14 @@ func parseKubeconfigRaw(r io.Reader) (*yaml.Node, error) {
 }
 
 func saveKubeconfigRaw(w io.Writer, rootNode *yaml.Node) error {
+	if f, ok := w.(*os.File); ok {
+		if err := f.Truncate(0); err != nil {
+			return errors.Wrap(err, "failed to truncate")
+		}
+		if _, err := f.Seek(0, 0); err != nil {
+			return errors.Wrap(err, "failed to seek")
+		}
+	}
 	enc := yaml.NewEncoder(w)
 	enc.SetIndent(2)
 	return enc.Encode(rootNode)
@@ -38,15 +46,4 @@ func openKubeconfig() (f *os.File, rootNode *yaml.Node, err error) {
 		return nil, nil, errors.Wrap(err, "yaml parse error")
 	}
 	return f, kc, nil
-}
-
-// resetFile deletes contents of a file and sets the seek
-// position to 0.
-func resetFile(f *os.File) error {
-	if err := f.Truncate(0); err != nil {
-		return errors.Wrap(err, "failed to truncate")
-	}
-
-	_, err := f.Seek(0, 0)
-	return errors.Wrap(err, "failed to seek")
 }

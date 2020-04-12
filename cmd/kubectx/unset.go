@@ -1,11 +1,17 @@
 package main
 
 import (
+	"fmt"
+	"io"
+
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 )
 
-func unsetContext() error {
+// UnsetOp indicates intention to remove current-context preference.
+type UnsetOp struct{}
+
+func (_ UnsetOp) Run(_, stderr io.Writer) error {
 	f, rootNode, err := openKubeconfig()
 	if err != nil {
 		return err
@@ -15,13 +21,12 @@ func unsetContext() error {
 	if err := modifyDocToUnsetContext(rootNode); err != nil {
 		return errors.Wrap(err, "error while modifying current-context")
 	}
-	if err := resetFile(f); err != nil {
-		return err
-	}
 	if err := saveKubeconfigRaw(f, rootNode); err != nil {
 		return errors.Wrap(err, "failed to save kubeconfig file after modification")
 	}
-	return nil
+
+	_, err = fmt.Fprintln(stderr, "Successfully unset the current context")
+	return err
 }
 
 func modifyDocToUnsetContext(rootNode *yaml.Node) error {

@@ -2,12 +2,19 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 )
+
+// RenameOp indicates intention to rename contexts.
+type RenameOp struct {
+	New string // NAME of New context
+	Old string // NAME of Old context (or '.' for current-context)
+}
 
 // parseRenameSyntax parses A=B form into [A,B] and returns
 // whether it is parsed correctly.
@@ -26,7 +33,7 @@ func parseRenameSyntax(v string) (string, string, bool) {
 // rename changes the old (NAME or '.' for current-context)
 // to the "new" value. If the old refers to the current-context,
 // current-context preference is also updated.
-func renameContexts(old, new string) error {
+func (op RenameOp) Run(_, _ io.Writer) error {
 	f, rootNode, err := openKubeconfig()
 	if err != nil {
 		return nil
@@ -34,34 +41,28 @@ func renameContexts(old, new string) error {
 	defer f.Close()
 
 	cur := getCurrentContext(rootNode)
-	if old == "." {
-		old = cur
+	if op.Old == "." {
+		op.Old = cur
 	}
 
-	if !checkContextExists(rootNode, old) {
-		return errors.Errorf("context %q not found, can't rename it", old)
+	if !checkContextExists(rootNode, op.Old) {
+		return errors.Errorf("context %q not found, can't rename it", op.Old)
 	}
 
-	if checkContextExists(rootNode, new) {
-		printWarning("context %q exists, overwriting it.", new)
-		if err := modifyDocToDeleteContext(rootNode, new); err != nil {
+	if checkContextExists(rootNode, op.New) {
+		printWarning("context %q exists, overwriting it.", op.New)
+		if err := modifyDocToDeleteContext(rootNode, op.New); err != nil {
 			return errors.Wrap(err, "failed to delete new context to overwrite it")
 		}
 	}
 
-	if err := modifyContextName(rootNode, old, new); err != nil {
+	if err := modifyContextName(rootNode, op.Old, op.New); err != nil {
 		return errors.Wrap(err, "failed to change context name")
 	}
-
-	if old == cur {
-		if err := modifyCurrentContext(rootNode, new); err != nil {
+	if op.New == cur {
+		if err := modifyCurrentContext(rootNode, op.New); err != nil {
 			return errors.Wrap(err, "failed to set current-context to new name")
 		}
-	}
-
-	// TODO the next two functions are always repeated.
-	if err := resetFile(f); err != nil {
-		return err
 	}
 	if err := saveKubeconfigRaw(f, rootNode); err != nil {
 		return errors.Wrap(err, "failed to save modified kubeconfig")

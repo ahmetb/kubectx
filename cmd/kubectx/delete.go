@@ -8,9 +8,14 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// DeleteOp indicates intention to delete contexts.
+type DeleteOp struct {
+	Contexts []string // NAME or '.' to indicate current-context.
+}
+
 // deleteContexts deletes context entries one by one.
-func deleteContexts(w io.Writer, ctxs []string) error {
-	for _, ctx := range ctxs {
+func (op DeleteOp) Run(_, stderr io.Writer) error {
+	for _, ctx := range op.Contexts {
 		// TODO inefficency here. we open/write/close the same file many times.
 		deletedName, wasActiveContext, err := deleteContext(ctx)
 		if err != nil {
@@ -20,7 +25,7 @@ func deleteContexts(w io.Writer, ctxs []string) error {
 			// TODO we don't always run as kubectx (sometimes "kubectl ctx")
 			printWarning("You deleted the current context. use \"kubectx\" to select a different one.")
 		}
-		fmt.Fprintf(w, "deleted context %q\n", deletedName) // TODO write with printSuccess (i.e. green)
+		fmt.Fprintf(stderr, "deleted context %q\n", deletedName) // TODO write with printSuccess (i.e. green)
 	}
 	return nil
 }
@@ -48,10 +53,6 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 
 	if err := modifyDocToDeleteContext(rootNode, name); err != nil {
 		return "", false, errors.Wrap(err, "failed to modify yaml doc")
-	}
-
-	if err := resetFile(f); err != nil {
-		return "", false, err
 	}
 	return name, wasActiveContext, errors.Wrap(saveKubeconfigRaw(f, rootNode), "failed to save kubeconfig file")
 }

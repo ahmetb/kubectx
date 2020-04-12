@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func kubectxFilePath() (string, error) {
+func kubectxPrevCtxFile() (string, error) {
 	home := homeDir()
 	if home == "" {
 		return "", errors.New("HOME or USERPROFILE environment variable not set")
