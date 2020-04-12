@@ -42,7 +42,7 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 		return "", false, err
 	}
 
-	cur := kubeconfig.GetCurrentContext(rootNode)
+	cur := kc.GetCurrentContext()
 
 	// resolve "." to a real name
 	if name == "." {
@@ -50,7 +50,7 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 		name = cur
 	}
 
-	if !checkContextExists(rootNode, name) {
+	if !kc.ContextExists(name) {
 		return "", false, errors.New("context does not exist")
 	}
 

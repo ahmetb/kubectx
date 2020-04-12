@@ -44,8 +44,8 @@ func switchContext(name string) (string, error) {
 		return "", err
 	}
 
-	prev := kubeconfig.GetCurrentContext(rootNode)
-	if !checkContextExists(rootNode, name) {
+	prev := kc.GetCurrentContext()
+	if !kc.ContextExists(name) {
 		return "", errors.Errorf("no context exists with the name: %q", name)
 	}
 	if err := modifyCurrentContext(rootNode, name); err != nil {
@@ -80,16 +80,6 @@ func swapContext() (string, error) {
 	return switchContext(prev)
 }
 
-
-func checkContextExists(rootNode *yaml.Node, name string) bool {
-	ctxNames := kubeconfig.ContextNames(rootNode)
-	for _, v := range ctxNames {
-		if v == name {
-			return true
-		}
-	}
-	return false
-}
 
 // TODO delete
 func valueOf(mapNode *yaml.Node, key string) *yaml.Node {

@@ -42,16 +42,16 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 		return err
 	}
 
-	cur := kubeconfig.GetCurrentContext(rootNode)
+	cur := kc.GetCurrentContext()
 	if op.Old == "." {
 		op.Old = cur
 	}
 
-	if !checkContextExists(rootNode, op.Old) {
+	if !kc.ContextExists(op.Old) {
 		return errors.Errorf("context %q not found, can't rename it", op.Old)
 	}
 
-	if checkContextExists(rootNode, op.New) {
+	if kc.ContextExists( op.New) {
 		printWarning(stderr, "context %q exists, overwriting it.", op.New)
 		if err := modifyDocToDeleteContext(rootNode, op.New); err != nil {
 			return errors.Wrap(err, "failed to delete new context to overwrite it")
