@@ -50,7 +50,5 @@ func parseArgs(argv []string) Op {
 		}
 		return SwitchOp{Target: argv[0]}
 	}
-
-	// TODO handle too many arguments e.g. "kubectx a b c"
 	return UnsupportedOp{Err: errors.New("too many arguments")}
 }

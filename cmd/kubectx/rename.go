@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"io"
-	"os"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -33,7 +31,7 @@ func parseRenameSyntax(v string) (string, string, bool) {
 // rename changes the old (NAME or '.' for current-context)
 // to the "new" value. If the old refers to the current-context,
 // current-context preference is also updated.
-func (op RenameOp) Run(_, _ io.Writer) error {
+func (op RenameOp) Run(_, stderr io.Writer) error {
 	f, rootNode, err := openKubeconfig()
 	if err != nil {
 		return nil
@@ -50,7 +48,7 @@ func (op RenameOp) Run(_, _ io.Writer) error {
 	}
 
 	if checkContextExists(rootNode, op.New) {
-		printWarning("context %q exists, overwriting it.", op.New)
+		printWarning(stderr, "context %q exists, overwriting it.", op.New)
 		if err := modifyDocToDeleteContext(rootNode, op.New); err != nil {
 			return errors.Wrap(err, "failed to delete new context to overwrite it")
 		}
@@ -67,6 +65,7 @@ func (op RenameOp) Run(_, _ io.Writer) error {
 	if err := saveKubeconfigRaw(f, rootNode); err != nil {
 		return errors.Wrap(err, "failed to save modified kubeconfig")
 	}
+	printSuccess(stderr, "Context %q renamed to %q.", op.Old, op.New)
 	return nil
 }
 
@@ -93,8 +92,5 @@ func modifyContextName(rootNode *yaml.Node, old, new string) error {
 	if !changed {
 		return errors.New("no changes were made")
 	}
-	// TODO use printSuccess
-	// TODO consider moving printing logic to main
-	fmt.Fprintf(os.Stderr, "Context %q renamed to %q.\n", old, new)
 	return nil
 }
