@@ -25,8 +25,16 @@ type Kubeconfig struct {
 	rootNode *yaml.Node
 }
 
-func (k *Kubeconfig) WithLoader(l Loader) {
+func (k *Kubeconfig) WithLoader(l Loader) *Kubeconfig {
 	k.loader = l
+	return k
+}
+
+func (k *Kubeconfig) Close() error {
+	if k.f == nil {
+		return nil
+	}
+	return k.f.Close()
 }
 
 func (k *Kubeconfig) ParseRaw() (*yaml.Node, error) {

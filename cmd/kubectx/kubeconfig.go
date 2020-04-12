@@ -10,7 +10,11 @@ import (
 	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
 )
 
-type defaultKubeconfigLoader struct{}
+var (
+	defaultLoader kubeconfig.Loader = new(StandardKubeconfigLoader)
+)
+
+type StandardKubeconfigLoader struct{}
 
 type kubeconfigFile struct { *os.File }
 
@@ -22,7 +26,7 @@ func (kf *kubeconfigFile) Reset() error {
 	return errors.Wrap(err, "failed to seek in file")
 }
 
-func (defaultKubeconfigLoader) Load() (kubeconfig.ReadWriteResetCloser, error) {
+func (*StandardKubeconfigLoader) Load() (kubeconfig.ReadWriteResetCloser, error) {
 	cfgPath, err := kubeconfigPath()
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot determine kubeconfig path")

@@ -5,6 +5,8 @@ import (
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
+
+	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
 )
 
 // DeleteOp indicates intention to delete contexts.
@@ -33,13 +35,14 @@ func (op DeleteOp) Run(_, stderr io.Writer) error {
 // deleteContext deletes a context entry by NAME or current-context
 // indicated by ".".
 func deleteContext(name string) (deleteName string, wasActiveContext bool, err error) {
-	f, rootNode, err := openKubeconfig()
+	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
+	defer kc.Close()
+	rootNode, err := kc.ParseRaw()
 	if err != nil {
 		return "", false, err
 	}
-	defer f.Close()
 
-	cur := getCurrentContext(rootNode)
+	cur := kubeconfig.GetCurrentContext(rootNode)
 
 	// resolve "." to a real name
 	if name == "." {
@@ -54,7 +57,7 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 	if err := modifyDocToDeleteContext(rootNode, name); err != nil {
 		return "", false, errors.Wrap(err, "failed to modify yaml doc")
 	}
-	return name, wasActiveContext, errors.Wrap(saveKubeconfigRaw(f, rootNode), "failed to save kubeconfig file")
+	return name, wasActiveContext, errors.Wrap(kc.Save(), "failed to save kubeconfig file")
 }
 
 func modifyDocToDeleteContext(rootNode *yaml.Node, deleteName string) error {
