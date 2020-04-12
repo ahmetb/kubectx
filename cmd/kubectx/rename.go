@@ -6,6 +6,8 @@ import (
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
+
+	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
 )
 
 // RenameOp indicates intention to rename contexts.
@@ -32,13 +34,15 @@ func parseRenameSyntax(v string) (string, string, bool) {
 // to the "new" value. If the old refers to the current-context,
 // current-context preference is also updated.
 func (op RenameOp) Run(_, stderr io.Writer) error {
-	f, rootNode, err := openKubeconfig()
-	if err != nil {
-		return nil
-	}
-	defer f.Close()
+	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
+	defer kc.Close()
 
-	cur := getCurrentContext(rootNode)
+	rootNode, err := kc.ParseRaw()
+	if err != nil {
+		return err
+	}
+
+	cur := kubeconfig.GetCurrentContext(rootNode)
 	if op.Old == "." {
 		op.Old = cur
 	}
@@ -62,7 +66,7 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 			return errors.Wrap(err, "failed to set current-context to new name")
 		}
 	}
-	if err := saveKubeconfigRaw(f, rootNode); err != nil {
+	if err := kc.Save(); err != nil {
 		return errors.Wrap(err, "failed to save modified kubeconfig")
 	}
 	printSuccess(stderr, "Context %q renamed to %q.", op.Old, op.New)

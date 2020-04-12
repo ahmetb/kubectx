@@ -6,7 +6,8 @@ import (
 
 	"facette.io/natsort"
 	"github.com/fatih/color"
-	"github.com/pkg/errors"
+
+	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
 )
 
 type context struct {
@@ -22,30 +23,23 @@ type kubeconfigContents struct {
 // ListOp describes listing contexts.
 type ListOp struct{}
 
-func (_ ListOp) Run(stdout, stderr io.Writer) error {
-	// TODO extract printing and sorting into a function that's testable
-
-	cfgPath, err := kubeconfigPath()
+func (_ ListOp) Run(stdout, _ io.Writer) error {
+	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
+	defer kc.Close()
+	rootNode, err := kc.ParseRaw()
 	if err != nil {
-		return errors.Wrap(err, "failed to determine kubeconfig path")
+		return err
 	}
 
-	cfg, err := parseKubeconfig(cfgPath)
-	if err != nil {
-		return errors.Wrap(err, "failed to read kubeconfig file")
-	}
-
-	ctxs := make([]string, 0, len(cfg.Contexts))
-	for _, c := range cfg.Contexts {
-		ctxs = append(ctxs, c.Name)
-	}
+	ctxs := kubeconfig.ContextNames(rootNode)
 	natsort.Sort(ctxs)
 
 	// TODO support KUBECTX_CURRENT_FGCOLOR
 	// TODO support KUBECTX_CURRENT_BGCOLOR
+	cur :=  kubeconfig.GetCurrentContext(rootNode)
 	for _, c := range ctxs {
 		s := c
-		if c == cfg.CurrentContext {
+		if c == cur {
 			s = color.New(color.FgGreen, color.Bold).Sprint(c)
 		}
 		fmt.Fprintf(stdout, "%s\n", s)

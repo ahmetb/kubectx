@@ -5,6 +5,8 @@ import (
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
+
+	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
 )
 
 // SwitchOp indicates intention to switch contexts.
@@ -33,20 +35,23 @@ func switchContext(name string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to determine state file")
 	}
-	f, kc, err := openKubeconfig()
+
+	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
+	defer kc.Close()
+
+	rootNode, err := kc.ParseRaw()
 	if err != nil {
 		return "", err
 	}
-	defer f.Close()
 
-	prev := getCurrentContext(kc)
-	if !checkContextExists(kc, name) {
+	prev := kubeconfig.GetCurrentContext(rootNode)
+	if !checkContextExists(rootNode, name) {
 		return "", errors.Errorf("no context exists with the name: %q", name)
 	}
-	if err := modifyCurrentContext(kc, name); err != nil {
+	if err := modifyCurrentContext(rootNode, name); err != nil {
 		return "", err
 	}
-	if err := saveKubeconfigRaw(f, kc); err != nil {
+	if err := kc.Save(); err != nil {
 		return "", errors.Wrap(err, "failed to save kubeconfig")
 	}
 
@@ -77,22 +82,7 @@ func swapContext() (string, error) {
 
 
 func checkContextExists(rootNode *yaml.Node, name string) bool {
-	contexts := valueOf(rootNode, "contexts")
-	if contexts == nil {
-		return false
-	}
-	if contexts.Kind != yaml.SequenceNode {
-		return false
-	}
-
-	var ctxNames []string
-	for _, ctx := range contexts.Content {
-		nameVal := valueOf(ctx, "name")
-		if nameVal != nil {
-			ctxNames = append(ctxNames, nameVal.Value)
-		}
-	}
-
+	ctxNames := kubeconfig.ContextNames(rootNode)
 	for _, v := range ctxNames {
 		if v == name {
 			return true
@@ -101,6 +91,7 @@ func checkContextExists(rootNode *yaml.Node, name string) bool {
 	return false
 }
 
+// TODO delete
 func valueOf(mapNode *yaml.Node, key string) *yaml.Node {
 	if mapNode.Kind != yaml.MappingNode {
 		return nil
@@ -113,18 +104,7 @@ func valueOf(mapNode *yaml.Node, key string) *yaml.Node {
 	return nil
 }
 
-// getCurrentContext returns "current-context" value in given
-// kubeconfig object Node, or returns "" if not found.
-func getCurrentContext(rootNode *yaml.Node) string {
-	if rootNode.Kind != yaml.MappingNode {
-		return ""
-	}
-	v := valueOf(rootNode, "current-context")
-	if v == nil {
-		return ""
-	}
-	return v.Value
-}
+
 
 func modifyCurrentContext(rootNode *yaml.Node, name string) error {
 	if rootNode.Kind != yaml.MappingNode {
