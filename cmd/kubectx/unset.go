@@ -16,7 +16,7 @@ func (_ UnsetOp) Run(_, stderr io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		return errors.Wrap(err, "failed to parse kubeconfig")
+		return errors.Wrap(err, "kubeconfig error")
 	}
 
 	if err := kc.UnsetCurrentContext(); err != nil {
