@@ -37,20 +37,23 @@ func (k *Kubeconfig) Close() error {
 	return k.f.Close()
 }
 
-func (k *Kubeconfig) ParseRaw() (*yaml.Node, error) {
+func (k *Kubeconfig) Parse() error {
 	f, err := k.loader.Load()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to load kubeconfig")
+		return errors.Wrap(err, "failed to load")
 	}
 
 	k.f = f
 
 	var v yaml.Node
 	if err := yaml.NewDecoder(f).Decode(&v); err != nil {
-		return nil, errors.Wrap(err, "failed to decode kubeconfig")
+		return errors.Wrap(err, "failed to decode")
 	}
 	k.rootNode = v.Content[0]
-	return k. rootNode, nil
+	if k.rootNode.Kind != yaml.MappingNode {
+		return errors.New("kubeconfig file is not a map document")
+	}
+	return nil
 }
 
 func (k *Kubeconfig) Save() error {

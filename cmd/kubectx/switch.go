@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
 
 	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
 )
@@ -14,7 +13,7 @@ type SwitchOp struct {
 	Target string // '-' for back and forth, or NAME
 }
 
-func (op SwitchOp) Run(stdout, stderr io.Writer) error {
+func (op SwitchOp) Run(_, stderr io.Writer) error {
 	var newCtx string
 	var err error
 	if op.Target == "-" {
@@ -38,17 +37,15 @@ func switchContext(name string) (string, error) {
 
 	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
 	defer kc.Close()
-
-	rootNode, err := kc.ParseRaw()
-	if err != nil {
-		return "", err
+	if err := kc.Parse(); err != nil {
+		return "", errors.Wrap(err, "failed to parse kubeconfig")
 	}
 
 	prev := kc.GetCurrentContext()
 	if !kc.ContextExists(name) {
 		return "", errors.Errorf("no context exists with the name: %q", name)
 	}
-	if err := modifyCurrentContext(rootNode, name); err != nil {
+	if err := kc.ModifyCurrentContext(name); err != nil {
 		return "", err
 	}
 	if err := kc.Save(); err != nil {
@@ -78,46 +75,4 @@ func swapContext() (string, error) {
 		return "", errors.New("no previous context found")
 	}
 	return switchContext(prev)
-}
-
-
-// TODO delete
-func valueOf(mapNode *yaml.Node, key string) *yaml.Node {
-	if mapNode.Kind != yaml.MappingNode {
-		return nil
-	}
-	for i, ch := range mapNode.Content {
-		if i%2 == 0 && ch.Kind == yaml.ScalarNode && ch.Value == key {
-			return mapNode.Content[i+1]
-		}
-	}
-	return nil
-}
-
-
-
-func modifyCurrentContext(rootNode *yaml.Node, name string) error {
-	if rootNode.Kind != yaml.MappingNode {
-		return errors.New("document is not a map")
-	}
-
-	// find current-context field => modify value (next children)
-	for i, ch := range rootNode.Content {
-		if i%2 == 0 && ch.Value == "current-context" {
-			rootNode.Content[i+1].Value = name
-			return nil
-		}
-	}
-
-	// if current-context ==> create New field
-	keyNode := &yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Value: "current-context",
-		Tag:   "!!str"}
-	valueNode := &yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Value: name,
-		Tag:   "!!str"}
-	rootNode.Content = append(rootNode.Content, keyNode, valueNode)
-	return nil
 }

@@ -8,8 +8,7 @@ import (
 func TestKubeconfig_GetCurrentContext(t *testing.T) {
 	tl := &testLoader{in: strings.NewReader(`current-context: foo`)}
 	kc := new(Kubeconfig).WithLoader(tl)
-	_, err := kc.ParseRaw()
-	if err != nil {
+	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
 	}
 	v := kc.GetCurrentContext()
@@ -23,8 +22,7 @@ func TestKubeconfig_GetCurrentContext(t *testing.T) {
 func TestKubeconfig_GetCurrentContext_missingField(t *testing.T) {
 	tl := &testLoader{in: strings.NewReader(`abc: def`)}
 	kc := new(Kubeconfig).WithLoader(tl)
-	_, err := kc.ParseRaw()
-	if err != nil {
+	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
 	}
 	v := kc.GetCurrentContext()
@@ -38,8 +36,7 @@ func TestKubeconfig_GetCurrentContext_missingField(t *testing.T) {
 func TestKubeconfig_UnsetCurrentContext(t *testing.T) {
 	tl := &testLoader{in: strings.NewReader(`current-context: foo`)}
 	kc := new(Kubeconfig).WithLoader(tl)
-	_, err := kc.ParseRaw()
-	if err != nil {
+	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
 	}
 	if err := kc.UnsetCurrentContext(); err != nil {

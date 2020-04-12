@@ -18,10 +18,10 @@ contexts:
     bar: zoo`)}
 
 	kc := new(Kubeconfig).WithLoader(tl)
-	_, err := kc.ParseRaw()
-	if err != nil {
+	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
 	}
+
 	ctx := kc.ContextNames()
 	expected := []string{"abc", "def", "ghi"}
 	if diff := cmp.Diff(expected, ctx); diff != "" {
@@ -35,8 +35,7 @@ func TestKubeconfig_CheckContextExists(t *testing.T) {
 - name: c2`)}
 
 	kc := new(Kubeconfig).WithLoader(tl)
-	_, err := kc.ParseRaw()
-	if err != nil {
+	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
 	}
 

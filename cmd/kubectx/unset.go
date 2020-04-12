@@ -15,10 +15,8 @@ type UnsetOp struct{}
 func (_ UnsetOp) Run(_, stderr io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
 	defer kc.Close()
-
-	_, err := kc.ParseRaw()
-	if err != nil {
-		return err
+	if err := kc.Parse(); err != nil {
+		return errors.Wrap(err, "failed to parse kubeconfig")
 	}
 
 	if err := kc.UnsetCurrentContext(); err != nil {
@@ -28,7 +26,7 @@ func (_ UnsetOp) Run(_, stderr io.Writer) error {
 		return errors.Wrap(err, "failed to save kubeconfig file after modification")
 	}
 
-	_, err = fmt.Fprintln(stderr, "Successfully unset the current context")
+	_, err := fmt.Fprintln(stderr, "Successfully unset the current context")
 	return err
 }
 

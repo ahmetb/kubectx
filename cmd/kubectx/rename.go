@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
 
 	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
 )
@@ -36,10 +35,8 @@ func parseRenameSyntax(v string) (string, string, bool) {
 func (op RenameOp) Run(_, stderr io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
 	defer kc.Close()
-
-	rootNode, err := kc.ParseRaw()
-	if err != nil {
-		return err
+	if err := kc.Parse(); err != nil {
+		return errors.Wrap(err, "failed to parse kubeconfig")
 	}
 
 	cur := kc.GetCurrentContext()
@@ -53,16 +50,16 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 
 	if kc.ContextExists( op.New) {
 		printWarning(stderr, "context %q exists, overwriting it.", op.New)
-		if err := modifyDocToDeleteContext(rootNode, op.New); err != nil {
+		if err := kc.DeleteContextEntry(op.New); err != nil {
 			return errors.Wrap(err, "failed to delete new context to overwrite it")
 		}
 	}
 
-	if err := modifyContextName(rootNode, op.Old, op.New); err != nil {
+	if err := kc.ModifyContextName(op.Old, op.New); err != nil {
 		return errors.Wrap(err, "failed to change context name")
 	}
 	if op.New == cur {
-		if err := modifyCurrentContext(rootNode, op.New); err != nil {
+		if err := kc.ModifyCurrentContext( op.New); err != nil {
 			return errors.Wrap(err, "failed to set current-context to new name")
 		}
 	}
@@ -73,28 +70,3 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 	return nil
 }
 
-func modifyContextName(rootNode *yaml.Node, old, new string) error {
-	if rootNode.Kind != yaml.MappingNode {
-		return errors.New("root doc is not a mapping node")
-	}
-	contexts := valueOf(rootNode, "contexts")
-	if contexts == nil {
-		return errors.New("\"contexts\" entry is nil")
-	} else if contexts.Kind != yaml.SequenceNode {
-		return errors.New("\"contexts\" is not a sequence node")
-	}
-
-	var changed bool
-	for _, contextNode := range contexts.Content {
-		nameNode := valueOf(contextNode, "name")
-		if nameNode.Kind == yaml.ScalarNode && nameNode.Value == old {
-			nameNode.Value = new
-			changed = true
-			break
-		}
-	}
-	if !changed {
-		return errors.New("no changes were made")
-	}
-	return nil
-}

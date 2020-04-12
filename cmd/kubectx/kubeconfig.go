@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
 
 	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
 )
@@ -68,20 +67,4 @@ func homeDir() string {
 		home = os.Getenv("USERPROFILE") // windows
 	}
 	return home
-}
-
-// TODO parseKubeconfig doesn't seem necessary when there's a raw version that returns what's needed
-func parseKubeconfig(path string) (kubeconfigContents, error) {
-	// TODO refactor to accept io.Reader instead of file
-	var v kubeconfigContents
-
-	f, err := os.Open(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return v, nil
-		}
-		return v, errors.Wrap(err, "file open error")
-	}
-	err = yaml.NewDecoder(f).Decode(&v)
-	return v, errors.Wrap(err, "yaml parse error")
 }

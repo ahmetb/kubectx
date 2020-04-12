@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
 
 	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
 )
@@ -37,9 +36,8 @@ func (op DeleteOp) Run(_, stderr io.Writer) error {
 func deleteContext(name string) (deleteName string, wasActiveContext bool, err error) {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
 	defer kc.Close()
-	rootNode, err := kc.ParseRaw()
-	if err != nil {
-		return "", false, err
+	if err := kc.Parse(); err != nil {
+		return "", false, errors.Wrap(err, "failed to parse kubeconfig")
 	}
 
 	cur := kc.GetCurrentContext()
@@ -54,36 +52,9 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 		return "", false, errors.New("context does not exist")
 	}
 
-	if err := modifyDocToDeleteContext(rootNode, name); err != nil {
+	if err := kc.DeleteContextEntry(name); err != nil {
 		return "", false, errors.Wrap(err, "failed to modify yaml doc")
 	}
 	return name, wasActiveContext, errors.Wrap(kc.Save(), "failed to save kubeconfig file")
 }
 
-func modifyDocToDeleteContext(rootNode *yaml.Node, deleteName string) error {
-	if rootNode.Kind != yaml.MappingNode {
-		return errors.New("root node was not a mapping node")
-	}
-	contexts := valueOf(rootNode, "contexts")
-	if contexts == nil {
-		return errors.New("there are no contexts in kubeconfig")
-	}
-	if contexts.Kind != yaml.SequenceNode {
-		return errors.New("'contexts' key is not a sequence")
-	}
-
-	i := -1
-	for j, ctxNode := range contexts.Content {
-		nameNode := valueOf(ctxNode, "name")
-		if nameNode != nil && nameNode.Kind == yaml.ScalarNode && nameNode.Value == deleteName {
-			i = j
-			break
-		}
-	}
-	if i >= 0 {
-		copy(contexts.Content[i:], contexts.Content[i+1:])
-		contexts.Content[len(contexts.Content)-1] = nil
-		contexts.Content = contexts.Content[:len(contexts.Content)-1]
-	}
-	return nil
-}
