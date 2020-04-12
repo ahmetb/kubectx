@@ -26,17 +26,17 @@ type ListOp struct{}
 func (_ ListOp) Run(stdout, _ io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
 	defer kc.Close()
-	rootNode, err := kc.ParseRaw()
+	_, err := kc.ParseRaw()
 	if err != nil {
 		return err
 	}
 
-	ctxs := kubeconfig.ContextNames(rootNode)
+	ctxs := kc.ContextNames()
 	natsort.Sort(ctxs)
 
 	// TODO support KUBECTX_CURRENT_FGCOLOR
 	// TODO support KUBECTX_CURRENT_BGCOLOR
-	cur :=  kubeconfig.GetCurrentContext(rootNode)
+	cur :=  kc.GetCurrentContext()
 	for _, c := range ctxs {
 		s := c
 		if c == cur {

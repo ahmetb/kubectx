@@ -15,12 +15,12 @@ type CurrentOp struct{}
 func (_op CurrentOp) Run(stdout, _ io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
 	defer kc.Close()
-	rootNode, err := kc.ParseRaw()
+	_, err := kc.ParseRaw()
 	if err != nil {
 		return err
 	}
 
-	v := kubeconfig.GetCurrentContext(rootNode)
+	v := kc.GetCurrentContext()
 	if v == "" {
 		return errors.New("current-context is not set")
 	}

@@ -1,9 +1,11 @@
 package kubeconfig
 
-import "gopkg.in/yaml.v3"
+import (
+	"gopkg.in/yaml.v3"
+)
 
-func ContextNames(rootNode *yaml.Node) []string {
-	contexts := valueOf(rootNode, "contexts")
+func (k *Kubeconfig) ContextNames() []string {
+	contexts := valueOf(k.rootNode, "contexts")
 	if contexts == nil {
 		return nil
 	}
@@ -21,17 +23,14 @@ func ContextNames(rootNode *yaml.Node) []string {
 	return ctxNames
 }
 
-// GetCurrentContext returns "current-context" value in given
-// kubeconfig object Node, or returns "" if not found.
-func GetCurrentContext(rootNode *yaml.Node) string {
-	if rootNode.Kind != yaml.MappingNode {
-		return ""
+func (k *Kubeconfig) ContextExists(name string) bool {
+	ctxNames := k.ContextNames()
+	for _, v := range ctxNames {
+		if v == name {
+			return true
+		}
 	}
-	v := valueOf(rootNode, "current-context")
-	if v == nil {
-		return ""
-	}
-	return v.Value
+	return false
 }
 
 func valueOf(mapNode *yaml.Node, key string) *yaml.Node {
