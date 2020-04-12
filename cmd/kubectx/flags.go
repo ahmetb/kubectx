@@ -2,6 +2,7 @@ package main
 
 import (
 	"io"
+	"os"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -22,6 +23,9 @@ func (op UnsupportedOp) Run(_, _ io.Writer) error {
 // and decides which operation should be taken.
 func parseArgs(argv []string) Op {
 	if len(argv) == 0 {
+		if isInteractiveMode(os.Stdout){
+			return InteractiveSwitchOp{SelfCmd: os.Args[0]}
+		}
 		return ListOp{}
 	}
 
