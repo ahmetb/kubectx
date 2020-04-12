@@ -23,7 +23,7 @@ func (op DeleteOp) Run(_, stderr io.Writer) error {
 		}
 		if wasActiveContext {
 			// TODO we don't always run as kubectx (sometimes "kubectl ctx")
-			printWarning(stderr,"You deleted the current context. use \"kubectx\" to select a different one.")
+			printWarning(stderr, "You deleted the current context. use \"kubectx\" to select a different one.")
 		}
 
 		printSuccess(stderr, "deleted context %q", deletedName)
@@ -57,4 +57,3 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 	}
 	return name, wasActiveContext, errors.Wrap(kc.Save(), "failed to save kubeconfig file")
 }
-

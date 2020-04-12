@@ -15,13 +15,13 @@ var (
 
 type StandardKubeconfigLoader struct{}
 
-type kubeconfigFile struct { *os.File }
+type kubeconfigFile struct{ *os.File }
 
 func (kf *kubeconfigFile) Reset() error {
-	if err := kf.Truncate(0);err!= nil {
+	if err := kf.Truncate(0); err != nil {
 		return errors.Wrap(err, "failed to truncate file")
 	}
-	_, err := kf.Seek(0,0)
+	_, err := kf.Seek(0, 0)
 	return errors.Wrap(err, "failed to seek in file")
 }
 

@@ -13,10 +13,6 @@ import (
 	"github.com/mattn/go-isatty"
 )
 
-const (
-	envFZFIgnore = "KUBECTX_IGNORE_FZF"
-)
-
 type InteractiveSwitchOp struct {
 	SelfCmd string
 }
@@ -30,7 +26,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 
 	cmd.Env = append(os.Environ(),
 		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", op.SelfCmd),
-		fmt.Sprintf("%s=1", envForceColor))
+		fmt.Sprintf("%s=1", EnvForceColor))
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); !ok {
 			return err
@@ -64,6 +60,6 @@ func fzfInstalled() bool {
 
 // isInteractiveMode determines if we can do choosing with fzf.
 func isInteractiveMode(stdout *os.File) bool {
-	v := os.Getenv(envFZFIgnore)
+	v := os.Getenv(EnvFZFIgnore)
 	return v == "" && isTerminal(stdout) && fzfInstalled()
 }

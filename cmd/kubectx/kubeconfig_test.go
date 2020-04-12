@@ -19,7 +19,7 @@ func Test_kubeconfigPath_homePath(t *testing.T) {
 	}
 	expected := filepath.Join(filepath.FromSlash("/foo/bar"), ".kube", "config")
 
-	if got != expected{
+	if got != expected {
 		t.Fatalf("wrong value: expected=%s got=%s", expected, got)
 	}
 }
@@ -36,7 +36,7 @@ func Test_kubeconfigPath_userprofile(t *testing.T) {
 	}
 	expected := filepath.Join(filepath.FromSlash("/foo/bar"), ".kube", "config")
 
-	if got != expected{
+	if got != expected {
 		t.Fatalf("wrong value: expected=%s got=%s", expected, got)
 	}
 }
@@ -60,19 +60,23 @@ func Test_kubeconfigPath_envOvveride(t *testing.T) {
 	defer os.Unsetenv("KUBECONFIG")
 
 	v, err := kubeconfigPath()
-	if err != nil { t.Fatal(err)}
+	if err != nil {
+		t.Fatal(err)
+	}
 	if expected := "foo"; v != expected {
 		t.Fatalf("expected=%q, got=%q", expected, v)
 	}
 }
 
 func Test_kubeconfigPath_envOvverideDoesNotSupportPathSeparator(t *testing.T) {
-	path := strings.Join([]string{"file1","file2"}, string(os.PathListSeparator))
+	path := strings.Join([]string{"file1", "file2"}, string(os.PathListSeparator))
 	os.Setenv("KUBECONFIG", path)
 	defer os.Unsetenv("KUBECONFIG")
 
 	_, err := kubeconfigPath()
-	if err == nil { t.Fatal("expected error")}
+	if err == nil {
+		t.Fatal("expected error")
+	}
 }
 
 func testfile(t *testing.T, contents string) (path string, cleanup func()) {

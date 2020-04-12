@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
 
 	"facette.io/natsort"
 	"github.com/fatih/color"
@@ -29,13 +28,13 @@ func (_ ListOp) Run(stdout, _ io.Writer) error {
 	// TODO support KUBECTX_CURRENT_BGCOLOR
 
 	currentColor := color.New(color.FgGreen, color.Bold)
-	if useColors(){
+	if useColors() {
 		currentColor.EnableColor()
 	} else {
 		currentColor.DisableColor()
 	}
 
-	cur :=  kc.GetCurrentContext()
+	cur := kc.GetCurrentContext()
 	for _, c := range ctxs {
 		s := c
 		if c == cur {
@@ -44,18 +43,4 @@ func (_ ListOp) Run(stdout, _ io.Writer) error {
 		fmt.Fprintf(stdout, "%s\n", s)
 	}
 	return nil
-}
-
-const (
-	envForceColor = `_KUBECTX_FORCE_COLOR`
-	envNoColor = `NO_COLOR`
-)
-
-func useColors() bool {
-	if os.Getenv(envForceColor) != "" {
-		return true
-	} else if os.Getenv(envNoColor) != "" {
-		return false
-	}
-	return true
 }

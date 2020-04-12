@@ -48,7 +48,7 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 		return errors.Errorf("context %q not found, can't rename it", op.Old)
 	}
 
-	if kc.ContextExists( op.New) {
+	if kc.ContextExists(op.New) {
 		printWarning(stderr, "context %q exists, overwriting it.", op.New)
 		if err := kc.DeleteContextEntry(op.New); err != nil {
 			return errors.Wrap(err, "failed to delete new context to overwrite it")
@@ -59,7 +59,7 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 		return errors.Wrap(err, "failed to change context name")
 	}
 	if op.New == cur {
-		if err := kc.ModifyCurrentContext( op.New); err != nil {
+		if err := kc.ModifyCurrentContext(op.New); err != nil {
 			return errors.Wrap(err, "failed to set current-context to new name")
 		}
 	}
@@ -69,4 +69,3 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 	printSuccess(stderr, "Context %q renamed to %q.", op.Old, op.New)
 	return nil
 }
-

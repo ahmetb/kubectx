@@ -8,7 +8,9 @@ import (
 
 func TestPrintHelp(t *testing.T) {
 	var buf bytes.Buffer
-	printHelp(&buf)
+	if err := (&HelpOp{}).Run(&buf, &buf); err != nil {
+		t.Fatal(err)
+	}
 
 	out := buf.String()
 	if !strings.Contains(out, "USAGE:") {
