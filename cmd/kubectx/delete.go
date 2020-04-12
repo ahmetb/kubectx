@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/pkg/errors"
@@ -23,9 +22,10 @@ func (op DeleteOp) Run(_, stderr io.Writer) error {
 		}
 		if wasActiveContext {
 			// TODO we don't always run as kubectx (sometimes "kubectl ctx")
-			printWarning("You deleted the current context. use \"kubectx\" to select a different one.")
+			printWarning(stderr,"You deleted the current context. use \"kubectx\" to select a different one.")
 		}
-		fmt.Fprintf(stderr, "deleted context %q\n", deletedName) // TODO write with printSuccess (i.e. green)
+
+		printSuccess(stderr, "deleted context %q", deletedName)
 	}
 	return nil
 }

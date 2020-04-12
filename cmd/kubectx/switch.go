@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/pkg/errors"
@@ -24,8 +23,7 @@ func (op SwitchOp) Run(stdout, stderr io.Writer) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to switch context")
 	}
-	// TODO use printSuccess when available.
-	fmt.Fprintf(stderr, "Switched to context %q.\n", newCtx)
+	printSuccess(stderr, "Switched to context %q.", newCtx)
 	return nil
 }
 

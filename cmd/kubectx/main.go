@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/fatih/color"
@@ -13,15 +14,20 @@ func main() {
 	op = parseArgs(os.Args[1:])
 
 	if err := op.Run(os.Stdout, os.Stderr); err != nil {
-		printError(err.Error())
+		printError(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 }
 
-func printError(format string, args ...interface{}) {
+func printError(w io.Writer, format string, args ...interface{}) {
 	fmt.Fprintf(os.Stderr, color.RedString("error: ")+format+"\n", args...)
 }
 
-func printWarning(format string, args ...interface{}) {
-	fmt.Fprintf(os.Stderr, color.YellowString("warning: ")+format+"\n", args...)
+func printWarning(w io.Writer, format string, args ...interface{}) {
+	fmt.Fprintf(w, color.YellowString("warning: ")+format+"\n", args...)
 }
+
+func printSuccess(w io.Writer, format string, args ...interface{}) {
+	fmt.Fprintf(w, color.GreenString(fmt.Sprintf(format+"\n", args...)))
+}
+
