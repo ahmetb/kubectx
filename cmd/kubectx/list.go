@@ -13,7 +13,7 @@ type context struct {
 	Name string `yaml:"name"`
 }
 
-type kubeconfig struct {
+type kubeconfigContents struct {
 	APIVersion     string    `yaml:"apiVersion"`
 	CurrentContext string    `yaml:"current-context"`
 	Contexts       []context `yaml:"contexts"`
