@@ -1,17 +1,40 @@
 package main
 
 import (
+	"fmt"
+	"io"
+
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 )
 
+// SwitchOp indicates intention to switch contexts.
+type SwitchOp struct {
+	Target string // '-' for back and forth, or NAME
+}
+
+func (op SwitchOp) Run(stdout, stderr io.Writer) error {
+	var newCtx string
+	var err error
+	if op.Target == "-" {
+		newCtx, err = swapContext()
+	} else {
+		newCtx, err = switchContext(op.Target)
+	}
+	if err != nil {
+		return errors.Wrap(err, "failed to switch context")
+	}
+	// TODO use printSuccess when available.
+	fmt.Fprintf(stderr, "Switched to context %q.\n", newCtx)
+	return nil
+}
+
 // switchContext switches to specified context name.
 func switchContext(name string) (string, error) {
-	stateFile, err := kubectxFilePath()
+	prevCtxFile, err := kubectxPrevCtxFile()
 	if err != nil {
 		return "", errors.Wrap(err, "failed to determine state file")
 	}
-
 	f, kc, err := openKubeconfig()
 	if err != nil {
 		return "", err
@@ -19,32 +42,41 @@ func switchContext(name string) (string, error) {
 	defer f.Close()
 
 	prev := getCurrentContext(kc)
-
-	// TODO: add a check to ensure user can't switch to non-existing context.
-	if !checkContextExists(kc, name)  {
+	if !checkContextExists(kc, name) {
 		return "", errors.Errorf("no context exists with the name: %q", name)
 	}
-
 	if err := modifyCurrentContext(kc, name); err != nil {
 		return "", err
 	}
-
-	if err := resetFile(f); err != nil {
-		return "", err
-	}
-
 	if err := saveKubeconfigRaw(f, kc); err != nil {
 		return "", errors.Wrap(err, "failed to save kubeconfig")
 	}
 
 	if prev != name {
-		if err := writeLastContext(stateFile, prev); err != nil {
+		if err := writeLastContext(prevCtxFile, prev); err != nil {
 			return "", errors.Wrap(err, "failed to save previous context name")
 		}
 	}
-
 	return name, nil
 }
+
+
+// swapContext switches to previously switch context.
+func swapContext() (string, error) {
+	prevCtxFile, err := kubectxPrevCtxFile()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to determine state file")
+	}
+	prev, err := readLastContext(prevCtxFile)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to read previous context file")
+	}
+	if prev == "" {
+		return "", errors.New("no previous context found")
+	}
+	return switchContext(prev)
+}
+
 
 func checkContextExists(rootNode *yaml.Node, name string) bool {
 	contexts := valueOf(rootNode, "contexts")
@@ -81,22 +113,6 @@ func valueOf(mapNode *yaml.Node, key string) *yaml.Node {
 		}
 	}
 	return nil
-}
-
-// swapContext switches to previously switch context.
-func swapContext() (string, error) {
-	stateFile, err := kubectxFilePath()
-	if err != nil {
-		return "", errors.Wrap(err, "failed to determine state file")
-	}
-	prev, err := readLastContext(stateFile)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to read previous context file")
-	}
-	if prev == "" {
-		return "", errors.New("no previous context found")
-	}
-	return switchContext(prev)
 }
 
 // getCurrentContext returns "current-context" value in given

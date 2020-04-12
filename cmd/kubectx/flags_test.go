@@ -59,8 +59,8 @@ func Test_parseArgs_new(t *testing.T) {
 			want: RenameOp{"a", "."}},
 		{name: "unrecognized flag",
 			args: []string{"-x"},
-			want: UnknownOp{Args: []string{"-x"}}},
-		// TODO add more UnknownOp cases
+			want: UnsupportedOp{Args: []string{"-x"}}},
+		// TODO add more UnsupportedOp cases
 
 		// TODO consider these cases
 		// - kubectx foo --help

@@ -29,7 +29,10 @@ func kubeconfigPath() (string, error) {
 }
 
 func homeDir() string {
-	// TODO move tests out of kubeconfigPath to TestHomeDir()
+	// TODO move tests for this out of kubeconfigPath to TestHomeDir()
+	if v := os.Getenv("XDG_CACHE_HOME"); v != "" {
+		return v
+	}
 	home := os.Getenv("HOME")
 	if home == "" {
 		home = os.Getenv("USERPROFILE") // windows
@@ -37,6 +40,8 @@ func homeDir() string {
 	return home
 }
 
+
+// TODO parseKubeconfig doesn't seem necessary when there's a raw version that returns what's needed
 func parseKubeconfig(path string) (kubeconfig, error) {
 	// TODO refactor to accept io.Reader instead of file
 	var v kubeconfig

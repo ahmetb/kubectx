@@ -19,7 +19,10 @@ type kubeconfig struct {
 	Contexts       []context `yaml:"contexts"`
 }
 
-func printListContexts(out io.Writer) error {
+// ListOp describes listing contexts.
+type ListOp struct{}
+
+func (_ ListOp) Run(stdout, stderr io.Writer) error {
 	// TODO extract printing and sorting into a function that's testable
 
 	cfgPath, err := kubeconfigPath()
@@ -41,12 +44,11 @@ func printListContexts(out io.Writer) error {
 	// TODO support KUBECTX_CURRENT_FGCOLOR
 	// TODO support KUBECTX_CURRENT_BGCOLOR
 	for _, c := range ctxs {
-		out := c
+		s := c
 		if c == cfg.CurrentContext {
-			out = color.New(color.FgYellow, color.Bold).Sprint(c)
+			s = color.New(color.FgGreen, color.Bold).Sprint(c)
 		}
-		fmt.Println(out)
+		fmt.Fprintf(stdout, "%s\n", s)
 	}
 	return nil
 }
-

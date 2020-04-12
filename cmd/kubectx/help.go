@@ -5,7 +5,14 @@ import (
 	"io"
 )
 
-func printHelp(out io.Writer) {
+// HelpOp describes printing help.
+type HelpOp struct{}
+
+func (_ HelpOp) Run(stdout, _ io.Writer) error {
+	return printUsage(stdout)
+}
+
+func printUsage(out io.Writer) error {
 	help := `USAGE:
   kubectx                       : list the contexts
   kubectx <NAME>                : switch to context <NAME>
@@ -20,5 +27,6 @@ func printHelp(out io.Writer) {
 
   kubectx -h,--help             : show this message`
 
-	fmt.Fprintf(out, "%s\n", help)
+	_, err := fmt.Fprintf(out, "%s\n", help)
+	return err
 }

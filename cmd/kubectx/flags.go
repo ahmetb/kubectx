@@ -1,39 +1,22 @@
 package main
 
-import "strings"
+import (
+	"io"
+	"strings"
 
-type Op interface{}
+	"github.com/pkg/errors"
+)
 
-// HelpOp describes printing help.
-type HelpOp struct{}
-
-// ListOp describes listing contexts.
-type ListOp struct{}
-
-// CurrentOp prints the current context
-type CurrentOp struct{}
-
-// SwitchOp indicates intention to switch contexts.
-type SwitchOp struct {
-	Target string // '-' for back and forth, or NAME
+type Op interface {
+	Run(stdout, stderr io.Writer) error
 }
 
-// UnsetOp indicates intention to remove current-context preference.
-type UnsetOp struct{}
+// UnsupportedOp indicates an unsupported flag.
+type UnsupportedOp struct{ Err error }
 
-// DeleteOp indicates intention to delete contexts.
-type DeleteOp struct {
-	Contexts []string // NAME or '.' to indicate current-context.
+func (op UnsupportedOp) Run(_, _ io.Writer) error {
+	return op.Err
 }
-
-// RenameOp indicates intention to rename contexts.
-type RenameOp struct {
-	New string // NAME of New context
-	Old string // NAME of Old context (or '.' for current-context)
-}
-
-// UnknownOp indicates an unsupported flag.
-type UnknownOp struct{ Args []string }
 
 // parseArgs looks at flags (excl. executable name, i.e. argv[0])
 // and decides which operation should be taken.
@@ -43,8 +26,7 @@ func parseArgs(argv []string) Op {
 	}
 
 	if argv[0] == "-d" {
-		ctxs := argv[1:]
-		return DeleteOp{ctxs}
+		return DeleteOp{Contexts: argv[1:]}
 	}
 
 	if len(argv) == 1 {
@@ -59,21 +41,16 @@ func parseArgs(argv []string) Op {
 			return UnsetOp{}
 		}
 
-		new, old, ok := parseRenameSyntax(v) // a=b a=.
-		if ok {
-			return RenameOp{new, old}
+		if new, old, ok := parseRenameSyntax(v); ok {
+			return RenameOp{New: new, Old: old}
 		}
 
 		if strings.HasPrefix(v, "-") && v != "-" {
-			return UnknownOp{argv}
+			return UnsupportedOp{Err: errors.Errorf("unsupported option %s", v)}
 		}
-
-		// TODO handle -d
-		// TODO handle -u/--unset
-		// TODO handle -c/--current
 		return SwitchOp{Target: argv[0]}
 	}
 
 	// TODO handle too many arguments e.g. "kubectx a b c"
-	return UnknownOp{}
+	return UnsupportedOp{Err: errors.New("too many arguments")}
 }
