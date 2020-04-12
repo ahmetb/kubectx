@@ -60,7 +60,6 @@ func switchContext(name string) (string, error) {
 	return name, nil
 }
 
-
 // swapContext switches to previously switch context.
 func swapContext() (string, error) {
 	prevCtxFile, err := kubectxPrevCtxFile()

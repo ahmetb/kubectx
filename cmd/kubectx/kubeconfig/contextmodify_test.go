@@ -46,7 +46,7 @@ func TestKubeconfig_DeleteContextEntry(t *testing.T) {
 
 	expected := "contexts: [{name: c2}, {name: c3}]\n"
 	out := test.out.String()
-	if diff := cmp.Diff(expected,out); diff != "" {
+	if diff := cmp.Diff(expected, out); diff != "" {
 		t.Fatalf("diff: %s", diff)
 	}
 }
@@ -67,9 +67,9 @@ field1: value1`)}
 	}
 
 	expected := `current-context: foo
-field1: value1`+"\n"
+field1: value1` + "\n"
 	out := test.out.String()
-	if diff := cmp.Diff(expected,out); diff != "" {
+	if diff := cmp.Diff(expected, out); diff != "" {
 		t.Fatalf("diff: %s", diff)
 	}
 }
@@ -90,7 +90,7 @@ func TestKubeconfig_ModifyCurrentContext_fieldMissing(t *testing.T) {
 
 	expected := `field1: value1` + "\n" + "current-context: foo\n"
 	out := test.out.String()
-	if diff := cmp.Diff(expected,out); diff != "" {
+	if diff := cmp.Diff(expected, out); diff != "" {
 		t.Fatalf("diff: %s", diff)
 	}
 }
@@ -123,7 +123,7 @@ func TestKubeconfig_ModifyContextName(t *testing.T) {
 
 	expected := "contexts: [{name: ccc}, {name: c2}, {name: c3}]\n"
 	out := test.out.String()
-	if diff := cmp.Diff(expected,out); diff != "" {
+	if diff := cmp.Diff(expected, out); diff != "" {
 		t.Fatalf("diff: %s", diff)
 	}
 }

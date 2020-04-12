@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type ReadWriteResetCloser interface{
+type ReadWriteResetCloser interface {
 	io.ReadWriteCloser
 
 	// Reset truncates the file and seeks to the beginning of the file.
@@ -19,9 +19,9 @@ type Loader interface {
 }
 
 type Kubeconfig struct {
-	loader   Loader
+	loader Loader
 
-	f ReadWriteResetCloser
+	f        ReadWriteResetCloser
 	rootNode *yaml.Node
 }
 

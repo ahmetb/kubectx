@@ -30,4 +30,3 @@ func printWarning(w io.Writer, format string, args ...interface{}) {
 func printSuccess(w io.Writer, format string, args ...interface{}) {
 	fmt.Fprintf(w, color.GreenString(fmt.Sprintf(format+"\n", args...)))
 }
-
