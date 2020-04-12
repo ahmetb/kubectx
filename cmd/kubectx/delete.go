@@ -37,7 +37,7 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		return "", false, errors.Wrap(err, "failed to parse kubeconfig")
+		return "", false, errors.Wrap(err, "kubeconfig error")
 	}
 
 	cur := kc.GetCurrentContext()
