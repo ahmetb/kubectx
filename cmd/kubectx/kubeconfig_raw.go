@@ -9,6 +9,7 @@ import (
 )
 
 func parseKubeconfigRaw(r io.Reader) (*yaml.Node, error) {
+	// TODO DELETE
 	var v yaml.Node
 	if err := yaml.NewDecoder(r).Decode(&v); err != nil {
 		return nil, err

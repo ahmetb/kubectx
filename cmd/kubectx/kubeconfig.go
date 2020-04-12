@@ -6,7 +6,33 @@ import (
 
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
+
+	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
 )
+
+type defaultKubeconfigLoader struct{}
+
+type kubeconfigFile struct { *os.File }
+
+func (kf *kubeconfigFile) Reset() error {
+	if err := kf.Truncate(0);err!= nil {
+		return errors.Wrap(err, "failed to truncate file")
+	}
+	_, err := kf.Seek(0,0)
+	return errors.Wrap(err, "failed to seek in file")
+}
+
+func (defaultKubeconfigLoader) Load() (kubeconfig.ReadWriteResetCloser, error) {
+	cfgPath, err := kubeconfigPath()
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot determine kubeconfig path")
+	}
+	f, err := os.OpenFile(cfgPath, os.O_RDWR, 0)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open file")
+	}
+	return &kubeconfigFile{f}, nil
+}
 
 func kubeconfigPath() (string, error) {
 	// KUBECONFIG env var
@@ -40,11 +66,10 @@ func homeDir() string {
 	return home
 }
 
-
 // TODO parseKubeconfig doesn't seem necessary when there's a raw version that returns what's needed
-func parseKubeconfig(path string) (kubeconfig, error) {
+func parseKubeconfig(path string) (kubeconfigContents, error) {
 	// TODO refactor to accept io.Reader instead of file
-	var v kubeconfig
+	var v kubeconfigContents
 
 	f, err := os.Open(path)
 	if err != nil {
