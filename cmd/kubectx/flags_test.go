@@ -1,10 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/pkg/errors"
 )
 
 func Test_parseArgs_new(t *testing.T) {
@@ -60,7 +60,10 @@ func Test_parseArgs_new(t *testing.T) {
 			want: RenameOp{"a", "."}},
 		{name: "unrecognized flag",
 			args: []string{"-x"},
-			want: UnsupportedOp{Err: errors.Errorf("unsupported option \"-x\"")}},
+			want: UnsupportedOp{Err: fmt.Errorf("unsupported option \"-x\"")}},
+		{name: "too many args",
+			args: []string{"a", "b", "c"},
+			want: UnsupportedOp{Err: fmt.Errorf("too many arguments")}},
 		// TODO add more UnsupportedOp cases
 
 		// TODO consider these cases

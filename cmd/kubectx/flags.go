@@ -1,11 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 type Op interface {
@@ -50,9 +49,9 @@ func parseArgs(argv []string) Op {
 		}
 
 		if strings.HasPrefix(v, "-") && v != "-" {
-			return UnsupportedOp{Err: errors.Errorf("unsupported option %s", v)}
+			return UnsupportedOp{Err: fmt.Errorf("unsupported option '%s'", v)}
 		}
 		return SwitchOp{Target: argv[0]}
 	}
-	return UnsupportedOp{Err: errors.New("too many arguments")}
+	return UnsupportedOp{Err: fmt.Errorf("too many arguments")}
 }
