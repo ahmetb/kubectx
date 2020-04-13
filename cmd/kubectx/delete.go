@@ -20,14 +20,14 @@ func (op DeleteOp) Run(_, stderr io.Writer) error {
 		// TODO inefficency here. we open/write/close the same file many times.
 		deletedName, wasActiveContext, err := deleteContext(ctx)
 		if err != nil {
-			return errors.Wrapf(err, "error deleting context %q", ctx)
+			return errors.Wrapf(err, "error deleting context %q", deletedName)
 		}
 		if wasActiveContext {
-			// TODO we don't always run as kubectx (sometimes "kubectl ctx")
-			printer.Warning(stderr, "You deleted the current context. use \"kubectx\" to select a different one.")
+			printer.Warning(stderr, "You deleted the current context. Use \"%s\" to select a new context.",
+				selfName())
 		}
 
-		printer.Success(stderr, "deleted context %q", deletedName)
+		printer.Success(stderr, `Deleted context %s.`, printer.SuccessColor.Sprint(deletedName))
 	}
 	return nil
 }
@@ -38,23 +38,25 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		return "", false, errors.Wrap(err, "kubeconfig error")
+		return deleteName, false, errors.Wrap(err, "kubeconfig error")
 	}
 
 	cur := kc.GetCurrentContext()
-
 	// resolve "." to a real name
 	if name == "." {
+		if cur == "" {
+			return deleteName, false, errors.New("can't use '.' as the no active context is set")
+		}
 		wasActiveContext = true
 		name = cur
 	}
 
 	if !kc.ContextExists(name) {
-		return "", false, errors.New("context does not exist")
+		return name, false, errors.New("context does not exist")
 	}
 
 	if err := kc.DeleteContextEntry(name); err != nil {
-		return "", false, errors.Wrap(err, "failed to modify yaml doc")
+		return name, false, errors.Wrap(err, "failed to modify yaml doc")
 	}
 	return name, wasActiveContext, errors.Wrap(kc.Save(), "failed to save modified kubeconfig file")
 }

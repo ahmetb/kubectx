@@ -45,7 +45,7 @@ func Test_parseArgs_new(t *testing.T) {
 			want: SwitchOp{Target: "-"}},
 		{name: "delete - without contexts",
 			args: []string{"-d"},
-			want: DeleteOp{[]string{}}},
+			want: UnsupportedOp{fmt.Errorf("'-d' needs arguments")}},
 		{name: "delete - current context",
 			args: []string{"-d", "."},
 			want: DeleteOp{[]string{"."}}},
