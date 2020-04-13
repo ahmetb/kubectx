@@ -59,7 +59,7 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 	if err := kc.ModifyContextName(op.Old, op.New); err != nil {
 		return errors.Wrap(err, "failed to change context name")
 	}
-	if op.New == cur {
+	if op.Old == cur {
 		if err := kc.ModifyCurrentContext(op.New); err != nil {
 			return errors.Wrap(err, "failed to set current-context to new name")
 		}
@@ -67,6 +67,8 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 	if err := kc.Save(); err != nil {
 		return errors.Wrap(err, "failed to save modified kubeconfig")
 	}
-	printer.Success(stderr, "Context %q renamed to %q.", op.Old, op.New)
+	printer.Success(stderr, "Context %s renamed to %s.",
+		printer.SuccessColor.Sprint(op.Old),
+		printer.SuccessColor.Sprint(op.New))
 	return nil
 }
