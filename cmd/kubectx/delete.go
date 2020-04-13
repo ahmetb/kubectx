@@ -55,5 +55,5 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 	if err := kc.DeleteContextEntry(name); err != nil {
 		return "", false, errors.Wrap(err, "failed to modify yaml doc")
 	}
-	return name, wasActiveContext, errors.Wrap(kc.Save(), "failed to save kubeconfig file")
+	return name, wasActiveContext, errors.Wrap(kc.Save(), "failed to save modified kubeconfig file")
 }

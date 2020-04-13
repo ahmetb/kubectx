@@ -29,6 +29,32 @@ contexts:
 	}
 }
 
+func TestKubeconfig_ContextNames_noContextsEntry(t *testing.T) {
+	tl := &testLoader{in: strings.NewReader(`a: b`)}
+	kc := new(Kubeconfig).WithLoader(tl)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+	ctx := kc.ContextNames()
+	var expected []string = nil
+	if diff := cmp.Diff(expected, ctx); diff != "" {
+		t.Fatalf("%s", diff)
+	}
+}
+
+func TestKubeconfig_ContextNames_nonArrayContextsEntry(t *testing.T) {
+	tl := &testLoader{in: strings.NewReader(`contexts: "hello"`)}
+	kc := new(Kubeconfig).WithLoader(tl)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+	ctx := kc.ContextNames()
+	var expected []string = nil
+	if diff := cmp.Diff(expected, ctx); diff != "" {
+		t.Fatalf("%s", diff)
+	}
+}
+
 func TestKubeconfig_CheckContextExists(t *testing.T) {
 	tl := &testLoader{in: strings.NewReader(`contexts:
 - name: c1

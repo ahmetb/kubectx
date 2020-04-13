@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"io"
+
+	"github.com/pkg/errors"
 )
 
 // HelpOp describes printing help.
@@ -28,5 +30,5 @@ func printUsage(out io.Writer) error {
   kubectx -h,--help             : show this message`
 
 	_, err := fmt.Fprintf(out, "%s\n", help)
-	return err
+	return errors.Wrap(err, "write error")
 }
