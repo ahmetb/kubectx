@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
+	"github.com/ahmetb/kubectx/internal/printer"
 )
 
 // RenameOp indicates intention to rename contexts.
@@ -49,7 +50,7 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 	}
 
 	if kc.ContextExists(op.New) {
-		printWarning(stderr, "context %q exists, overwriting it.", op.New)
+		printer.Warning(stderr, "context %q exists, overwriting it.", op.New)
 		if err := kc.DeleteContextEntry(op.New); err != nil {
 			return errors.Wrap(err, "failed to delete new context to overwrite it")
 		}
@@ -66,6 +67,6 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 	if err := kc.Save(); err != nil {
 		return errors.Wrap(err, "failed to save modified kubeconfig")
 	}
-	printSuccess(stderr, "Context %q renamed to %q.", op.Old, op.New)
+	printer.Success(stderr, "Context %q renamed to %q.", op.Old, op.New)
 	return nil
 }

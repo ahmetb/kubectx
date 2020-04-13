@@ -5,15 +5,20 @@ import (
 	"io"
 	"os"
 
-	"github.com/fatih/color"
+	"github.com/ahmetb/kubectx/internal/env"
+	"github.com/ahmetb/kubectx/internal/printer"
 )
+
+type Op interface {
+	Run(stdout, stderr io.Writer) error
+}
 
 func main() {
 	op := parseArgs(os.Args[1:])
 	if err := op.Run(os.Stdout, os.Stderr); err != nil {
-		printError(os.Stderr, err.Error())
+		printer.Error(os.Stderr, err.Error())
 
-		if _, ok := os.LookupEnv(EnvDebug); ok {
+		if _, ok := os.LookupEnv(env.EnvDebug); ok {
 			// print stack trace in verbose mode
 			fmt.Fprintf(os.Stderr, "[DEBUG] error: %+v\n", err)
 		}
@@ -21,14 +26,3 @@ func main() {
 	}
 }
 
-func printError(w io.Writer, format string, args ...interface{}) {
-	fmt.Fprintf(w, color.RedString("error: ")+format+"\n", args...)
-}
-
-func printWarning(w io.Writer, format string, args ...interface{}) {
-	fmt.Fprintf(w, color.YellowString("warning: ")+format+"\n", args...)
-}
-
-func printSuccess(w io.Writer, format string, args ...interface{}) {
-	fmt.Fprintf(w, color.GreenString(fmt.Sprintf(format+"\n", args...)))
-}

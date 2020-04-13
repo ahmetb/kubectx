@@ -11,6 +11,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/mattn/go-isatty"
+
+	"github.com/ahmetb/kubectx/internal/env"
+	"github.com/ahmetb/kubectx/internal/printer"
 )
 
 type InteractiveSwitchOp struct {
@@ -26,7 +29,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 
 	cmd.Env = append(os.Environ(),
 		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", op.SelfCmd),
-		fmt.Sprintf("%s=1", EnvForceColor))
+		fmt.Sprintf("%s=1", env.EnvForceColor))
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); !ok {
 			return err
@@ -40,7 +43,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to switch context")
 	}
-	printSuccess(stderr, "Switched to context %q.", name)
+	printer.Success(stderr, "Switched to context %q.", name)
 	return nil
 }
 
@@ -60,6 +63,6 @@ func fzfInstalled() bool {
 
 // isInteractiveMode determines if we can do choosing with fzf.
 func isInteractiveMode(stdout *os.File) bool {
-	v := os.Getenv(EnvFZFIgnore)
+	v := os.Getenv(env.EnvFZFIgnore)
 	return v == "" && isTerminal(stdout) && fzfInstalled()
 }
