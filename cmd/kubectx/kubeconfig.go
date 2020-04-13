@@ -51,16 +51,15 @@ func kubeconfigPath() (string, error) {
 		return v, nil
 	}
 
+	// default path
 	home := homeDir()
 	if home == "" {
 		return "", errors.New("HOME or USERPROFILE environment variable not set")
 	}
-	// return default path
 	return filepath.Join(home, ".kube", "config"), nil
 }
 
 func homeDir() string {
-	// TODO move tests for this out of kubeconfigPath to TestHomeDir()
 	if v := os.Getenv("XDG_CACHE_HOME"); v != "" {
 		return v
 	}
