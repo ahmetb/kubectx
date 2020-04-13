@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
+	"github.com/ahmetb/kubectx/internal/kubeconfig"
 )
 
 // UnsetOp indicates intention to remove current-context preference.
@@ -26,6 +26,6 @@ func (_ UnsetOp) Run(_, stderr io.Writer) error {
 		return errors.Wrap(err, "failed to save kubeconfig file after modification")
 	}
 
-	_, err := fmt.Fprintln(stderr, "Successfully unset the current context")
+	_, err := fmt.Fprintln(stderr, "Successfully unset the active context for kubectl.")
 	return errors.Wrap(err, "write error")
 }

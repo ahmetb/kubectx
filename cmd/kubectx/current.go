@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
+	"github.com/ahmetb/kubectx/internal/kubeconfig"
 )
 
 // CurrentOp prints the current context

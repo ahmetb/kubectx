@@ -8,7 +8,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/pkg/errors"
 
-	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
+	"github.com/ahmetb/kubectx/internal/kubeconfig"
 )
 
 // ListOp describes listing contexts.

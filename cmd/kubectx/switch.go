@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ahmetb/kubectx/cmd/kubectx/kubeconfig"
+	"github.com/ahmetb/kubectx/internal/kubeconfig"
 )
 
 // SwitchOp indicates intention to switch contexts.
