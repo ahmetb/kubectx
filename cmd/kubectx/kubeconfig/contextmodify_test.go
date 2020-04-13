@@ -95,6 +95,34 @@ func TestKubeconfig_ModifyCurrentContext_fieldMissing(t *testing.T) {
 	}
 }
 
+func TestKubeconfig_ModifyContextName_noContextsEntryError(t *testing.T) {
+	// no context entries
+	test := &testLoader{in: strings.NewReader(
+		`a: b`)}
+	kc := new(Kubeconfig).WithLoader(test)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+	if err := kc.ModifyContextName("c1", "c2"); err == nil {
+		t.Fatal("was expecting error for no 'contexts' entry; got nil")
+	}
+}
+
+
+func TestKubeconfig_ModifyContextName_contextsEntryNotSequenceError(t *testing.T) {
+	// no context entries
+	test := &testLoader{in: strings.NewReader(
+		`contexts: "hello"`)}
+	kc := new(Kubeconfig).WithLoader(test)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+	if err := kc.ModifyContextName("c1", "c2"); err == nil {
+		t.Fatal("was expecting error for 'context entry not a sequence'; got nil")
+	}
+}
+
+
 func TestKubeconfig_ModifyContextName_noChange(t *testing.T) {
 	test := &testLoader{in: strings.NewReader(
 		`contexts: [{name: c1}, {name: c2}, {name: c3}]`)}

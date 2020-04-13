@@ -27,5 +27,5 @@ func (_ UnsetOp) Run(_, stderr io.Writer) error {
 	}
 
 	_, err := fmt.Fprintln(stderr, "Successfully unset the current context")
-	return err
+	return errors.Wrap(err, "write error")
 }

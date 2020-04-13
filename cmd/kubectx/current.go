@@ -24,5 +24,5 @@ func (_op CurrentOp) Run(stdout, _ io.Writer) error {
 		return errors.New("current-context is not set")
 	}
 	_, err := fmt.Fprintln(stdout, v)
-	return err
+	return errors.Wrap(err, "write error")
 }
