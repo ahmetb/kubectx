@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	errorColor   = color.New(color.FgRed, color.Bold)
-	warningColor = color.New(color.FgYellow, color.Bold)
-	successColor = color.New(color.FgGreen)
+	ErrorColor   = color.New(color.FgRed, color.Bold)
+	WarningColor = color.New(color.FgYellow, color.Bold)
+	SuccessColor = color.New(color.FgGreen)
 )
 
 func init() {
@@ -19,24 +19,27 @@ func init() {
 		return
 	}
 	if *colors {
-		errorColor.EnableColor()
-		warningColor.EnableColor()
-		successColor.EnableColor()
+		ErrorColor.EnableColor()
+		WarningColor.EnableColor()
+		SuccessColor.EnableColor()
 	} else {
-		errorColor.DisableColor()
-		warningColor.DisableColor()
-		successColor.DisableColor()
+		ErrorColor.DisableColor()
+		WarningColor.DisableColor()
+		SuccessColor.DisableColor()
 	}
 }
 
-func Error(w io.Writer, format string, args ...interface{}) {
-	fmt.Fprintf(w, color.RedString("error: ")+format+"\n", args...)
+func Error(w io.Writer, format string, args ...interface{}) error {
+	_, err := fmt.Fprintf(w, ErrorColor.Sprint("error: ")+format+"\n", args...)
+	return err
 }
 
-func Warning(w io.Writer, format string, args ...interface{}) {
-	fmt.Fprintf(w, color.YellowString("warning: ")+format+"\n", args...)
+func Warning(w io.Writer, format string, args ...interface{}) error {
+	_, err := fmt.Fprintf(w, WarningColor.Sprint("warning: ")+format+"\n", args...)
+	return err
 }
 
-func Success(w io.Writer, format string, args ...interface{}) {
-	fmt.Fprintf(w, color.GreenString(fmt.Sprintf(format+"\n", args...)))
+func Success(w io.Writer, format string, args ...interface{}) error {
+	_, err := fmt.Fprintf(w, SuccessColor.Sprint("✔ ")+fmt.Sprintf(format+"\n", args...))
+	return err
 }

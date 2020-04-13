@@ -25,4 +25,3 @@ func main() {
 		defer os.Exit(1)
 	}
 }
-

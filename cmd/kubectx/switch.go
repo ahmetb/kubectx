@@ -25,8 +25,8 @@ func (op SwitchOp) Run(_, stderr io.Writer) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to switch context")
 	}
-	printer.Success(stderr, "Switched to context %q.", newCtx)
-	return nil
+	err = printer.Success(stderr, "Switched to context %q.", newCtx)
+	return errors.Wrap(err, "print error")
 }
 
 // switchContext switches to specified context name.
