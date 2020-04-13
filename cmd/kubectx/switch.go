@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
+	"github.com/ahmetb/kubectx/internal/printer"
 )
 
 // SwitchOp indicates intention to switch contexts.
@@ -24,7 +25,7 @@ func (op SwitchOp) Run(_, stderr io.Writer) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to switch context")
 	}
-	printSuccess(stderr, "Switched to context %q.", newCtx)
+	printer.Success(stderr, "Switched to context %q.", newCtx)
 	return nil
 }
 

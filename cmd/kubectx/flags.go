@@ -7,10 +7,6 @@ import (
 	"strings"
 )
 
-type Op interface {
-	Run(stdout, stderr io.Writer) error
-}
-
 // UnsupportedOp indicates an unsupported flag.
 type UnsupportedOp struct{ Err error }
 

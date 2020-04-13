@@ -8,6 +8,22 @@ import (
 	"testing"
 )
 
+
+func withTestVar(key, value string) func() {
+	// TODO(ahmetb) this method is currently duplicated
+	// consider extracting to internal/testutil or something
+
+	orig, ok := os.LookupEnv(key)
+	os.Setenv(key, value)
+	return func() {
+		if ok {
+			os.Setenv(key, orig)
+		} else {
+			os.Unsetenv(key)
+		}
+	}
+}
+
 func Test_homeDir(t *testing.T) {
 	type env struct{ k, v string }
 	cases := []struct {

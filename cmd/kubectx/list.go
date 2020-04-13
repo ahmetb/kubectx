@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
+	"github.com/ahmetb/kubectx/internal/printer"
 )
 
 // ListOp describes listing contexts.
@@ -28,9 +29,9 @@ func (_ ListOp) Run(stdout, _ io.Writer) error {
 	// TODO support KUBECTX_CURRENT_BGCOLOR
 
 	currentColor := color.New(color.FgGreen, color.Bold)
-	if useColors() {
+	if v := printer.UseColors(); v != nil && *v {
 		currentColor.EnableColor()
-	} else {
+	} else if v != nil && !*v {
 		currentColor.DisableColor()
 	}
 
