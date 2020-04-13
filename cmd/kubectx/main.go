@@ -9,18 +9,20 @@ import (
 )
 
 func main() {
-	// parse command-line flags
-	var op Op
-	op = parseArgs(os.Args[1:])
-
+	op := parseArgs(os.Args[1:])
 	if err := op.Run(os.Stdout, os.Stderr); err != nil {
 		printError(os.Stderr, err.Error())
-		os.Exit(1)
+
+		if _, ok := os.LookupEnv(EnvDebug); ok {
+			// print stack trace in verbose mode
+			fmt.Fprintf(os.Stderr, "[DEBUG] error: %+v\n", err)
+		}
+		defer os.Exit(1)
 	}
 }
 
 func printError(w io.Writer, format string, args ...interface{}) {
-	fmt.Fprintf(os.Stderr, color.RedString("error: ")+format+"\n", args...)
+	fmt.Fprintf(w, color.RedString("error: ")+format+"\n", args...)
 }
 
 func printWarning(w io.Writer, format string, args ...interface{}) {

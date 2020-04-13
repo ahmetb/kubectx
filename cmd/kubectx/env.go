@@ -14,6 +14,9 @@ const (
 	// EnvForceColor describes the "internal" environment variable to force
 	// color usage to show current context in a list.
 	EnvForceColor = `_KUBECTX_FORCE_COLOR`
+
+	// EnvDebug describes the internal environment variable for more verbose logging.
+	EnvDebug = `DEBUG`
 )
 
 func useColors() bool {
