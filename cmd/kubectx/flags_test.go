@@ -60,22 +60,23 @@ func Test_parseArgs_new(t *testing.T) {
 			want: RenameOp{"a", "."}},
 		{name: "unrecognized flag",
 			args: []string{"-x"},
-			want: UnsupportedOp{Err: fmt.Errorf("unsupported option \"-x\"")}},
+			want: UnsupportedOp{Err: fmt.Errorf("unsupported option '-x'")}},
 		{name: "too many args",
 			args: []string{"a", "b", "c"},
 			want: UnsupportedOp{Err: fmt.Errorf("too many arguments")}},
-		// TODO add more UnsupportedOp cases
-
-		// TODO consider these cases
-		// - kubectx foo --help
-		// - kubectx -h --help
-		// - kubectx -d foo --h
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := parseArgs(tt.args)
 
-			if diff := cmp.Diff(got, tt.want); diff != "" {
+			var opts cmp.Options
+			if _, ok := tt.want.(UnsupportedOp); ok {
+				opts = append(opts, cmp.Comparer(func(x, y UnsupportedOp) bool {
+					return (x.Err == nil && y.Err == nil) || (x.Err.Error() == y.Err.Error())
+				}))
+			}
+
+			if diff := cmp.Diff(got, tt.want, opts...); diff != "" {
 				t.Errorf("parseArgs(%#v) diff: %s", tt.args, diff)
 			}
 		})
