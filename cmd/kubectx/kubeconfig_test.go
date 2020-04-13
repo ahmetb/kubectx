@@ -8,46 +8,84 @@ import (
 	"testing"
 )
 
-func Test_kubeconfigPath_homePath(t *testing.T) {
-	origHome := os.Getenv("HOME")
-	os.Setenv("HOME", "/foo/bar")
-	defer os.Setenv("HOME", origHome)
-
-	got, err := kubeconfigPath()
-	if err != nil {
-		t.Fatal(err)
+func Test_homeDir(t *testing.T) {
+	type env struct{ k, v string }
+	cases := []struct {
+		name string
+		envs []env
+		want string
+	}{
+		{
+			name: "XDG_CACHE_HOME precedence",
+			envs: []env{
+				{"XDG_CACHE_HOME", "xdg"},
+				{"HOME", "home"},
+			},
+			want: "xdg",
+		},
+		{
+			name: "HOME over USERPROFILE",
+			envs: []env{
+				{"HOME", "home"},
+				{"USERPROFILE", "up"},
+			},
+			want: "home",
+		},
+		{
+			name: "only USERPROFILE available",
+			envs: []env{
+				{"XDG_CACHE_HOME", ""},
+				{"HOME", ""},
+				{"USERPROFILE", "up"},
+			},
+			want: "up",
+		},
+		{
+			name: "none available",
+			envs: []env{
+				{"XDG_CACHE_HOME", ""},
+				{"HOME", ""},
+				{"USERPROFILE", ""},
+			},
+			want: "",
+		},
 	}
-	expected := filepath.Join(filepath.FromSlash("/foo/bar"), ".kube", "config")
 
-	if got != expected {
-		t.Fatalf("wrong value: expected=%s got=%s", expected, got)
+	for _, c := range cases {
+		t.Run(c.name, func(tt *testing.T) {
+			var unsets []func()
+			for _, e := range c.envs {
+				unsets = append(unsets, withTestVar(e.k, e.v))
+			}
+
+			got := homeDir()
+			if got != c.want {
+				t.Errorf("expected:%q got:%q", c.want, got)
+			}
+			for _, u := range unsets {
+				u()
+			}
+		})
 	}
 }
 
-func Test_kubeconfigPath_userprofile(t *testing.T) {
-	origHome := os.Getenv("HOME")
-	os.Unsetenv("HOME")
-	os.Setenv("USERPROFILE", "/foo/bar")
-	defer os.Setenv("HOME", origHome)
+func Test_kubeconfigPath(t *testing.T) {
+	defer withTestVar("HOME", "/x/y/z")()
 
+	expected := filepath.FromSlash("/x/y/z/.kube/config")
 	got, err := kubeconfigPath()
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := filepath.Join(filepath.FromSlash("/foo/bar"), ".kube", "config")
-
 	if got != expected {
-		t.Fatalf("wrong value: expected=%s got=%s", expected, got)
+		t.Fatalf("got=%q expected=%q", got, expected)
 	}
 }
 
 func Test_kubeconfigPath_noEnvVars(t *testing.T) {
-	origHome := os.Getenv("HOME")
-	origUserprofile := os.Getenv("USERPROFILE")
-	os.Unsetenv("HOME")
-	os.Unsetenv("USERPROFILE")
-	defer os.Setenv("HOME", origHome)
-	defer os.Setenv("USERPROFILE", origUserprofile)
+	defer withTestVar("XDG_CACHE_HOME", "")()
+	defer withTestVar("HOME", "")()
+	defer withTestVar("USERPROFILE", "")()
 
 	_, err := kubeconfigPath()
 	if err == nil {
@@ -56,8 +94,7 @@ func Test_kubeconfigPath_noEnvVars(t *testing.T) {
 }
 
 func Test_kubeconfigPath_envOvveride(t *testing.T) {
-	os.Setenv("KUBECONFIG", "foo")
-	defer os.Unsetenv("KUBECONFIG")
+	defer withTestVar("KUBECONFIG", "foo")()
 
 	v, err := kubeconfigPath()
 	if err != nil {
@@ -70,8 +107,7 @@ func Test_kubeconfigPath_envOvveride(t *testing.T) {
 
 func Test_kubeconfigPath_envOvverideDoesNotSupportPathSeparator(t *testing.T) {
 	path := strings.Join([]string{"file1", "file2"}, string(os.PathListSeparator))
-	os.Setenv("KUBECONFIG", path)
-	defer os.Unsetenv("KUBECONFIG")
+	defer withTestVar("KUBECONFIG", path)()
 
 	_, err := kubeconfigPath()
 	if err == nil {
