@@ -44,7 +44,6 @@ func (k *Kubeconfig) Parse() error {
 	}
 
 	k.f = f
-
 	var v yaml.Node
 	if err := yaml.NewDecoder(f).Decode(&v); err != nil {
 		return errors.Wrap(err, "failed to decode")
