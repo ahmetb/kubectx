@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/ahmetb/kubectx/internal/testutil"
 )
 
 func TestKubeconfig_DeleteContextEntry_errors(t *testing.T) {
@@ -31,7 +33,10 @@ func TestKubeconfig_DeleteContextEntry_errors(t *testing.T) {
 
 func TestKubeconfig_DeleteContextEntry(t *testing.T) {
 	test := WithMockKubeconfigLoader(
-		`contexts: [{name: c1}, {name: c2}, {name: c3}]`)
+		testutil.KC().WithCtxs(
+			testutil.Ctx("c1"),
+			testutil.Ctx("c2"),
+			testutil.Ctx("c3")).ToYAML(t))
 	kc := new(Kubeconfig).WithLoader(test)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -43,7 +48,9 @@ func TestKubeconfig_DeleteContextEntry(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := "contexts: [{name: c2}, {name: c3}]\n"
+	expected := testutil.KC().WithCtxs(
+		testutil.Ctx("c2"),
+		testutil.Ctx("c3")).ToYAML(t)
 	out := test.Output()
 	if diff := cmp.Diff(expected, out); diff != "" {
 		t.Fatalf("diff: %s", diff)
@@ -51,8 +58,8 @@ func TestKubeconfig_DeleteContextEntry(t *testing.T) {
 }
 
 func TestKubeconfig_ModifyCurrentContext_fieldExists(t *testing.T) {
-	test := WithMockKubeconfigLoader(`current-context: abc
-field1: value1`)
+	test := WithMockKubeconfigLoader(
+		testutil.KC().WithCurrentCtx("abc").Set("field1", "value1").ToYAML(t))
 	kc := new(Kubeconfig).WithLoader(test)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -64,8 +71,7 @@ field1: value1`)
 		t.Fatal(err)
 	}
 
-	expected := `current-context: foo
-field1: value1` + "\n"
+	expected := testutil.KC().WithCurrentCtx("foo").Set("field1", "value1").ToYAML(t)
 	out := test.Output()
 	if diff := cmp.Diff(expected, out); diff != "" {
 		t.Fatalf("diff: %s", diff)
@@ -73,8 +79,7 @@ field1: value1` + "\n"
 }
 
 func TestKubeconfig_ModifyCurrentContext_fieldMissing(t *testing.T) {
-	test := WithMockKubeconfigLoader(
-		`field1: value1`)
+	test := WithMockKubeconfigLoader(`f1: v1`)
 	kc := new(Kubeconfig).WithLoader(test)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -86,7 +91,9 @@ func TestKubeconfig_ModifyCurrentContext_fieldMissing(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := `field1: value1` + "\n" + "current-context: foo\n"
+	expected := `f1: v1
+current-context: foo
+`
 	out := test.Output()
 	if diff := cmp.Diff(expected, out); diff != "" {
 		t.Fatalf("diff: %s", diff)
@@ -95,8 +102,7 @@ func TestKubeconfig_ModifyCurrentContext_fieldMissing(t *testing.T) {
 
 func TestKubeconfig_ModifyContextName_noContextsEntryError(t *testing.T) {
 	// no context entries
-	test := WithMockKubeconfigLoader(
-		`a: b`)
+	test := WithMockKubeconfigLoader(`a: b`)
 	kc := new(Kubeconfig).WithLoader(test)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -105,7 +111,6 @@ func TestKubeconfig_ModifyContextName_noContextsEntryError(t *testing.T) {
 		t.Fatal("was expecting error for no 'contexts' entry; got nil")
 	}
 }
-
 
 func TestKubeconfig_ModifyContextName_contextsEntryNotSequenceError(t *testing.T) {
 	// no context entries
@@ -120,10 +125,11 @@ func TestKubeconfig_ModifyContextName_contextsEntryNotSequenceError(t *testing.T
 	}
 }
 
-
 func TestKubeconfig_ModifyContextName_noChange(t *testing.T) {
-	test := WithMockKubeconfigLoader(
-		`contexts: [{name: c1}, {name: c2}, {name: c3}]`)
+	test := WithMockKubeconfigLoader(testutil.KC().WithCtxs(
+		testutil.Ctx("c1"),
+		testutil.Ctx("c2"),
+		testutil.Ctx("c3")).ToYAML(t))
 	kc := new(Kubeconfig).WithLoader(test)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -134,8 +140,10 @@ func TestKubeconfig_ModifyContextName_noChange(t *testing.T) {
 }
 
 func TestKubeconfig_ModifyContextName(t *testing.T) {
-	test := WithMockKubeconfigLoader(
-		`contexts: [{name: c1}, {name: c2}, {name: c3}]`)
+	test := WithMockKubeconfigLoader(testutil.KC().WithCtxs(
+		testutil.Ctx("c1"),
+		testutil.Ctx("c2"),
+		testutil.Ctx("c3")).ToYAML(t))
 	kc := new(Kubeconfig).WithLoader(test)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -147,7 +155,10 @@ func TestKubeconfig_ModifyContextName(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := "contexts: [{name: ccc}, {name: c2}, {name: c3}]\n"
+	expected := testutil.KC().WithCtxs(
+		testutil.Ctx("ccc"),
+		testutil.Ctx("c2"),
+		testutil.Ctx("c3")).ToYAML(t)
 	out := test.Output()
 	if diff := cmp.Diff(expected, out); diff != "" {
 		t.Fatalf("diff: %s", diff)

@@ -2,6 +2,8 @@ package kubeconfig
 
 import (
 	"testing"
+
+	"github.com/ahmetb/kubectx/internal/testutil"
 )
 
 func TestKubeconfig_GetCurrentContext(t *testing.T) {
@@ -33,7 +35,7 @@ func TestKubeconfig_GetCurrentContext_missingField(t *testing.T) {
 }
 
 func TestKubeconfig_UnsetCurrentContext(t *testing.T) {
-	tl := WithMockKubeconfigLoader(`current-context: foo`)
+	tl := WithMockKubeconfigLoader(testutil.KC().WithCurrentCtx("foo").ToYAML(t))
 	kc := new(Kubeconfig).WithLoader(tl)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -46,8 +48,7 @@ func TestKubeconfig_UnsetCurrentContext(t *testing.T) {
 	}
 
 	out := tl.Output()
-	expected := `current-context: ""
-`
+	expected := testutil.KC().WithCurrentCtx("").ToYAML(t)
 	if out != expected {
 		t.Fatalf("expected=%q; got=%q", expected, out)
 	}
