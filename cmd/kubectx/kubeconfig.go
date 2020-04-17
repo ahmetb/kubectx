@@ -33,7 +33,7 @@ func (*StandardKubeconfigLoader) Load() (kubeconfig.ReadWriteResetCloser, error)
 	f, err := os.OpenFile(cfgPath, os.O_RDWR, 0)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, errors.Errorf("kubeconfig file not found at %s", cfgPath)
+			return nil, errors.Wrap(err, "kubeconfig file not found")
 		}
 		return nil, errors.Wrap(err, "failed to open file")
 	}

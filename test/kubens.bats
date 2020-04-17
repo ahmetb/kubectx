@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-COMMAND="${BATS_TEST_DIRNAME}/../kubens"
+COMMAND="${COMMAND:-$BATS_TEST_DIRNAME/../kubens}"
 export KUBECTL="$BATS_TEST_DIRNAME/../test/mock-kubectl"
 
 load common
