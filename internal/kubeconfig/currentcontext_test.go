@@ -1,12 +1,11 @@
 package kubeconfig
 
 import (
-	"strings"
 	"testing"
 )
 
 func TestKubeconfig_GetCurrentContext(t *testing.T) {
-	tl := &testLoader{in: strings.NewReader(`current-context: foo`)}
+	tl := WithMockKubeconfigLoader(`current-context: foo`)
 	kc := new(Kubeconfig).WithLoader(tl)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -20,7 +19,7 @@ func TestKubeconfig_GetCurrentContext(t *testing.T) {
 }
 
 func TestKubeconfig_GetCurrentContext_missingField(t *testing.T) {
-	tl := &testLoader{in: strings.NewReader(`abc: def`)}
+	tl := WithMockKubeconfigLoader(`abc: def`)
 	kc := new(Kubeconfig).WithLoader(tl)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -34,7 +33,7 @@ func TestKubeconfig_GetCurrentContext_missingField(t *testing.T) {
 }
 
 func TestKubeconfig_UnsetCurrentContext(t *testing.T) {
-	tl := &testLoader{in: strings.NewReader(`current-context: foo`)}
+	tl := WithMockKubeconfigLoader(`current-context: foo`)
 	kc := new(Kubeconfig).WithLoader(tl)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -46,7 +45,7 @@ func TestKubeconfig_UnsetCurrentContext(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	out := tl.out.String()
+	out := tl.Output()
 	expected := `current-context: ""
 `
 	if out != expected {
