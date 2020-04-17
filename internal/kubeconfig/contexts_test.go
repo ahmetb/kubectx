@@ -1,21 +1,20 @@
 package kubeconfig
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestKubeconfig_ContextNames(t *testing.T) {
-	tl := &testLoader{in: strings.NewReader(`
+	tl := WithMockKubeconfigLoader(`
 contexts:
 - name: abc
 - name: def
   field1: value1
 - name: ghi
   foo:
-    bar: zoo`)}
+    bar: zoo`)
 
 	kc := new(Kubeconfig).WithLoader(tl)
 	if err := kc.Parse(); err != nil {
@@ -30,7 +29,7 @@ contexts:
 }
 
 func TestKubeconfig_ContextNames_noContextsEntry(t *testing.T) {
-	tl := &testLoader{in: strings.NewReader(`a: b`)}
+	tl := WithMockKubeconfigLoader(`a: b`)
 	kc := new(Kubeconfig).WithLoader(tl)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -43,7 +42,7 @@ func TestKubeconfig_ContextNames_noContextsEntry(t *testing.T) {
 }
 
 func TestKubeconfig_ContextNames_nonArrayContextsEntry(t *testing.T) {
-	tl := &testLoader{in: strings.NewReader(`contexts: "hello"`)}
+	tl := WithMockKubeconfigLoader(`contexts: "hello"`)
 	kc := new(Kubeconfig).WithLoader(tl)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -56,9 +55,9 @@ func TestKubeconfig_ContextNames_nonArrayContextsEntry(t *testing.T) {
 }
 
 func TestKubeconfig_CheckContextExists(t *testing.T) {
-	tl := &testLoader{in: strings.NewReader(`contexts:
+	tl := WithMockKubeconfigLoader(`contexts:
 - name: c1
-- name: c2`)}
+- name: c2`)
 
 	kc := new(Kubeconfig).WithLoader(tl)
 	if err := kc.Parse(); err != nil {

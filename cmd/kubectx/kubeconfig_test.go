@@ -8,22 +8,9 @@ import (
 	"testing"
 
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
+	"github.com/ahmetb/kubectx/internal/testutil"
 )
 
-func withTestVar(key, value string) func() {
-	// TODO(ahmetb) this method is currently duplicated
-	// consider extracting to internal/testutil or something
-
-	orig, ok := os.LookupEnv(key)
-	os.Setenv(key, value)
-	return func() {
-		if ok {
-			os.Setenv(key, orig)
-		} else {
-			os.Unsetenv(key)
-		}
-	}
-}
 
 func Test_homeDir(t *testing.T) {
 	type env struct{ k, v string }
@@ -72,7 +59,7 @@ func Test_homeDir(t *testing.T) {
 		t.Run(c.name, func(tt *testing.T) {
 			var unsets []func()
 			for _, e := range c.envs {
-				unsets = append(unsets, withTestVar(e.k, e.v))
+				unsets = append(unsets, testutil.WithEnvVar(e.k, e.v))
 			}
 
 			got := homeDir()
@@ -87,7 +74,7 @@ func Test_homeDir(t *testing.T) {
 }
 
 func Test_kubeconfigPath(t *testing.T) {
-	defer withTestVar("HOME", "/x/y/z")()
+	defer testutil.WithEnvVar("HOME", "/x/y/z")()
 
 	expected := filepath.FromSlash("/x/y/z/.kube/config")
 	got, err := kubeconfigPath()
@@ -100,9 +87,9 @@ func Test_kubeconfigPath(t *testing.T) {
 }
 
 func Test_kubeconfigPath_noEnvVars(t *testing.T) {
-	defer withTestVar("XDG_CACHE_HOME", "")()
-	defer withTestVar("HOME", "")()
-	defer withTestVar("USERPROFILE", "")()
+	defer testutil.WithEnvVar("XDG_CACHE_HOME", "")()
+	defer testutil.WithEnvVar("HOME", "")()
+	defer testutil.WithEnvVar("USERPROFILE", "")()
 
 	_, err := kubeconfigPath()
 	if err == nil {
@@ -111,7 +98,7 @@ func Test_kubeconfigPath_noEnvVars(t *testing.T) {
 }
 
 func Test_kubeconfigPath_envOvveride(t *testing.T) {
-	defer withTestVar("KUBECONFIG", "foo")()
+	defer testutil.WithEnvVar("KUBECONFIG", "foo")()
 
 	v, err := kubeconfigPath()
 	if err != nil {
@@ -124,7 +111,7 @@ func Test_kubeconfigPath_envOvveride(t *testing.T) {
 
 func Test_kubeconfigPath_envOvverideDoesNotSupportPathSeparator(t *testing.T) {
 	path := strings.Join([]string{"file1", "file2"}, string(os.PathListSeparator))
-	defer withTestVar("KUBECONFIG", path)()
+	defer testutil.WithEnvVar("KUBECONFIG", path)()
 
 	_, err := kubeconfigPath()
 	if err == nil {
@@ -133,7 +120,7 @@ func Test_kubeconfigPath_envOvverideDoesNotSupportPathSeparator(t *testing.T) {
 }
 
 func TestStandardKubeconfigLoader_returnsNotFoundErr(t *testing.T) {
-	defer withTestVar("KUBECONFIG", "foo")()
+	defer testutil.WithEnvVar("KUBECONFIG", "foo")()
 	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
 	err := kc.Parse()
 	if err == nil {
