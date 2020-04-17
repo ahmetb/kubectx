@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/ahmetb/kubectx/internal/testutil"
 )
 
 func TestParse(t *testing.T) {
@@ -21,21 +23,30 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	err = new(Kubeconfig).WithLoader(WithMockKubeconfigLoader(testutil.KC().
+		WithCurrentCtx("foo").
+		WithCtxs().ToYAML(t))).Parse()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestSave(t *testing.T) {
-	in := `a: [1, 2, 3]` + "\n"
+	in := "a: [1, 2, 3]\n"
 	test := WithMockKubeconfigLoader(in)
 	kc := new(Kubeconfig).WithLoader(test)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
 	}
-	if err := kc.ModifyCurrentContext("hello"); err != nil {t.Fatal(err)}
+	if err := kc.ModifyCurrentContext("hello"); err != nil {
+		t.Fatal(err)
+	}
 	if err := kc.Save(); err != nil {
 		t.Fatal(err)
 	}
-	expected := in+"current-context: hello\n"
+	expected := "a: [1, 2, 3]\ncurrent-context: hello\n"
 	if diff := cmp.Diff(expected, test.Output()); diff != "" {
 		t.Fatal(diff)
 	}

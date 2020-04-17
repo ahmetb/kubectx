@@ -4,18 +4,16 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/ahmetb/kubectx/internal/testutil"
 )
 
 func TestKubeconfig_ContextNames(t *testing.T) {
-	tl := WithMockKubeconfigLoader(`
-contexts:
-- name: abc
-- name: def
-  field1: value1
-- name: ghi
-  foo:
-    bar: zoo`)
-
+	tl := WithMockKubeconfigLoader(
+		testutil.KC().WithCtxs(
+			testutil.Ctx("abc"),
+			testutil.Ctx("def"),
+			testutil.Ctx("ghi")).Set("field1", map[string]string{"bar": "zoo"}).ToYAML(t))
 	kc := new(Kubeconfig).WithLoader(tl)
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
@@ -55,9 +53,10 @@ func TestKubeconfig_ContextNames_nonArrayContextsEntry(t *testing.T) {
 }
 
 func TestKubeconfig_CheckContextExists(t *testing.T) {
-	tl := WithMockKubeconfigLoader(`contexts:
-- name: c1
-- name: c2`)
+	tl := WithMockKubeconfigLoader(
+		testutil.KC().WithCtxs(
+			testutil.Ctx("c1"),
+			testutil.Ctx("c2")).ToYAML(t))
 
 	kc := new(Kubeconfig).WithLoader(tl)
 	if err := kc.Parse(); err != nil {

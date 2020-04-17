@@ -60,6 +60,6 @@ func (k *Kubeconfig) Save() error {
 		return errors.Wrap(err, "failed to reset file")
 	}
 	enc := yaml.NewEncoder(k.f)
-	enc.SetIndent(2)
+	enc.SetIndent(0)
 	return enc.Encode(k.rootNode)
 }
