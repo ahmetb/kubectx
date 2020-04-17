@@ -13,6 +13,7 @@ import (
 	"github.com/mattn/go-isatty"
 
 	"github.com/ahmetb/kubectx/internal/env"
+	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
 )
 
@@ -21,6 +22,17 @@ type InteractiveSwitchOp struct {
 }
 
 func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
+	// parse kubeconfig just to see if it can be loaded
+	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
+	if err := kc.Parse(); err != nil {
+		if isENOENT(err) {
+			printer.Warning(stderr, "kubeconfig file not found")
+			return nil
+		}
+		return errors.Wrap(err, "kubeconfig error")
+	}
+	kc.Close()
+
 	cmd := exec.Command("fzf", "--ansi", "--no-preview")
 	var out bytes.Buffer
 	cmd.Stdin = os.Stdin

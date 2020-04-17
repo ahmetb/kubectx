@@ -6,8 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-)
 
+	"github.com/ahmetb/kubectx/internal/kubeconfig"
+)
 
 func withTestVar(key, value string) func() {
 	// TODO(ahmetb) this method is currently duplicated
@@ -128,6 +129,18 @@ func Test_kubeconfigPath_envOvverideDoesNotSupportPathSeparator(t *testing.T) {
 	_, err := kubeconfigPath()
 	if err == nil {
 		t.Fatal("expected error")
+	}
+}
+
+func TestStandardKubeconfigLoader_returnsNotFoundErr(t *testing.T) {
+	defer withTestVar("KUBECONFIG", "foo")()
+	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
+	err := kc.Parse()
+	if err == nil {
+		t.Fatal("expected err")
+	}
+	if !isENOENT(err) {
+		t.Fatalf("expected ENOENT error; got=%v", err)
 	}
 }
 

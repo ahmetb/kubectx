@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-COMMAND="$BATS_TEST_DIRNAME/../kubectx"
+COMMAND="${COMMAND:-$BATS_TEST_DIRNAME/../kubectx}"
 
 load common
 
@@ -29,7 +29,7 @@ load common
   run ${COMMAND}
   echo "$output"
   [ "$status" -eq 0 ]
-  [[ "$output" = "" ]]
+  [[ "$output" = "warning: kubeconfig file not found" ]]
 }
 
 @test "get one context and list contexts" {
