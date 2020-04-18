@@ -16,16 +16,16 @@ func Test_useColors_forceColors(t *testing.T) {
 	defer testutil.WithEnvVar("_KUBECTX_FORCE_COLOR", "1")()
 	defer testutil.WithEnvVar("NO_COLOR", "1")()
 
-	if v := UseColors(); !cmp.Equal(v, &tr) {
-		t.Fatalf("expected UseColors() = true; got = %v", v)
+	if v := useColors(); !cmp.Equal(v, &tr) {
+		t.Fatalf("expected useColors() = true; got = %v", v)
 	}
 }
 
 func Test_useColors_disableColors(t *testing.T) {
 	defer testutil.WithEnvVar("NO_COLOR", "1")()
 
-	if v := UseColors(); !cmp.Equal(v, &fa) {
-		t.Fatalf("expected UseColors() = false; got = %v", v)
+	if v := useColors(); !cmp.Equal(v, &fa) {
+		t.Fatalf("expected useColors() = false; got = %v", v)
 	}
 }
 
@@ -33,7 +33,7 @@ func Test_useColors_default(t *testing.T) {
 	defer testutil.WithEnvVar("NO_COLOR", "")()
 	defer testutil.WithEnvVar("_KUBECTX_FORCE_COLOR", "")()
 
-	if v := UseColors(); v != nil {
-		t.Fatalf("expected UseColors() = nil; got=%v", *v)
+	if v := useColors(); v != nil {
+		t.Fatalf("expected useColors() = nil; got=%v", *v)
 	}
 }
