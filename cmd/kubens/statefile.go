@@ -9,7 +9,7 @@ import (
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 )
 
-var defaultDir = filepath.Join(cmdutil.HomeDir(), "kubens")
+var defaultDir = filepath.Join(cmdutil.HomeDir(), ".kube", "kubens")
 
 type NSFile struct {
 	dir string

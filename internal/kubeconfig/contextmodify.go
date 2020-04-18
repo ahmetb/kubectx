@@ -6,12 +6,9 @@ import (
 )
 
 func (k *Kubeconfig) DeleteContextEntry(deleteName string) error {
-	contexts := valueOf(k.rootNode, "contexts")
-	if contexts == nil {
-		return errors.New("there are no contexts in kubeconfig")
-	}
-	if contexts.Kind != yaml.SequenceNode {
-		return errors.New("'contexts' key is not a sequence")
+	contexts, err := k.contextsNode()
+	if err != nil {
+		return err
 	}
 
 	i := -1
@@ -51,11 +48,9 @@ func (k *Kubeconfig) ModifyCurrentContext(name string) error {
 }
 
 func (k *Kubeconfig) ModifyContextName(old, new string) error {
-	contexts := valueOf(k.rootNode, "contexts")
-	if contexts == nil {
-		return errors.New("\"contexts\" entry is nil")
-	} else if contexts.Kind != yaml.SequenceNode {
-		return errors.New("\"contexts\" is not a sequence node")
+	contexts, err := k.contextsNode()
+	if err != nil {
+		return err
 	}
 
 	var changed bool
