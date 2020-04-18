@@ -10,6 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/env"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
@@ -21,9 +22,9 @@ type InteractiveSwitchOp struct {
 
 func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	// parse kubeconfig just to see if it can be loaded
-	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
+	kc := new(kubeconfig.Kubeconfig).WithLoader(cmdutil.DefaultLoader)
 	if err := kc.Parse(); err != nil {
-		if isENOENT(err) {
+		if cmdutil.IsNotFoundErr(err) {
 			printer.Warning(stderr, "kubeconfig file not found")
 			return nil
 		}

@@ -6,10 +6,12 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
+
+	"github.com/ahmetb/kubectx/internal/cmdutil"
 )
 
 func kubectxPrevCtxFile() (string, error) {
-	home := homeDir()
+	home := cmdutil.HomeDir()
 	if home == "" {
 		return "", errors.New("HOME or USERPROFILE environment variable not set")
 	}

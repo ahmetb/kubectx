@@ -5,6 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
 )
@@ -13,7 +14,7 @@ import (
 type UnsetOp struct{}
 
 func (_ UnsetOp) Run(_, stderr io.Writer) error {
-	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
+	kc := new(kubeconfig.Kubeconfig).WithLoader(cmdutil.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
 		return errors.Wrap(err, "kubeconfig error")

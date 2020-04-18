@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
 
 	"facette.io/natsort"
 	"github.com/fatih/color"
 	"github.com/pkg/errors"
 
+	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
 )
@@ -17,10 +17,10 @@ import (
 type ListOp struct{}
 
 func (_ ListOp) Run(stdout, stderr io.Writer) error {
-	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
+	kc := new(kubeconfig.Kubeconfig).WithLoader(cmdutil.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		if isENOENT(err) {
+		if cmdutil.IsNotFoundErr(err) {
 			printer.Warning(stderr, "kubeconfig file not found")
 			return nil
 		}
@@ -49,15 +49,4 @@ func (_ ListOp) Run(stdout, stderr io.Writer) error {
 		fmt.Fprintf(stdout, "%s\n", s)
 	}
 	return nil
-}
-
-// isENOENT determines if the underlying error is os.IsNotExist. Right now
-// errors from github.com/pkg/errors doesn't work with os.IsNotExist.
-func isENOENT(err error) bool {
-	for e := err; e != nil; e = errors.Unwrap(e) {
-		if os.IsNotExist(e) {
-			return true
-		}
-	}
-	return false
 }

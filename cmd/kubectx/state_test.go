@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/ahmetb/kubectx/internal/testutil"
 )
 
 func Test_readLastContext_nonExistingFile(t *testing.T) {
@@ -18,7 +20,7 @@ func Test_readLastContext_nonExistingFile(t *testing.T) {
 }
 
 func Test_readLastContext(t *testing.T) {
-	path, cleanup := testfile(t, "foo")
+	path, cleanup := testutil.TempFile(t, "foo")
 	defer cleanup()
 
 	s, err := readLastContext(path)
@@ -86,3 +88,4 @@ func Test_kubectxFilePath_error(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
