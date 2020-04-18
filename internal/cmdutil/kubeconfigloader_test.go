@@ -1,7 +1,6 @@
-package main
+package cmdutil
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -61,7 +60,7 @@ func Test_homeDir(t *testing.T) {
 				unsets = append(unsets, testutil.WithEnvVar(e.k, e.v))
 			}
 
-			got := homeDir()
+			got := HomeDir()
 			if got != c.want {
 				t.Errorf("expected:%q got:%q", c.want, got)
 			}
@@ -120,30 +119,12 @@ func Test_kubeconfigPath_envOvverideDoesNotSupportPathSeparator(t *testing.T) {
 
 func TestStandardKubeconfigLoader_returnsNotFoundErr(t *testing.T) {
 	defer testutil.WithEnvVar("KUBECONFIG", "foo")()
-	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
+	kc := new(kubeconfig.Kubeconfig).WithLoader(DefaultLoader)
 	err := kc.Parse()
 	if err == nil {
 		t.Fatal("expected err")
 	}
-	if !isENOENT(err) {
+	if !IsNotFoundErr(err) {
 		t.Fatalf("expected ENOENT error; got=%v", err)
-	}
-}
-
-func testfile(t *testing.T, contents string) (path string, cleanup func()) {
-	t.Helper()
-
-	f, err := ioutil.TempFile(os.TempDir(), "test-file")
-	if err != nil {
-		t.Fatalf("failed to create test file: %v", err)
-	}
-	path = f.Name()
-	if _, err := f.Write([]byte(contents)); err != nil {
-		t.Fatalf("failed to write to test file: %v", err)
-	}
-
-	return path, func() {
-		f.Close()
-		os.Remove(path)
 	}
 }

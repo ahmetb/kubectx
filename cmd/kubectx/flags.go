@@ -20,7 +20,7 @@ func (op UnsupportedOp) Run(_, _ io.Writer) error {
 // and decides which operation should be taken.
 func parseArgs(argv []string) Op {
 	if len(argv) == 0 {
-		if env.IsInteractiveMode(os.Stdout) {
+		if cmdutil.IsInteractiveMode(os.Stdout) {
 			return InteractiveSwitchOp{SelfCmd: os.Args[0]}
 		}
 		return ListOp{}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 )
 
@@ -13,7 +14,7 @@ import (
 type CurrentOp struct{}
 
 func (_op CurrentOp) Run(stdout, _ io.Writer) error {
-	kc := new(kubeconfig.Kubeconfig).WithLoader(defaultLoader)
+	kc := new(kubeconfig.Kubeconfig).WithLoader(cmdutil.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
 		return errors.Wrap(err, "kubeconfig error")

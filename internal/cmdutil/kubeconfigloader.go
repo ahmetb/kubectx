@@ -1,4 +1,4 @@
-package main
+package cmdutil
 
 import (
 	"os"
@@ -10,20 +10,12 @@ import (
 )
 
 var (
-	defaultLoader kubeconfig.Loader = new(StandardKubeconfigLoader)
+	DefaultLoader kubeconfig.Loader = new(StandardKubeconfigLoader)
 )
 
 type StandardKubeconfigLoader struct{}
 
 type kubeconfigFile struct{ *os.File }
-
-func (kf *kubeconfigFile) Reset() error {
-	if err := kf.Truncate(0); err != nil {
-		return errors.Wrap(err, "failed to truncate file")
-	}
-	_, err := kf.Seek(0, 0)
-	return errors.Wrap(err, "failed to seek in file")
-}
 
 func (*StandardKubeconfigLoader) Load() (kubeconfig.ReadWriteResetCloser, error) {
 	cfgPath, err := kubeconfigPath()
@@ -40,6 +32,14 @@ func (*StandardKubeconfigLoader) Load() (kubeconfig.ReadWriteResetCloser, error)
 	return &kubeconfigFile{f}, nil
 }
 
+func (kf *kubeconfigFile) Reset() error {
+	if err := kf.Truncate(0); err != nil {
+		return errors.Wrap(err, "failed to truncate file")
+	}
+	_, err := kf.Seek(0, 0)
+	return errors.Wrap(err, "failed to seek in file")
+}
+
 func kubeconfigPath() (string, error) {
 	// KUBECONFIG env var
 	if v := os.Getenv("KUBECONFIG"); v != "" {
@@ -52,14 +52,14 @@ func kubeconfigPath() (string, error) {
 	}
 
 	// default path
-	home := homeDir()
+	home := HomeDir()
 	if home == "" {
 		return "", errors.New("HOME or USERPROFILE environment variable not set")
 	}
 	return filepath.Join(home, ".kube", "config"), nil
 }
 
-func homeDir() string {
+func HomeDir() string {
 	if v := os.Getenv("XDG_CACHE_HOME"); v != "" {
 		return v
 	}
@@ -68,4 +68,15 @@ func homeDir() string {
 		home = os.Getenv("USERPROFILE") // windows
 	}
 	return home
+}
+
+// IsNotFoundErr determines if the underlying error is os.IsNotExist. Right now
+// errors from github.com/pkg/errors doesn't work with os.IsNotExist.
+func IsNotFoundErr(err error) bool {
+	for e := err; e != nil; e = errors.Unwrap(e) {
+		if os.IsNotExist(e) {
+			return true
+		}
+	}
+	return false
 }

@@ -12,7 +12,8 @@ type Context struct {
 	Namespace string `yaml:"namespace,omitempty"`
 }
 
-func Ctx(name string) *Context { return &Context{Name: name} }
+func Ctx(name string) *Context           { return &Context{Name: name} }
+func (c *Context) Ns(ns string) *Context { c.Namespace = ns; return c }
 
 type Kubeconfig map[string]interface{}
 
