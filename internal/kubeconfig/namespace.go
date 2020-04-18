@@ -11,7 +11,11 @@ func (k *Kubeconfig) NamespaceOfContext(contextName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	ns := valueOf(ctx, "namespace")
+	ctxBody := valueOf(ctx, "context")
+	if ctxBody == nil {
+		return defaultNamespace, nil
+	}
+	ns := valueOf(ctxBody, "namespace")
 	if ns == nil || ns.Value == "" {
 		return defaultNamespace, nil
 	}
@@ -19,11 +23,21 @@ func (k *Kubeconfig) NamespaceOfContext(contextName string) (string, error) {
 }
 
 func (k *Kubeconfig) SetNamespace(ctxName string, ns string) error {
-	ctx, err := k.contextNode(ctxName)
+	ctxNode, err := k.contextNode(ctxName)
 	if err != nil {
 		return err
 	}
-	nsNode := valueOf(ctx, "namespace")
+
+	var ctxBodyNodeWasEmpty bool // actual namespace value is in contexts[index].context.namespace, but .context might not exist
+	ctxBodyNode := valueOf(ctxNode, "context")
+	if ctxBodyNode == nil {
+		ctxBodyNodeWasEmpty = true
+		ctxBodyNode = &yaml.Node{
+			Kind: yaml.MappingNode,
+		}
+	}
+
+	nsNode := valueOf(ctxBodyNode, "namespace")
 	if nsNode != nil {
 		nsNode.Value = ns
 		return nil
@@ -37,6 +51,13 @@ func (k *Kubeconfig) SetNamespace(ctxName string, ns string) error {
 		Kind:  yaml.ScalarNode,
 		Value: ns,
 		Tag:   "!!str"}
-	ctx.Content = append(ctx.Content, keyNode, valueNode)
+	ctxBodyNode.Content = append(ctxBodyNode.Content, keyNode, valueNode)
+	if ctxBodyNodeWasEmpty {
+		ctxNode.Content = append(ctxNode.Content, &yaml.Node{
+			Kind:  yaml.ScalarNode,
+			Value: "context",
+			Tag:   "!!str",
+		}, ctxBodyNode)
+	}
 	return nil
 }
