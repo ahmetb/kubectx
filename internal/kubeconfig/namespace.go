@@ -1,30 +1,10 @@
 package kubeconfig
 
-import (
-	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
-)
+import "gopkg.in/yaml.v3"
 
 const (
 	defaultNamespace = "default"
 )
-
-func (k *Kubeconfig) contextNode(name string) (*yaml.Node, error) {
-	contexts := valueOf(k.rootNode, "contexts")
-	if contexts == nil {
-		return nil, errors.New("\"contexts\" entry is nil")
-	} else if contexts.Kind != yaml.SequenceNode {
-		return nil, errors.New("\"contexts\" is not a sequence node")
-	}
-
-	for _, contextNode := range contexts.Content {
-		nameNode := valueOf(contextNode, "name")
-		if nameNode.Kind == yaml.ScalarNode && nameNode.Value == name {
-			return contextNode, nil
-		}
-	}
-	return nil, errors.Errorf("context with name %q not found", name)
-}
 
 func (k *Kubeconfig) NamespaceOfContext(contextName string) (string, error) {
 	ctx, err := k.contextNode(contextName)
@@ -36,4 +16,27 @@ func (k *Kubeconfig) NamespaceOfContext(contextName string) (string, error) {
 		return defaultNamespace, nil
 	}
 	return ns.Value, nil
+}
+
+func (k *Kubeconfig) SetNamespace(ctxName string, ns string) error {
+	ctx, err := k.contextNode(ctxName)
+	if err != nil {
+		return err
+	}
+	nsNode := valueOf(ctx, "namespace")
+	if nsNode != nil {
+		nsNode.Value = ns
+		return nil
+	}
+
+	keyNode := &yaml.Node{
+		Kind:  yaml.ScalarNode,
+		Value: "namespace",
+		Tag:   "!!str"}
+	valueNode := &yaml.Node{
+		Kind:  yaml.ScalarNode,
+		Value: ns,
+		Tag:   "!!str"}
+	ctx.Content = append(ctx.Content, keyNode, valueNode)
+	return nil
 }

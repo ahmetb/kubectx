@@ -22,10 +22,6 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(cmdutil.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		if cmdutil.IsNotFoundErr(err) {
-			printer.Warning(stderr, "kubeconfig file not found")
-			return nil
-		}
 		return errors.Wrap(err, "kubeconfig error")
 	}
 
@@ -38,13 +34,9 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 		return errors.Wrap(err, "cannot read current namespace")
 	}
 
-	kubectl, err := findKubectl()
+	ns, err := queryNamespaces()
 	if err != nil {
-		return err
-	}
-	ns, err := queryNamespaces(kubectl)
-	if err != nil {
-		return err
+		return errors.Wrap(err, "could not list namespaces (is the cluster accessible?)")
 	}
 
 	currentColor := color.New(color.FgGreen, color.Bold)
@@ -68,7 +60,14 @@ func findKubectl() (string, error) {
 	return v, errors.Wrap(err, "kubectl not found, needed for kubens")
 }
 
-func queryNamespaces(kubectl string) ([]string, error) {
+func queryNamespaces() ([]string, error) {
+	kubectl ,err := findKubectl()
+	if err != nil {
+		return nil ,err
+	}
+
+	// TODO add a log message to user if kubectl is taking >1s
+
 	var b bytes.Buffer
 	cmd := exec.Command(kubectl, "get", "namespaces", `-o=jsonpath={range .items[*].metadata.name}{@}{"\n"}{end}`)
 	cmd.Env = os.Environ()
