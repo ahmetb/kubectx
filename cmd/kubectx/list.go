@@ -34,11 +34,7 @@ func (_ ListOp) Run(stdout, stderr io.Writer) error {
 	// TODO support KUBECTX_CURRENT_BGCOLOR
 
 	currentColor := color.New(color.FgGreen, color.Bold)
-	if v := printer.UseColors(); v != nil && *v {
-		currentColor.EnableColor()
-	} else if v != nil && !*v {
-		currentColor.DisableColor()
-	}
+	printer.EnableOrDisableColor(currentColor)
 
 	cur := kc.GetCurrentContext()
 	for _, c := range ctxs {

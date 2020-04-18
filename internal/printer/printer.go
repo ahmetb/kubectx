@@ -14,7 +14,7 @@ var (
 )
 
 func init() {
-	colors := UseColors()
+	colors := useColors()
 	if colors == nil {
 		return
 	}
