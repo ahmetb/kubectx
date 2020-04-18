@@ -11,7 +11,6 @@ import (
 	"github.com/ahmetb/kubectx/internal/testutil"
 )
 
-
 func Test_homeDir(t *testing.T) {
 	type env struct{ k, v string }
 	cases := []struct {

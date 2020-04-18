@@ -15,4 +15,3 @@ func WithEnvVar(key, value string) func() {
 		}
 	}
 }
-

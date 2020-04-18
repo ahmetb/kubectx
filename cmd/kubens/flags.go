@@ -3,10 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
 	"strings"
-
-	"github.com/ahmetb/kubectx/internal/cmdutil"
 )
 
 // UnsupportedOp indicates an unsupported flag.
@@ -20,17 +17,10 @@ func (op UnsupportedOp) Run(_, _ io.Writer) error {
 // and decides which operation should be taken.
 func parseArgs(argv []string) Op {
 	if len(argv) == 0 {
-		if env.IsInteractiveMode(os.Stdout) {
-			return InteractiveSwitchOp{SelfCmd: os.Args[0]}
-		}
+		//if env.IsInteractiveMode(os.Stdout) {
+		//	return InteractiveSwitchOp{SelfCmd: os.Args[0]}
+		//}
 		return ListOp{}
-	}
-
-	if argv[0] == "-d" {
-		if len(argv) == 1 {
-			return UnsupportedOp{Err: fmt.Errorf("'-d' needs arguments")}
-		}
-		return DeleteOp{Contexts: argv[1:]}
 	}
 
 	if len(argv) == 1 {
@@ -41,14 +31,6 @@ func parseArgs(argv []string) Op {
 		if v == "--current" || v == "-c" {
 			return CurrentOp{}
 		}
-		if v == "--unset" || v == "-u" {
-			return UnsetOp{}
-		}
-
-		if new, old, ok := parseRenameSyntax(v); ok {
-			return RenameOp{New: new, Old: old}
-		}
-
 		if strings.HasPrefix(v, "-") && v != "-" {
 			return UnsupportedOp{Err: fmt.Errorf("unsupported option '%s'", v)}
 		}
