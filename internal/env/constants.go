@@ -16,4 +16,3 @@ const (
 	// EnvDebug describes the internal environment variable for more verbose logging.
 	EnvDebug = `DEBUG`
 )
-
