@@ -8,12 +8,14 @@ import (
 )
 
 type Context struct {
-	Name      string `yaml:"name,omitempty"`
-	Namespace string `yaml:"namespace,omitempty"`
+	Name    string `yaml:"name,omitempty"`
+	Context struct {
+		Namespace string `yaml:"namespace,omitempty"`
+	} `yaml:"context,omitempty"`
 }
 
 func Ctx(name string) *Context           { return &Context{Name: name} }
-func (c *Context) Ns(ns string) *Context { c.Namespace = ns; return c }
+func (c *Context) Ns(ns string) *Context { c.Context.Namespace = ns; return c }
 
 type Kubeconfig map[string]interface{}
 

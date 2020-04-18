@@ -21,7 +21,6 @@ load common
   run ${COMMAND}
   echo "$output"
   [[ "$status" -eq 1 ]]
-  [[ "$output" = *"current-context is not set"* ]]
 }
 
 @test "list namespaces" {
