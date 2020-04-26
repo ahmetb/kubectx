@@ -61,9 +61,9 @@ func findKubectl() (string, error) {
 }
 
 func queryNamespaces() ([]string, error) {
-	kubectl ,err := findKubectl()
+	kubectl, err := findKubectl()
 	if err != nil {
-		return nil ,err
+		return nil, err
 	}
 
 	// TODO add a log message to user if kubectl is taking >1s

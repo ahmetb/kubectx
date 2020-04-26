@@ -88,4 +88,3 @@ func Test_kubectxFilePath_error(t *testing.T) {
 		t.Fatal(err)
 	}
 }
-
