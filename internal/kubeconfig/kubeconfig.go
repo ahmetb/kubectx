@@ -55,6 +55,10 @@ func (k *Kubeconfig) Parse() error {
 	return nil
 }
 
+func (k *Kubeconfig) Bytes() ([]byte, error) {
+	return yaml.Marshal(k.rootNode)
+}
+
 func (k *Kubeconfig) Save() error {
 	if err := k.f.Reset(); err != nil {
 		return errors.Wrap(err, "failed to reset file")

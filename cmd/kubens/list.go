@@ -1,14 +1,14 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io"
-	"os"
-	"os/exec"
-	"strings"
 
 	"github.com/pkg/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
@@ -33,7 +33,7 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 		return errors.Wrap(err, "cannot read current namespace")
 	}
 
-	ns, err := queryNamespaces()
+	ns, err := queryNamespaces(kc)
 	if err != nil {
 		return errors.Wrap(err, "could not list namespaces (is the cluster accessible?)")
 	}
@@ -48,28 +48,37 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 	return nil
 }
 
-func findKubectl() (string, error) {
-	if v := os.Getenv("KUBECTL"); v != "" {
-		return v, nil
-	}
-	v, err := exec.LookPath("kubectl")
-	return v, errors.Wrap(err, "kubectl not found, needed for kubens")
-}
-
-func queryNamespaces() ([]string, error) {
-	kubectl, err := findKubectl()
+func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
+	b, err := kc.Bytes()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to convert in-memory kubeconfig to yaml")
+	}
+	cfg, err := clientcmd.RESTConfigFromKubeConfig(b)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to initialize config")
+	}
+	clientset, err := kubernetes.NewForConfig(cfg)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to initialize k8s REST client")
 	}
 
-	// TODO add a log message to user if kubectl is taking >1s
-
-	var b bytes.Buffer
-	cmd := exec.Command(kubectl, "get", "namespaces", `-o=jsonpath={range .items[*].metadata.name}{@}{"\n"}{end}`)
-	cmd.Env = os.Environ()
-	cmd.Stdout, cmd.Stderr = &b, &b
-	if err := cmd.Run(); err != nil {
-		return nil, errors.Wrapf(err, "failed to query namespaces: %v", b.String())
+	var out []string
+	var next string
+	for {
+		list, err := clientset.CoreV1().Namespaces().List(metav1.ListOptions{
+			Limit:    100,
+			Continue: next,
+		})
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to list namespaces from k8s API")
+		}
+		next = list.Continue
+		for _, it := range list.Items {
+			out = append(out, it.Name)
+		}
+		if next == "" {
+			break
+		}
 	}
-	return strings.Split(strings.TrimSpace(b.String()), "\n"), nil
+	return out, nil
 }
