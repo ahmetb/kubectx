@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"facette.io/natsort"
-	"github.com/fatih/color"
 	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
@@ -30,17 +29,11 @@ func (_ ListOp) Run(stdout, stderr io.Writer) error {
 	ctxs := kc.ContextNames()
 	natsort.Sort(ctxs)
 
-	// TODO support KUBECTX_CURRENT_FGCOLOR
-	// TODO support KUBECTX_CURRENT_BGCOLOR
-
-	currentColor := color.New(color.FgGreen, color.Bold)
-	printer.EnableOrDisableColor(currentColor)
-
 	cur := kc.GetCurrentContext()
 	for _, c := range ctxs {
 		s := c
 		if c == cur {
-			s = currentColor.Sprint(c)
+			s = printer.ActiveItemColor.Sprint(c)
 		}
 		fmt.Fprintf(stdout, "%s\n", s)
 	}

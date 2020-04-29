@@ -39,13 +39,11 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 		return errors.Wrap(err, "could not list namespaces (is the cluster accessible?)")
 	}
 
-	currentColor := color.New(color.FgGreen, color.Bold)
-	printer.EnableOrDisableColor(currentColor)
 
 	for _, c := range ns {
 		s := c
 		if c == curNs {
-			s = currentColor.Sprint(c)
+			s = printer.ActiveItemColor.Sprint(c)
 		}
 		fmt.Fprintf(stdout, "%s\n", s)
 	}
