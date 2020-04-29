@@ -12,6 +12,10 @@ jobs:
       uses: actions/setup-go@v1
       with:
         go-version: 1.14
+    - name: Ensure go.mod is already tidied
+      run: go mod tidy && git diff --no-patch --exit-code
+    - name: Run unit tests
+      run: go test ./...
     - name: GoReleaser
       uses: goreleaser/goreleaser-action@v1
       with:
