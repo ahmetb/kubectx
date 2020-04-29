@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
 jobs:
-  goreleaser:
+  ci:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
