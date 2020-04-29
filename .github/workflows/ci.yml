@@ -1,8 +1,7 @@
-name: Release
+name: Go implementation (CI)
 on:
   push:
-    tags:
-    - 'v*.*.*'
+  pull_request:
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
@@ -17,7 +16,4 @@ jobs:
       uses: goreleaser/goreleaser-action@v1
       with:
         version: latest
-        args: release --rm-dist
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+        args: release --snapshot --skip-publish --rm-dist

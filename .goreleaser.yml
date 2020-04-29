@@ -1,0 +1,64 @@
+# This is an example goreleaser.yaml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+before:
+  hooks:
+    - go mod download
+builds:
+- id: kubectx
+  main: ./cmd/kubectx
+  binary: kubectx
+  env:
+  - CGO_ENABLED=0
+  goos:
+    - linux
+    - darwin
+    - windows
+  goarch:
+    - amd64
+- id: kubens
+  main: ./cmd/kubens
+  binary: kubens
+  env:
+  - CGO_ENABLED=0
+  goos:
+    - linux
+    - darwin
+    - windows
+  goarch:
+    - amd64
+archives:
+- id: kubectx-archive
+  name_template: "kubectx_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+  builds:
+    - kubectx
+  replacements:
+    386: i386
+    amd64: x86_64
+  format_overrides:
+    - goos: windows
+      format: zip
+  files: ["LICENSE"]
+- id: kubens-archive
+  name_template: "kubens_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+  builds:
+    - kubens
+  replacements:
+    386: i386
+    amd64: x86_64
+  format_overrides:
+    - goos: windows
+      format: zip
+  files: ["LICENSE"]
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+release:
+  extra_files:
+    - glob: ./kubens
+    - glob: ./kubectx
