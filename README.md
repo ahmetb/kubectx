@@ -8,9 +8,10 @@
 This repository provides both `kubectx` and `kubens` tools.
 [Install &rarr;](#installation)
 
-> **🥳📰 NEWS:** With v0.9.0 `kubectx` and `kubens` are now rewritten in Go.
-> Bash versions are still available, however please test the new Go versions
-> by downloading them from [Releases](/releases).
+> **🥳📰 NEWS:** With v0.9.0 `kubectx` and `kubens` **are now rewritten in Go**.
+> (Don't worry, our lovely **bash** versions are still available!) Please test
+> this new Go binaries by downloading them from
+> [**Releases &rarr;**](https://github.com/ahmetb/kubectx/releases)
 
 **`kubectx`** helps you switch between clusters back and forth:
 ![kubectx demo GIF](img/kubectx-demo.gif)
@@ -88,6 +89,11 @@ Active namespace is "default".
 -----
 
 ## Installation
+
+> **🥳📰 NEWS:** With v0.9.0 `kubectx` and `kubens` **are now rewritten in Go**.
+> (Don't worry, our lovely **bash** versions are still available!) Please test
+> this new Go binaries by downloading them from
+> [**Releases &rarr;**](https://github.com/ahmetb/kubectx/releases)
 
 There are several installation options:
 
