@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
@@ -39,7 +38,6 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 		return errors.Wrap(err, "could not list namespaces (is the cluster accessible?)")
 	}
 
-
 	for _, c := range ns {
 		s := c
 		if c == curNs {
@@ -59,9 +57,9 @@ func findKubectl() (string, error) {
 }
 
 func queryNamespaces() ([]string, error) {
-	kubectl ,err := findKubectl()
+	kubectl, err := findKubectl()
 	if err != nil {
-		return nil ,err
+		return nil, err
 	}
 
 	// TODO add a log message to user if kubectl is taking >1s
