@@ -5,10 +5,12 @@
 ![Travis (.org) branch](https://img.shields.io/travis/ahmetb/kubectx/master.svg)
 ![Proudly written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4.svg)
 
-
 This repository provides both `kubectx` and `kubens` tools.
 [Install &rarr;](#installation)
 
+> **🥳📰 NEWS:** With v0.9.0 `kubectx` and `kubens` are now rewritten in Go.
+> Bash versions are still available, however please test the new Go versions
+> by downloading them from [Releases](/releases).
 
 **`kubectx`** helps you switch between clusters back and forth:
 ![kubectx demo GIF](img/kubectx-demo.gif)

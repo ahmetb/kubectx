@@ -24,9 +24,7 @@ jobs:
         version: latest
         args: release --snapshot --skip-publish --rm-dist
     - name: Setup BATS framework
-      uses: mig4/setup-bats@master
-      with:
-        bats-version: 1.1.0
+      run: sudo npm install -g bats
     - name: kubectx (Go) integration tests
       run: COMMAND=./dist/kubectx_linux_amd64/kubectx bats test/kubectx.bats
     - name: kubens (Go) integration tests
