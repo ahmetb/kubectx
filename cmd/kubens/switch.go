@@ -52,7 +52,7 @@ func switchNamespace(kc *kubeconfig.Kubeconfig, ns string) (string, error) {
 		ns = prev
 	}
 
-	ok, err := namespaceExists(ns)
+	ok, err := namespaceExists(kc, ns)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to query if namespace exists (is cluster accessible?)")
 	}
@@ -75,8 +75,8 @@ func switchNamespace(kc *kubeconfig.Kubeconfig, ns string) (string, error) {
 }
 
 
-func namespaceExists(ns string) (bool, error) {
-	nses, err := queryNamespaces()
+func namespaceExists(kc *kubeconfig.Kubeconfig, ns string) (bool, error) {
+	nses, err := queryNamespaces(kc)
 	if err != nil {
 		return false, err
 	}
