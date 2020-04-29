@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -49,6 +50,10 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 }
 
 func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
+	if os.Getenv("_MOCK_NAMESPACES") != "" {
+		return []string{"ns1","ns2"}, nil
+	}
+
 	b, err := kc.Bytes()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert in-memory kubeconfig to yaml")
