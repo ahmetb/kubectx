@@ -8,6 +8,14 @@ import (
 	"github.com/ahmetb/kubectx/internal/env"
 )
 
+var (
+	ActiveItemColor = color.New(color.FgGreen, color.Bold)
+)
+
+func init(){
+	EnableOrDisableColor(ActiveItemColor)
+}
+
 // useColors returns true if colors are force-enabled,
 // false if colors are disabled, or nil for default behavior
 // which is determined based on factors like if stdout is tty.
