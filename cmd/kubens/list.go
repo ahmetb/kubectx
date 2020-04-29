@@ -66,7 +66,7 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 	var next string
 	for {
 		list, err := clientset.CoreV1().Namespaces().List(metav1.ListOptions{
-			Limit:    100,
+			Limit:    500,
 			Continue: next,
 		})
 		if err != nil {
