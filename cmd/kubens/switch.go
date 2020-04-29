@@ -74,7 +74,6 @@ func switchNamespace(kc *kubeconfig.Kubeconfig, ns string) (string, error) {
 	return ns, nil
 }
 
-
 func namespaceExists(kc *kubeconfig.Kubeconfig, ns string) (bool, error) {
 	nses, err := queryNamespaces(kc)
 	if err != nil {

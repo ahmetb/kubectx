@@ -51,7 +51,7 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 
 func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 	if os.Getenv("_MOCK_NAMESPACES") != "" {
-		return []string{"ns1","ns2"}, nil
+		return []string{"ns1", "ns2"}, nil
 	}
 
 	b, err := kc.Bytes()

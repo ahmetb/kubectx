@@ -12,7 +12,7 @@ var (
 	ActiveItemColor = color.New(color.FgGreen, color.Bold)
 )
 
-func init(){
+func init() {
 	EnableOrDisableColor(ActiveItemColor)
 }
 
