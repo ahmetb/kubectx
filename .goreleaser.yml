@@ -49,12 +49,6 @@ archives:
     - goos: windows
       format: zip
   files: ["LICENSE"]
-changelog:
-  sort: asc
-  filters:
-    exclude:
-    - '^docs:'
-    - '^test:'
 checksum:
   name_template: "checksums.txt"
   algorithm: sha256
