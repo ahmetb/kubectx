@@ -40,5 +40,5 @@ func selfName() string {
 	if strings.HasPrefix(me, pluginPrefix) {
 		return "kubectl " + strings.TrimPrefix(me, pluginPrefix)
 	}
-	return "kubectx"
+	return "kubens"
 }
