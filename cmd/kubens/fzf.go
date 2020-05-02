@@ -51,7 +51,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	if choice == "" {
 		return errors.New("you did not choose any of the options")
 	}
-	name, err := switchNamespace(kc, choice)
+	name, err := switchNamespace(kc, choice, false)
 	if err != nil {
 		return errors.Wrap(err, "failed to switch namespace")
 	}
