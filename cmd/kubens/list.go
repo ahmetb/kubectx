@@ -101,7 +101,7 @@ func namespaceExists(kc *kubeconfig.Kubeconfig, NamespaceName string) (bool, err
 		if NamespaceName == "ns1" || NamespaceName == "ns2" {
 			return true, nil
 		}
-		return  false, nil
+		return false, nil
 	}
 	clientset, err := getKubernetesClientForConfig(kc)
 	if err != nil {
