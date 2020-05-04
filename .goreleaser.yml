@@ -15,6 +15,9 @@ builds:
     - windows
   goarch:
     - amd64
+    - arm
+    - arm64
+  goarm: [6, 7]
 - id: kubens
   main: ./cmd/kubens
   binary: kubens
@@ -26,9 +29,18 @@ builds:
     - windows
   goarch:
     - amd64
+    - arm
+    - arm64
+  goarm: [6, 7]
 archives:
 - id: kubectx-archive
-  name_template: "kubectx_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+  name_template: |-
+    kubectx_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
+    {{- with .Arm -}}
+      {{- if (eq . "6") -}}hf
+      {{- else -}}v{{- . -}}
+      {{- end -}}
+    {{- end -}}
   builds:
     - kubectx
   replacements:
@@ -39,7 +51,13 @@ archives:
       format: zip
   files: ["LICENSE"]
 - id: kubens-archive
-  name_template: "kubens_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+  name_template: |-
+    kubens_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
+    {{- with .Arm -}}
+      {{- if (eq . "6") -}}hf
+      {{- else -}}v{{- . -}}
+      {{- end -}}
+    {{- end -}}
   builds:
     - kubens
   replacements:
