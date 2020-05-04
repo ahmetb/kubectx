@@ -49,11 +49,7 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 	return nil
 }
 
-func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
-	if os.Getenv("_MOCK_NAMESPACES") != "" {
-		return []string{"ns1", "ns2"}, nil
-	}
-
+func getKubernetesClientForConfig(kc *kubeconfig.Kubeconfig) (*kubernetes.Clientset, error) {
 	b, err := kc.Bytes()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert in-memory kubeconfig to yaml")
@@ -65,6 +61,18 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 	clientset, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize k8s REST client")
+	}
+	return clientset, nil
+}
+
+func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
+	if os.Getenv("_MOCK_NAMESPACES") != "" {
+		return []string{"ns1", "ns2"}, nil
+	}
+
+	clientset, err := getKubernetesClientForConfig(kc)
+	if err != nil {
+		return nil, err
 	}
 
 	var out []string
@@ -86,4 +94,16 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 		}
 	}
 	return out, nil
+}
+
+func namespaceExists(kc *kubeconfig.Kubeconfig, NamespaceName string) (bool, error) {
+	clientset, err := getKubernetesClientForConfig(kc)
+	if err != nil {
+		return false, err
+	}
+	_, err = clientset.CoreV1().Namespaces().Get(NamespaceName, metav1.GetOptions{})
+	if err != nil {
+		return false, errors.Wrap(err, "failed to get namespace from k8s API")
+	}
+	return true, nil
 }
