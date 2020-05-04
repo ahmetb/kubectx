@@ -97,6 +97,12 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 }
 
 func namespaceExists(kc *kubeconfig.Kubeconfig, NamespaceName string) (bool, error) {
+	if os.Getenv("_MOCK_NAMESPACES") != "" {
+		if NamespaceName == "ns1" || NamespaceName == "ns2" {
+			return true, nil
+		}
+		return  false, nil
+	}
 	clientset, err := getKubernetesClientForConfig(kc)
 	if err != nil {
 		return false, err
