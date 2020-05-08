@@ -15,7 +15,7 @@ func (t *MockKubeconfigLoader) Read(p []byte) (n int, err error)    { return t.i
 func (t *MockKubeconfigLoader) Write(p []byte) (n int, err error)   { return t.out.Write(p) }
 func (t *MockKubeconfigLoader) Close() error                        { return nil }
 func (t *MockKubeconfigLoader) Reset() error                        { return nil }
-func (t *MockKubeconfigLoader) Load() (ReadWriteResetCloser, error) { return t, nil }
+func (t *MockKubeconfigLoader) Load(string) (ReadWriteResetCloser, error) { return t, nil }
 func (t *MockKubeconfigLoader) Output() string                      { return t.out.String() }
 
 func WithMockKubeconfigLoader(kubecfg string) *MockKubeconfigLoader {

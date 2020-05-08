@@ -15,7 +15,7 @@ type ReadWriteResetCloser interface {
 }
 
 type Loader interface {
-	Load() (ReadWriteResetCloser, error)
+	Load(string) (ReadWriteResetCloser, error)
 }
 
 type Kubeconfig struct {
@@ -38,7 +38,12 @@ func (k *Kubeconfig) Close() error {
 }
 
 func (k *Kubeconfig) Parse() error {
-	f, err := k.loader.Load()
+	cfgPath, err := kubeconfigPath()
+	if err != nil {
+		return errors.Wrap(err, "cannot determine kubeconfig path")
+	}
+
+	f, err := k.loader.Load(cfgPath)
 	if err != nil {
 		return errors.Wrap(err, "failed to load")
 	}
