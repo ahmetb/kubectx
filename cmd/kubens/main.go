@@ -8,6 +8,7 @@ import (
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/env"
 	"github.com/ahmetb/kubectx/internal/printer"
+	"github.com/fatih/color"
 )
 
 type Op interface {
@@ -15,14 +16,14 @@ type Op interface {
 }
 
 func main() {
-	cmdutil.PrintDeprecatedEnvWarnings(os.Stderr, os.Environ())
+	cmdutil.PrintDeprecatedEnvWarnings(color.Error, os.Environ())
 	op := parseArgs(os.Args[1:])
-	if err := op.Run(os.Stdout, os.Stderr); err != nil {
-		printer.Error(os.Stderr, err.Error())
+	if err := op.Run(color.Output, color.Error); err != nil {
+		printer.Error(color.Error, err.Error())
 
 		if _, ok := os.LookupEnv(env.EnvDebug); ok {
 			// print stack trace in verbose mode
-			fmt.Fprintf(os.Stderr, "[DEBUG] error: %+v\n", err)
+			fmt.Fprintf(color.Error, "[DEBUG] error: %+v\n", err)
 		}
 		defer os.Exit(1)
 	}
