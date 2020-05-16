@@ -35,6 +35,9 @@ USAGE:
                               (this command won't delete the user/cluster entry
                               that is used by the context)
   kubectx -u, --unset       : unset the current context
+  kubectx -n<NUM>           : list the context with index numbers
+                              if <NUM> is specified - switch to
+                              context with that number
 ```
 
 ### Usage
