@@ -145,20 +145,6 @@ set_context() {
   fi
 }
 
-set_nth_context() {
-  local prev
-  prev="$(current_context)" || exit_err "error getting current context"
-
-  local nth
-  nth=`get_contexts | tail -n+"${1}" | head -n1`
-
-  switch_context "${nth}"
-
-  if [[ "${prev}" != "${nth}" ]]; then
-    save_context "${prev}"
-  fi
-}
-
 swap_context() {
   local ctx
   ctx="$(read_context)"
