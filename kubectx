@@ -44,6 +44,9 @@ USAGE:
                                   (this command won't delete the user/cluster entry
                                   that is used by the context)
   $SELF -u, --unset           : unset the current context
+  $SELF -n<NUM>               : list the context with index numbers
+                                  if <NUM> is specified - switch to
+                                  context with that number
 
   $SELF -h,--help             : show this message
 EOF
@@ -77,17 +80,24 @@ list_contexts() {
   cur_ctx_fg=${KUBECTX_CURRENT_FGCOLOR:-$yellow}
   cur_ctx_bg=${KUBECTX_CURRENT_BGCOLOR:-$darkbg}
 
+  local num=0
+  local fnum=""
+
   for c in $ctx_list; do
+  if [[ -n "${show_numbers+x}" ]]; then
+    num="$((num+1))"
+    fnum=$(printf "%2d%s. " $num)
+  fi
   if [[ -n "${_KUBECTX_FORCE_COLOR:-}" || \
        -t 1 && -z "${NO_COLOR:-}" ]]; then
     # colored output mode
     if [[ "${c}" = "${cur}" ]]; then
-      echo "${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
+      echo "${fnum}${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
     else
-      echo "${c}"
+      echo "${fnum}${c}"
     fi
   else
-    echo "${c}"
+    echo "${fnum}${c}"
   fi
   done
 }
@@ -214,6 +224,21 @@ main() {
       exit 1
     fi
     delete_contexts "${@:2}"
+  elif [[ "${1}" == -n* ]]; then
+    if [[ "${1}" == '-n' ]]; then
+	  show_numbers=true
+	  list_contexts
+	else
+	  local regex="^-n([0-9]+)$"
+	  if [[ "${1}" =~ $regex ]]; then
+	    local ctx_name=`get_contexts | tail -n+"${BASH_REMATCH[1]}" | head -n1`
+	    set_context "${ctx_name}"
+	  else
+	    echo "error: wrong number format for -n option" >&2
+        usage
+        exit 1
+	  fi
+	fi
   elif [[ "$#" -gt 1 ]]; then
     echo "error: too many arguments" >&2
     usage
