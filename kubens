@@ -130,7 +130,7 @@ set_namespace() {
   ctx="$(current_context)" || exit_err "error getting current context"
   prev="$(current_namespace)" || exit_error "error getting current namespace"
 
-  if grep -q ^"${1}"\$ <(get_namespaces); then
+  if grep -q ^"${1}"\$ <(get_namespaces) || $KUBECTL get ns "${1}"; then
     switch_namespace "${ctx}" "${1}"
 
     if [[ "${prev}" != "${1}" ]]; then
