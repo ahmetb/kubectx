@@ -22,6 +22,7 @@ func printUsage(out io.Writer) error {
   %PROG%                    : list the namespaces in the current context
   %PROG% <NAME>             : change the active namespace of current context
   %PROG% -                  : switch to the previous namespace in this context
+  %PROG% -l, --list         : list the namespaces in the current context (non-interactive)
   %PROG% -c, --current      : show the current namespace
   %PROG% -h,--help          : show this message
 `

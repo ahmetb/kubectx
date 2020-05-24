@@ -22,6 +22,7 @@ func printUsage(out io.Writer) error {
   %PROG%                       : list the contexts
   %PROG% <NAME>                : switch to context <NAME>
   %PROG% -                     : switch to the previous context
+  %PROG% -l, --list            : list the contexts (non-interactive)
   %PROG% -c, --current         : show the current context name
   %PROG% <NEW_NAME>=<NAME>     : rename context <NAME> to <NEW_NAME>
   %PROG% <NEW_NAME>=.          : rename current-context to <NEW_NAME>

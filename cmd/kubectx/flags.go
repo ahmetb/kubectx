@@ -35,6 +35,9 @@ func parseArgs(argv []string) Op {
 
 	if len(argv) == 1 {
 		v := argv[0]
+		if v == "--list" || v == "-l" {
+			return ListOp{}
+		}
 		if v == "--help" || v == "-h" {
 			return HelpOp{}
 		}
