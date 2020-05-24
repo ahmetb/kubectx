@@ -46,11 +46,11 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 	}
 
 	if !kc.ContextExists(op.Old) {
-		return errors.Errorf("context %q not found, can't rename it", op.Old)
+		return errors.Errorf("context \"%s\" not found, can't rename it", op.Old)
 	}
 
 	if kc.ContextExists(op.New) {
-		printer.Warning(stderr, "context %q exists, overwriting it.", op.New)
+		printer.Warning(stderr, "context \"%s\" exists, overwriting it.", op.New)
 		if err := kc.DeleteContextEntry(op.New); err != nil {
 			return errors.Wrap(err, "failed to delete new context to overwrite it")
 		}

@@ -37,7 +37,7 @@ func TestNSFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	if expected := "bar"; v != expected {
-		t.Fatalf("Load()=%q; expected=%q", v, expected)
+		t.Fatalf("Load()=\"%s\"; expected=\"%s\"", v, expected)
 	}
 }
 
