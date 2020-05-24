@@ -55,6 +55,6 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to switch namespace")
 	}
-	printer.Success(stderr, "Active namespace is %q.", printer.SuccessColor.Sprint(name))
+	printer.Success(stderr, "Active namespace is %s.", printer.SuccessColor.Sprint(name))
 	return nil
 }
