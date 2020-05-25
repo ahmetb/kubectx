@@ -3,6 +3,7 @@ package printer
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/fatih/color"
 )
@@ -30,16 +31,21 @@ func init() {
 }
 
 func Error(w io.Writer, format string, args ...interface{}) error {
-	_, err := fmt.Fprintf(w, ErrorColor.Sprint("error: ")+format+"\n", args...)
-	return err
+	return writeOutput(w, ErrorColor.Sprint("error: ")+format+"\n", args...)
 }
 
 func Warning(w io.Writer, format string, args ...interface{}) error {
-	_, err := fmt.Fprintf(w, WarningColor.Sprint("warning: ")+format+"\n", args...)
-	return err
+	return writeOutput(w, WarningColor.Sprint("warning: ")+format+"\n", args...)
 }
 
 func Success(w io.Writer, format string, args ...interface{}) error {
-	_, err := fmt.Fprintf(w, SuccessColor.Sprint("✔ ")+fmt.Sprintf(format+"\n", args...))
+	return writeOutput(w, SuccessColor.Sprint("✔ ")+format+"\n", args...)
+}
+
+func writeOutput(w io.Writer, format string, args ...interface{}) error {
+	// Replace %q with "%s" so unescaped color sequences are written to output
+	format = strings.ReplaceAll(format, "%q", "\"%s\"")
+
+	_, err := fmt.Fprintf(w, format, args...)
 	return err
 }
