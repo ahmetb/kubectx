@@ -3,7 +3,11 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"runtime"
+	"strings"
 	"testing"
+
+	"github.com/ahmetb/kubectx/internal/testutil"
 )
 
 func TestNSFile(t *testing.T) {
@@ -34,5 +38,30 @@ func TestNSFile(t *testing.T) {
 	}
 	if expected := "bar"; v != expected {
 		t.Fatalf("Load()=%q; expected=%q", v, expected)
+	}
+}
+
+func TestNSFile_path_windows(t *testing.T) {
+	defer testutil.WithEnvVar("_FORCE_GOOS", "windows")()
+	fp := NewNSFile("a:b:c").path()
+
+	if expected := "a__b__c"; !strings.HasSuffix(fp, expected) {
+		t.Fatalf("file did not have expected ending %q: %s", expected, fp)
+	}
+}
+
+func Test_isWindows(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("won't test this case on windows")
+	}
+
+	got := isWindows()
+	if got {
+		t.Fatalf("isWindows() returned true for %s", runtime.GOOS)
+	}
+
+	defer testutil.WithEnvVar("_FORCE_GOOS", "windows")()
+	if !isWindows() {
+		t.Fatalf("isWindows() failed to detect windows with env override.")
 	}
 }
