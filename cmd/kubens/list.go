@@ -54,15 +54,7 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 		return []string{"ns1", "ns2"}, nil
 	}
 
-	b, err := kc.Bytes()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to convert in-memory kubeconfig to yaml")
-	}
-	cfg, err := clientcmd.RESTConfigFromKubeConfig(b)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize config")
-	}
-	clientset, err := kubernetes.NewForConfig(cfg)
+	clientset, err := newKubernetesClientSet(kc)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize k8s REST client")
 	}
@@ -86,4 +78,16 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 		}
 	}
 	return out, nil
+}
+
+func newKubernetesClientSet(kc *kubeconfig.Kubeconfig) (*kubernetes.Clientset, error) {
+	b, err := kc.Bytes()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to convert in-memory kubeconfig to yaml")
+	}
+	cfg, err := clientcmd.RESTConfigFromKubeConfig(b)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to initialize config")
+	}
+	return kubernetes.NewForConfig(cfg)
 }

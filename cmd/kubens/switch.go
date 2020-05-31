@@ -2,8 +2,11 @@ package main
 
 import (
 	"io"
+	"os"
 
 	"github.com/pkg/errors"
+	errors2 "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
@@ -75,14 +78,20 @@ func switchNamespace(kc *kubeconfig.Kubeconfig, ns string) (string, error) {
 }
 
 func namespaceExists(kc *kubeconfig.Kubeconfig, ns string) (bool, error) {
-	nses, err := queryNamespaces(kc)
+	// for tests
+	if os.Getenv("_MOCK_NAMESPACES") != "" {
+		return ns == "ns1" || ns == "ns2", nil
+	}
+
+	clientset, err := newKubernetesClientSet(kc)
 	if err != nil {
-		return false, err
+		return false, errors.Wrap(err, "failed to initialize k8s REST client")
 	}
-	for _, v := range nses {
-		if v == ns {
-			return true, nil
-		}
+
+	namespace, err := clientset.CoreV1().Namespaces().Get(ns, metav1.GetOptions{})
+	if errors2.IsNotFound(err) {
+		return false, nil
 	}
-	return false, nil
+	return namespace != nil, errors.Wrapf(err, "failed to query "+
+		"namespace %q from k8s API", ns)
 }
