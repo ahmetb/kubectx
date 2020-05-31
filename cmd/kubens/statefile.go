@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 )
@@ -18,7 +20,14 @@ type NSFile struct {
 
 func NewNSFile(ctx string) NSFile { return NSFile{dir: defaultDir, ctx: ctx} }
 
-func (f NSFile) path() string { return filepath.Join(f.dir, f.ctx) }
+func (f NSFile) path() string {
+	fn := f.ctx
+	if isWindows() {
+		// bug 230: eks clusters contain ':' in ctx name, not a valid file name for win32
+		fn = strings.ReplaceAll(fn, ":", "__")
+	}
+	return filepath.Join(f.dir, fn)
+}
 
 // Load reads the previous namespace setting, or returns empty if not exists.
 func (f NSFile) Load() (string, error) {
@@ -39,4 +48,12 @@ func (f NSFile) Save(value string) error {
 		return err
 	}
 	return ioutil.WriteFile(f.path(), []byte(value), 0644)
+}
+
+// isWindows determines if the process is running on windows OS.
+func isWindows() bool {
+	if os.Getenv("_FORCE_GOOS") == "windows" { // for testing
+		return true
+	}
+	return runtime.GOOS == "windows"
 }
