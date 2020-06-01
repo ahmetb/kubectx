@@ -15,7 +15,7 @@ type ReadWriteResetCloser interface {
 }
 
 type Loader interface {
-	Load(string) (ReadWriteResetCloser, error)
+	Load() ([]ReadWriteResetCloser, error)
 }
 
 type Kubeconfig struct {
@@ -38,15 +38,15 @@ func (k *Kubeconfig) Close() error {
 }
 
 func (k *Kubeconfig) Parse() error {
-	cfgPath, err := kubeconfigPath()
-	if err != nil {
-		return errors.Wrap(err, "cannot determine kubeconfig path")
-	}
-
-	f, err := k.loader.Load(cfgPath)
+	files, err := k.loader.Load()
 	if err != nil {
 		return errors.Wrap(err, "failed to load")
 	}
+
+	files = append(files, &kubeconfigFile{})
+
+	// TODO since we don't support multiple kubeconfig files at the moment, there's just 1 file
+	f := files[0]
 
 	k.f = f
 	var v yaml.Node

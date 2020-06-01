@@ -16,7 +16,12 @@ type StandardKubeconfigLoader struct{}
 
 type kubeconfigFile struct{ *os.File }
 
-func (*StandardKubeconfigLoader) Load(cfgPath string) (ReadWriteResetCloser, error) {
+func (*StandardKubeconfigLoader) Load() ([]ReadWriteResetCloser, error) {
+	cfgPath, err := kubeconfigPath()
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot determine kubeconfig path")
+	}
+
 	f, err := os.OpenFile(cfgPath, os.O_RDWR, 0)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -24,7 +29,9 @@ func (*StandardKubeconfigLoader) Load(cfgPath string) (ReadWriteResetCloser, err
 		}
 		return nil, errors.Wrap(err, "failed to open file")
 	}
-	return &kubeconfigFile{f}, nil
+
+	// TODO we'll return all kubeconfig files when we start implementing multiple kubeconfig support
+	return []ReadWriteResetCloser{ReadWriteResetCloser(&kubeconfigFile{f})}, nil
 }
 
 func (kf *kubeconfigFile) Reset() error {
