@@ -43,8 +43,6 @@ func (k *Kubeconfig) Parse() error {
 		return errors.Wrap(err, "failed to load")
 	}
 
-	files = append(files, &kubeconfigFile{})
-
 	// TODO since we don't support multiple kubeconfig files at the moment, there's just 1 file
 	f := files[0]
 
