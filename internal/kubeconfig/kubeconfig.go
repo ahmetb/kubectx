@@ -15,7 +15,7 @@ type ReadWriteResetCloser interface {
 }
 
 type Loader interface {
-	Load() (ReadWriteResetCloser, error)
+	Load() ([]ReadWriteResetCloser, error)
 }
 
 type Kubeconfig struct {
@@ -38,10 +38,13 @@ func (k *Kubeconfig) Close() error {
 }
 
 func (k *Kubeconfig) Parse() error {
-	f, err := k.loader.Load()
+	files, err := k.loader.Load()
 	if err != nil {
 		return errors.Wrap(err, "failed to load")
 	}
+
+	// TODO since we don't support multiple kubeconfig files at the moment, there's just 1 file
+	f := files[0]
 
 	k.f = f
 	var v yaml.Node

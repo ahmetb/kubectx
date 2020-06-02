@@ -23,7 +23,7 @@ type InteractiveSwitchOp struct {
 // TODO(ahmetb) This method is heavily repetitive vs kubectx/fzf.go.
 func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	// parse kubeconfig just to see if it can be loaded
-	kc := new(kubeconfig.Kubeconfig).WithLoader(cmdutil.DefaultLoader)
+	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	if err := kc.Parse(); err != nil {
 		if cmdutil.IsNotFoundErr(err) {
 			printer.Warning(stderr, "kubeconfig file not found")

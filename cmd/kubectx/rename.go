@@ -6,7 +6,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
 )
@@ -35,7 +34,7 @@ func parseRenameSyntax(v string) (string, string, bool) {
 // to the "new" value. If the old refers to the current-context,
 // current-context preference is also updated.
 func (op RenameOp) Run(_, stderr io.Writer) error {
-	kc := new(kubeconfig.Kubeconfig).WithLoader(cmdutil.DefaultLoader)
+	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
 		return errors.Wrap(err, "kubeconfig error")

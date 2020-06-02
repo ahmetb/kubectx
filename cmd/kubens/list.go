@@ -11,7 +11,6 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
 )
@@ -19,7 +18,7 @@ import (
 type ListOp struct{}
 
 func (op ListOp) Run(stdout, stderr io.Writer) error {
-	kc := new(kubeconfig.Kubeconfig).WithLoader(cmdutil.DefaultLoader)
+	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
 		return errors.Wrap(err, "kubeconfig error")

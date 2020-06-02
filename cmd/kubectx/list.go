@@ -16,7 +16,7 @@ import (
 type ListOp struct{}
 
 func (_ ListOp) Run(stdout, stderr io.Writer) error {
-	kc := new(kubeconfig.Kubeconfig).WithLoader(cmdutil.DefaultLoader)
+	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
 		if cmdutil.IsNotFoundErr(err) {
