@@ -109,6 +109,10 @@ save_context() {
 
 switch_context() {
   $KUBECTL config use-context "${1}"
+  if [ -f $HOME/.rancher/cli2.json ]
+  then
+        sed -i "s/\"CurrentServer\"\: \".*\",/\"CurrentServer\"\: \"${1}\",/g" $HOME/.rancher/cli2.json
+  fi
 }
 
 choose_context_interactive() {
