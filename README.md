@@ -165,7 +165,7 @@ them to any POSIX environment that has Bash installed.
     In case of error, calling `compaudit` might help.
   - For bash:
     ```bash
-    git clone https://github.com/ahmetb/kubectx.git ~/.kubectx
+    git clone https://github.com/juanmancebo/kubectx.git ~/.kubectx
     COMPDIR=$(pkg-config --variable=completionsdir bash-completion)
     ln -sf ~/.kubectx/completion/kubens.bash $COMPDIR/kubens
     ln -sf ~/.kubectx/completion/kubectx.bash $COMPDIR/kubectx
