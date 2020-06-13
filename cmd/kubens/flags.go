@@ -34,6 +34,9 @@ func parseArgs(argv []string) Op {
 		if v == "--current" || v == "-c" {
 			return CurrentOp{}
 		}
+		if v == "--version" || v == "-v" {
+			return VersionOp{}
+		}
 		if strings.HasPrefix(v, "-") && v != "-" {
 			return UnsupportedOp{Err: fmt.Errorf("unsupported option '%s'", v)}
 		}
