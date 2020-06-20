@@ -20,4 +20,11 @@ jobs:
         args: release --rm-dist
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+    - name: Update new version for plugin 'ctx' in krew-index
+      uses: rajatjindal/krew-release-bot@v0.0.38
+      with:
+        krew_template_file: .krew/ctx.yaml
+    - name: Update new version for plugin 'ns' in krew-index
+      uses: rajatjindal/krew-release-bot@v0.0.38
+      with:
+        krew_template_file: .krew/ns.yaml
