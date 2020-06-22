@@ -13,7 +13,6 @@ spec:
     If fzf is installed on your machine, you can interactively choose
     between the entries using the arrow keys, or by fuzzy searching
     as you type.
-    See https://github.com/ahmetb/kubectx for customization and details.
   platforms:
   - selector:
       matchExpressions:
