@@ -17,6 +17,7 @@ builds:
     - amd64
     - arm
     - arm64
+    - ppc64le
   goarm: [6, 7]
 - id: kubens
   main: ./cmd/kubens
@@ -31,6 +32,7 @@ builds:
     - amd64
     - arm
     - arm64
+    - ppc64le
   goarm: [6, 7]
 archives:
 - id: kubectx-archive
