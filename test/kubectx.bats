@@ -227,7 +227,7 @@ load common
   run ${COMMAND}
   echo "$output"
   [ "$status" -eq 0 ]
-  [[ "$output" = "user2@cluster1" ]]
+  [[ "$output" = "warning: No kubectl context found" ]]
 }
 
 @test "unset selected context" {
