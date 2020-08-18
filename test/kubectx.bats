@@ -214,7 +214,7 @@ load common
   run ${COMMAND}
   echo "$output"
   [ "$status" -eq 0 ]
-  [[ "$output" = "" ]]
+  [[ "$output" = "warning: No kubectl context found" ]]
 }
 
 @test "delete several contexts including a non existent one" {
@@ -227,7 +227,7 @@ load common
   run ${COMMAND}
   echo "$output"
   [ "$status" -eq 0 ]
-  [[ "$output" = "warning: No kubectl context found" ]]
+  [[ "$output" = "user2@cluster1" ]]
 }
 
 @test "unset selected context" {
