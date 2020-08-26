@@ -14,10 +14,10 @@ func TestPrintHelp(t *testing.T) {
 
 	out := buf.String()
 	if !strings.Contains(out, "USAGE:") {
-		t.Errorf("help string doesn't contain USAGE: ; output=%q", out)
+		t.Errorf("help string doesn't contain USAGE: ; output=\"%s\"", out)
 	}
 
 	if !strings.HasSuffix(out, "\n") {
-		t.Errorf("does not end with New line; output=%q", out)
+		t.Errorf("does not end with New line; output=\"%s\"", out)
 	}
 }

@@ -27,7 +27,7 @@ func (s SwitchOp) Run(_, stderr io.Writer) error {
 	if err != nil {
 		return err
 	}
-	err = printer.Success(stderr, "Active namespace is %q", toNS)
+	err = printer.Success(stderr, "Active namespace is \"%s\"", printer.SuccessColor.Sprint(toNS))
 	return err
 }
 
@@ -59,11 +59,11 @@ func switchNamespace(kc *kubeconfig.Kubeconfig, ns string) (string, error) {
 		return "", errors.Wrap(err, "failed to query if namespace exists (is cluster accessible?)")
 	}
 	if !ok {
-		return "", errors.Errorf("no namespace exists with name %q", ns)
+		return "", errors.Errorf("no namespace exists with name \"%s\"", ns)
 	}
 
 	if err := kc.SetNamespace(ctx, ns); err != nil {
-		return "", errors.Wrapf(err, "failed to change to namespace %q", ns)
+		return "", errors.Wrapf(err, "failed to change to namespace \"%s\"", ns)
 	}
 	if err := kc.Save(); err != nil {
 		return "", errors.Wrap(err, "failed to save kubeconfig file")

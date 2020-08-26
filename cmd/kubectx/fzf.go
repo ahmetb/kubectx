@@ -54,6 +54,6 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to switch context")
 	}
-	printer.Success(stderr, "Switched to context %q.", printer.SuccessColor.Sprint(name))
+	printer.Success(stderr, "Switched to context \"%s\".", printer.SuccessColor.Sprint(name))
 	return nil
 }

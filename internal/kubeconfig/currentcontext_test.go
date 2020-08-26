@@ -16,7 +16,7 @@ func TestKubeconfig_GetCurrentContext(t *testing.T) {
 
 	expected := "foo"
 	if v != expected {
-		t.Fatalf("expected=%q; got=%q", expected, v)
+		t.Fatalf("expected=\"%s\"; got=\"%s\"", expected, v)
 	}
 }
 
@@ -30,7 +30,7 @@ func TestKubeconfig_GetCurrentContext_missingField(t *testing.T) {
 
 	expected := ""
 	if v != expected {
-		t.Fatalf("expected=%q; got=%q", expected, v)
+		t.Fatalf("expected=\"%s\"; got=\"%s\"", expected, v)
 	}
 }
 
@@ -50,6 +50,6 @@ func TestKubeconfig_UnsetCurrentContext(t *testing.T) {
 	out := tl.Output()
 	expected := testutil.KC().WithCurrentCtx("").ToYAML(t)
 	if out != expected {
-		t.Fatalf("expected=%q; got=%q", expected, out)
+		t.Fatalf("expected=\"%s\"; got=\"%s\"", expected, out)
 	}
 }

@@ -35,7 +35,7 @@ func TestKubeconfig_NamespaceOfContext(t *testing.T) {
 		t.Fatal("expected err")
 	}
 	if expected := `default`; v1 != expected {
-		t.Fatalf("c1: expected=%q got=%q", expected, v1)
+		t.Fatalf("c1: expected=\"%s\" got=\"%s\"", expected, v1)
 	}
 
 	v2, err := kc.NamespaceOfContext("c2")
@@ -43,7 +43,7 @@ func TestKubeconfig_NamespaceOfContext(t *testing.T) {
 		t.Fatal("expected err")
 	}
 	if expected := `c2n1`; v2 != expected {
-		t.Fatalf("c2: expected=%q got=%q", expected, v2)
+		t.Fatalf("c2: expected=\"%s\" got=\"%s\"", expected, v2)
 	}
 }
 

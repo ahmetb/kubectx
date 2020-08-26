@@ -25,7 +25,7 @@ func (op SwitchOp) Run(_, stderr io.Writer) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to switch context")
 	}
-	err = printer.Success(stderr, "Switched to context %q.", newCtx)
+	err = printer.Success(stderr, "Switched to context \"%s\".", printer.SuccessColor.Sprint(newCtx))
 	return errors.Wrap(err, "print error")
 }
 
@@ -44,7 +44,7 @@ func switchContext(name string) (string, error) {
 
 	prev := kc.GetCurrentContext()
 	if !kc.ContextExists(name) {
-		return "", errors.Errorf("no context exists with the name: %q", name)
+		return "", errors.Errorf("no context exists with the name: \"%s\"", name)
 	}
 	if err := kc.ModifyCurrentContext(name); err != nil {
 		return "", err

@@ -27,7 +27,7 @@ func (k *Kubeconfig) contextNode(name string) (*yaml.Node, error) {
 			return contextNode, nil
 		}
 	}
-	return nil, errors.Errorf("context with name %q not found", name)
+	return nil, errors.Errorf("context with name \"%s\" not found", name)
 }
 
 func (k *Kubeconfig) ContextNames() []string {
