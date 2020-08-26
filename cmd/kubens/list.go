@@ -17,7 +17,7 @@ import (
 
 type ListOp struct{}
 
-func (op ListOp) Run(stdout, stderr io.Writer) error {
+func (op ListOp) Run(stdout, _ io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
@@ -53,7 +53,7 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 		return []string{"ns1", "ns2"}, nil
 	}
 
-	clientset, err := newKubernetesClientSet(kc)
+	clientset, err := newWritableKubernetesClientSet(kc)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize k8s REST client")
 	}
@@ -79,14 +79,13 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 	return out, nil
 }
 
-func newKubernetesClientSet(kc *kubeconfig.Kubeconfig) (*kubernetes.Clientset, error) {
-	b, err := kc.Bytes()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to convert in-memory kubeconfig to yaml")
-	}
-	cfg, err := clientcmd.RESTConfigFromKubeConfig(b)
+func newWritableKubernetesClientSet(kc *kubeconfig.Kubeconfig) (*kubernetes.Clientset, error) {
+
+	path := kc.GetPath()
+	config, err := clientcmd.BuildConfigFromFlags("", path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize config")
 	}
-	return kubernetes.NewForConfig(cfg)
+
+	return kubernetes.NewForConfig(config)
 }

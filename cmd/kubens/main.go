@@ -19,7 +19,7 @@ func main() {
 	cmdutil.PrintDeprecatedEnvWarnings(color.Error, os.Environ())
 	op := parseArgs(os.Args[1:])
 	if err := op.Run(color.Output, color.Error); err != nil {
-		printer.Error(color.Error, err.Error())
+		_ = printer.Error(color.Error, err.Error())
 
 		if _, ok := os.LookupEnv(env.EnvDebug); ok {
 			// print stack trace in verbose mode

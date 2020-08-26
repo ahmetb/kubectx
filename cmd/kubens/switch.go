@@ -82,7 +82,7 @@ func namespaceExists(kc *kubeconfig.Kubeconfig, ns string) (bool, error) {
 		return ns == "ns1" || ns == "ns2", nil
 	}
 
-	clientset, err := newKubernetesClientSet(kc)
+	clientset, err := newWritableKubernetesClientSet(kc)
 	if err != nil {
 		return false, errors.Wrap(err, "failed to initialize k8s REST client")
 	}
