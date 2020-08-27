@@ -83,6 +83,10 @@ func namespaceExists(ns string) (bool, error) {
 		return ns == "ns1" || ns == "ns2", nil
 	}
 
+	if "-" == ns {
+		return true, nil
+	}
+
 	kubeCfgPath, err := kubeconfig.FindKubeconfigPath()
 	if err != nil {
 		return false, errors.Wrap(err, "cannot determine kubeconfig path")
