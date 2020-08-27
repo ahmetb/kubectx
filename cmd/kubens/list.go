@@ -18,6 +18,12 @@ import (
 type ListOp struct{}
 
 func (op ListOp) Run(stdout, _ io.Writer) error {
+
+	allNamespaces, err := queryNamespaces()
+	if err != nil {
+		return errors.Wrap(err, "could not list namespaces (is the cluster accessible?)")
+	}
+
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
@@ -33,27 +39,28 @@ func (op ListOp) Run(stdout, _ io.Writer) error {
 		return errors.Wrap(err, "cannot read current namespace")
 	}
 
-	ns, err := queryNamespaces(kc)
-	if err != nil {
-		return errors.Wrap(err, "could not list namespaces (is the cluster accessible?)")
-	}
-
-	for _, c := range ns {
+	for _, c := range allNamespaces {
 		s := c
 		if c == curNs {
 			s = printer.ActiveItemColor.Sprint(c)
 		}
-		fmt.Fprintf(stdout, "%s\n", s)
+		_, _ = fmt.Fprintf(stdout, "%s\n", s)
 	}
 	return nil
 }
 
-func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
+func queryNamespaces() ([]string, error) {
+
 	if os.Getenv("_MOCK_NAMESPACES") != "" {
 		return []string{"ns1", "ns2"}, nil
 	}
 
-	clientset, err := newWritableKubernetesClientSet(kc)
+	kubeCfgPath, err := kubeconfig.FindKubeconfigPath()
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot determine kubeconfig path")
+	}
+
+	clientset, err := newWritableKubernetesClientSet(kubeCfgPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize k8s REST client")
 	}
@@ -79,12 +86,11 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 	return out, nil
 }
 
-func newWritableKubernetesClientSet(kc *kubeconfig.Kubeconfig) (*kubernetes.Clientset, error) {
+func newWritableKubernetesClientSet(kubeCfgPath string) (*kubernetes.Clientset, error) {
 
-	path := kc.GetPath()
-	config, err := clientcmd.BuildConfigFromFlags("", path)
+	config, err := clientcmd.BuildConfigFromFlags("", kubeCfgPath)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize config")
+		return nil, errors.Wrap(err, "failed to initialize REST client config")
 	}
 
 	return kubernetes.NewForConfig(config)
