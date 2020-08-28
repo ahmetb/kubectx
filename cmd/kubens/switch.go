@@ -82,10 +82,10 @@ func switchNamespace(kc *kubeconfig.Kubeconfig, ns string) (string, error) {
 func namespaceExists(ns string) (bool, error) {
 	// for tests
 	if os.Getenv("_MOCK_NAMESPACES") != "" {
-		return ns == "ns1" || ns == "ns2", nil
+		return ns == "ns1" || ns == "ns2" || ns == "-", nil
 	}
 
-	if "-" == ns {
+	if ns == "-" {
 		return true, nil
 	}
 
