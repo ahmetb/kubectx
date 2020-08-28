@@ -41,12 +41,14 @@ func (s SwitchOp) Run(_, stderr io.Writer) error {
 }
 
 func switchNamespace(kc *kubeconfig.Kubeconfig, ns string) (string, error) {
+
 	ctx := kc.GetCurrentContext()
 	if ctx == "" {
 		return "", errors.New("current-context is not set")
 	}
+
 	curNS, err := kc.NamespaceOfContext(ctx)
-	if ctx == "" {
+	if curNS == "" {
 		return "", errors.New("failed to get current namespace")
 	}
 
