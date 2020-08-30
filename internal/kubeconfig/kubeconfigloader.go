@@ -44,10 +44,6 @@ func (kf *kubeconfigFile) Reset() error {
 	return errors.Wrap(err, "failed to seek in file")
 }
 
-func (kf *kubeconfigFile) GetPath() string {
-	return kf.File.Name()
-}
-
 // FindKubeconfigPath resolves kube config path
 func FindKubeconfigPath() (string, error) {
 	// KUBECONFIG env var

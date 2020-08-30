@@ -23,5 +23,3 @@ func (t *MockKubeconfigLoader) Output() string { return t.out.String() }
 func WithMockKubeconfigLoader(kubecfg string) *MockKubeconfigLoader {
 	return &MockKubeconfigLoader{in: strings.NewReader(kubecfg)}
 }
-
-func (t *MockKubeconfigLoader) GetPath() string { return "" }

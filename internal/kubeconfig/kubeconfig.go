@@ -12,7 +12,6 @@ type ReadWriteResetCloser interface {
 
 	// Reset truncates the file and seeks to the beginning of the file.
 	Reset() error
-	GetPath() string
 }
 
 type Loader interface {
@@ -29,10 +28,6 @@ type Kubeconfig struct {
 func (k *Kubeconfig) WithLoader(l Loader) *Kubeconfig {
 	k.loader = l
 	return k
-}
-
-func (k *Kubeconfig) GetPath() string {
-	return k.f.GetPath()
 }
 
 func (k *Kubeconfig) Close() error {
