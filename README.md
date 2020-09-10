@@ -181,14 +181,21 @@ them to any POSIX environment that has Bash installed.
     somewhere in your `PATH`, like `/usr/local/bin`
 - Make `kubectx` and `kubens` executable (`chmod +x ...`)
 - Install bash/zsh/fish [completion scripts](completion/).
+  - For zsh with [antibody](https://getantibody.github.io):
+    Add this line to your [Plugins File](https://getantibody.github.io/usage/) (e.g. `~/.zsh_plugins.txt`):
+    ```
+    ahmetb/kubectx path:completion kind:fpath
+    ```
+    Depending on your setup, you might or might not need to call `compinit` or `autoload -U compinit && compinit` in your `~/.zshrc` after you load the Plugins file.
+    You need to test what works for you. If you use [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh), load the completions before you load `oh-my-zsh` because `oh-my-zsh` will call `compinit`. 
   - For zsh:
     The completion scripts have to be in a path that belongs to `$fpath`. Either link or copy them to an existing folder.
     If using oh-my-zsh you can do as follows:
     ```bash
     mkdir -p ~/.oh-my-zsh/completions
     chmod -R 755 ~/.oh-my-zsh/completions
-    ln -s /opt/kubectx/completion/kubectx.zsh ~/.oh-my-zsh/completions/_kubectx.zsh
-    ln -s /opt/kubectx/completion/kubens.zsh ~/.oh-my-zsh/completions/_kubens.zsh
+    ln -s /opt/kubectx/completion/_kubectx.zsh ~/.oh-my-zsh/completions/_kubectx.zsh
+    ln -s /opt/kubectx/completion/_kubens.zsh ~/.oh-my-zsh/completions/_kubens.zsh
     ```
     Note that the leading underscore seems to be a convention. If completion doesn't work, add `autoload -U compinit && compinit` to your `.zshrc` (similar to [`zsh-completions`](https://github.com/zsh-users/zsh-completions/blob/master/README.md#oh-my-zsh)).
     If not using oh-my-zsh, you could link to `/usr/share/zsh/functions/Completion` (might require sudo), depending on the `$fpath` of your zsh installation.
