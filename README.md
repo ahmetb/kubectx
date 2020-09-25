@@ -2,7 +2,7 @@
 
 ![Latest GitHub release](https://img.shields.io/github/release/ahmetb/kubectx.svg)
 ![GitHub stars](https://img.shields.io/github/stars/ahmetb/kubectx.svg?label=github%20stars)
-![Travis (.org) branch](https://img.shields.io/travis/ahmetb/kubectx/master.svg)
+[![Go implementation (CI)](https://github.com/ahmetb/kubectx/workflows/Go%20implementation%20(CI)/badge.svg)](https://github.com/ahmetb/kubectx/actions?query=workflow%3A"Go+implementation+(CI)")
 ![Proudly written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4.svg)
 
 This repository provides both `kubectx` and `kubens` tools.
