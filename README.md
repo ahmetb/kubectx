@@ -102,10 +102,10 @@ There are several installation options:
   - Homebrew (recommended)
   - MacPorts
 - Linux
-  - Homebrew
-  - Manual installation/upgrades
-  - Arch Linux
   - Debian
+  - Arch Linux
+  - Homebrew
+  - Manual installation
 
 ### Kubectl Plugins (macOS and Linux)
 
@@ -141,6 +141,22 @@ If you use [MacPorts](https://www.macports.org) you can install like this:
     sudo port install kubectx
 
 ### Linux
+
+#### Debian
+
+Available as a Debian package for [Debian Buster (testing)](https://packages.debian.org/buster/kubectx), [Sid (unstable)](https://packages.debian.org/sid/kubectx) (_note: if you are unfamiliar with Debian release process and how to enable testing/unstable repos, check the [Debian Wiki](https://wiki.debian.org/DebianReleases)_):
+
+``` bash
+sudo apt install kubectx
+```
+
+#### Arch Linux
+
+Available as official Arch Linux package. Install it via:
+
+```bash
+sudo pacman -S kubectx
+```
 
 #### Homebrew
 
@@ -203,22 +219,6 @@ Example installation steps:
 sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
 sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
 sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
-```
-
-#### Arch Linux
-
-Available as official Arch Linux package. Install it via:
-
-```bash
-sudo pacman -S kubectx
-```
-
-#### Debian
-
-Available as a Debian package for [Debian Buster (testing)](https://packages.debian.org/buster/kubectx), [Sid (unstable)](https://packages.debian.org/sid/kubectx) (_note: if you are unfamiliar with Debian release process and how to enable testing/unstable repos, check the [Debian Wiki](https://wiki.debian.org/DebianReleases)_):
-
-``` bash
-sudo apt install kubectx
 ```
 
 -----
