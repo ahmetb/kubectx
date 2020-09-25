@@ -11,7 +11,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v1
       with:
-        go-version: 1.14
+        go-version: 1.15
     - name: Ensure gofmt
       run: test -z "$(gofmt -s -d .)"
     - name: Ensure go.mod is already tidied
