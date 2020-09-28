@@ -112,8 +112,8 @@ If you like to add context/namespace information to your shell prompt (`$PS1`), 
 You can install and use the [Krew](https://github.com/kubernetes-sigs/krew/) kubectl
 plugin manager to get `kubectx` and `kubens`.
 
- **NOTE:** This will not install the shell completion scripts. If you want them, choose another installation method
-or install the scripts [manually](#manual-installation-macos-and-linux)
+**NOTE:** This will not install the shell completion scripts. If you want them, choose another installation method
+or install the scripts [manually](#manual-installation-macos-and-linux).
 
 ```sh
 kubectl krew install ctx
