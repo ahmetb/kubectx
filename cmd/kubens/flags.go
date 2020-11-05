@@ -25,8 +25,10 @@ func parseArgs(argv []string) Op {
 		}
 		return ListOp{}
 	}
-
-	if len(argv) == 1 {
+	var isForceSwitch bool
+	isForceSwitch = false
+	ArgsLen := len(argv)
+	if ArgsLen == 1 || ArgsLen == 2 {
 		v := argv[0]
 		if v == "--help" || v == "-h" {
 			return HelpOp{}
@@ -34,10 +36,19 @@ func parseArgs(argv []string) Op {
 		if v == "--current" || v == "-c" {
 			return CurrentOp{}
 		}
-		if strings.HasPrefix(v, "-") && v != "-" {
+		if v == "--force" || v == "-f" {
+			isForceSwitch = true
+		}
+		if strings.HasPrefix(v, "-") && v != "-" && !isForceSwitch {
 			return UnsupportedOp{Err: fmt.Errorf("unsupported option '%s'", v)}
 		}
-		return SwitchOp{Target: argv[0]}
+		if isForceSwitch {
+			if ArgsLen == 1 {
+				return UnsupportedOp{Err: fmt.Errorf("force option needs namespace name")}
+			}
+			return SwitchOp{Target: argv[1], IsForce: isForceSwitch}
+		}
+		return SwitchOp{Target: argv[0], IsForce: isForceSwitch}
 	}
 	return UnsupportedOp{Err: fmt.Errorf("too many arguments")}
 }

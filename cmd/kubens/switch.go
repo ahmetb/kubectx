@@ -13,7 +13,8 @@ import (
 )
 
 type SwitchOp struct {
-	Target string // '-' for back and forth, or NAME
+	Target  string // '-' for back and forth, or NAME
+	IsForce bool
 }
 
 func (s SwitchOp) Run(_, stderr io.Writer) error {
@@ -23,7 +24,7 @@ func (s SwitchOp) Run(_, stderr io.Writer) error {
 		return errors.Wrap(err, "kubeconfig error")
 	}
 
-	toNS, err := switchNamespace(kc, s.Target)
+	toNS, err := switchNamespace(kc, s.Target, s.IsForce)
 	if err != nil {
 		return err
 	}
@@ -31,7 +32,7 @@ func (s SwitchOp) Run(_, stderr io.Writer) error {
 	return err
 }
 
-func switchNamespace(kc *kubeconfig.Kubeconfig, ns string) (string, error) {
+func switchNamespace(kc *kubeconfig.Kubeconfig, ns string, isForce bool) (string, error) {
 	ctx := kc.GetCurrentContext()
 	if ctx == "" {
 		return "", errors.New("current-context is not set")
@@ -54,12 +55,14 @@ func switchNamespace(kc *kubeconfig.Kubeconfig, ns string) (string, error) {
 		ns = prev
 	}
 
-	ok, err := namespaceExists(kc, ns)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to query if namespace exists (is cluster accessible?)")
-	}
-	if !ok {
-		return "", errors.Errorf("no namespace exists with name %q", ns)
+	if !isForce {
+		ok, err := namespaceExists(kc, ns)
+		if err != nil {
+			return "", errors.Wrap(err, "failed to query if namespace exists (is cluster accessible?)")
+		}
+		if !ok {
+			return "", errors.Errorf("no namespace exists with name %q", ns)
+		}
 	}
 
 	if err := kc.SetNamespace(ctx, ns); err != nil {
