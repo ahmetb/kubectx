@@ -24,7 +24,7 @@ func (c CurrentOp) Run(stdout, _ io.Writer) error {
 	}
 	ns, err := kc.NamespaceOfContext(ctx)
 	if err != nil {
-		return errors.Wrapf(err, "failed to read namespace of %q", ctx)
+		return errors.Wrapf(err, "failed to read namespace of \"%s\"", ctx)
 	}
 	_, err = fmt.Fprintln(stdout, ns)
 	return errors.Wrap(err, "write error")

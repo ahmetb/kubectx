@@ -15,7 +15,7 @@ func Test_readLastContext_nonExistingFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	if s != "" {
-		t.Fatalf("expected empty string; got=%q", s)
+		t.Fatalf("expected empty string; got=\"%s\"", s)
 	}
 }
 
@@ -28,7 +28,7 @@ func Test_readLastContext(t *testing.T) {
 		t.Fatal(err)
 	}
 	if expected := "foo"; s != expected {
-		t.Fatalf("expected=%q; got=%q", expected, s)
+		t.Fatalf("expected=\"%s\"; got=\"%s\"", expected, s)
 	}
 }
 
@@ -56,7 +56,7 @@ func Test_writeLastContext(t *testing.T) {
 		t.Fatal(err)
 	}
 	if expected := "ctx1"; v != expected {
-		t.Fatalf("read wrong value=%q; expected=%q", v, expected)
+		t.Fatalf("read wrong value=\"%s\"; expected=\"%s\"", v, expected)
 	}
 }
 
@@ -71,7 +71,7 @@ func Test_kubectxFilePath(t *testing.T) {
 		t.Fatal(err)
 	}
 	if v != expected {
-		t.Fatalf("expected=%q got=%q", expected, v)
+		t.Fatalf("expected=\"%s\" got=\"%s\"", expected, v)
 	}
 }
 

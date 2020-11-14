@@ -26,9 +26,9 @@ func TestPrintDeprecatedEnvWarnings_bgColors(t *testing.T) {
 	})
 	v := out.String()
 	if !strings.Contains(v, "KUBECTX_CURRENT_FGCOLOR") {
-		t.Fatalf("output doesn't contain 'KUBECTX_CURRENT_FGCOLOR': %q", v)
+		t.Fatalf("output doesn't contain 'KUBECTX_CURRENT_FGCOLOR': \"%s\"", v)
 	}
 	if !strings.Contains(v, "KUBECTX_CURRENT_BGCOLOR") {
-		t.Fatalf("output doesn't contain 'KUBECTX_CURRENT_BGCOLOR': %q", v)
+		t.Fatalf("output doesn't contain 'KUBECTX_CURRENT_BGCOLOR': \"%s\"", v)
 	}
 }

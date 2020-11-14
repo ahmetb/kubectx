@@ -20,7 +20,7 @@ func (op DeleteOp) Run(_, stderr io.Writer) error {
 		// TODO inefficency here. we open/write/close the same file many times.
 		deletedName, wasActiveContext, err := deleteContext(ctx)
 		if err != nil {
-			return errors.Wrapf(err, "error deleting context %q", deletedName)
+			return errors.Wrapf(err, "error deleting context \"%s\"", deletedName)
 		}
 		if wasActiveContext {
 			printer.Warning(stderr, "You deleted the current context. Use \"%s\" to select a new context.",
