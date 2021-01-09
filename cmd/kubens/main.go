@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/env"
@@ -29,8 +30,29 @@ type Op interface {
 	Run(stdout, stderr io.Writer) error
 }
 
+var (
+	name    = "kubens"
+	version = "v0.0.0"
+	date    = "0001-01-01T00:00:00Z"
+	commit  = "0000000"
+)
+
+func ver() string {
+	return fmt.Sprintf("%s %s (%s) %s", name, version, commit[:7], date)
+}
+
 func main() {
 	cmdutil.PrintDeprecatedEnvWarnings(color.Error, os.Environ())
+
+	// Support [--]version and -V
+	if len(os.Args) > 1 {
+		if "version" == strings.TrimLeft(os.Args[1], "-") || "-V" == os.Args[1] {
+			fmt.Println(ver())
+			os.Exit(0)
+			return
+		}
+	}
+
 	op := parseArgs(os.Args[1:])
 	if err := op.Run(color.Output, color.Error); err != nil {
 		printer.Error(color.Error, err.Error())
