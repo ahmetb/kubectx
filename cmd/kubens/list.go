@@ -15,6 +15,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -75,10 +76,12 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 	var out []string
 	var next string
 	for {
-		list, err := clientset.CoreV1().Namespaces().List(metav1.ListOptions{
-			Limit:    500,
-			Continue: next,
-		})
+		list, err := clientset.CoreV1().Namespaces().List(
+			context.Background(),
+			metav1.ListOptions{
+				Limit:    500,
+				Continue: next,
+			})
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to list namespaces from k8s API")
 		}

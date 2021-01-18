@@ -15,6 +15,7 @@
 package main
 
 import (
+	"context"
 	"io"
 	"os"
 
@@ -101,7 +102,7 @@ func namespaceExists(kc *kubeconfig.Kubeconfig, ns string) (bool, error) {
 		return false, errors.Wrap(err, "failed to initialize k8s REST client")
 	}
 
-	namespace, err := clientset.CoreV1().Namespaces().Get(ns, metav1.GetOptions{})
+	namespace, err := clientset.CoreV1().Namespaces().Get(context.Background(), ns, metav1.GetOptions{})
 	if errors2.IsNotFound(err) {
 		return false, nil
 	}
