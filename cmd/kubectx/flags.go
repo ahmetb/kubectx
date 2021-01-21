@@ -58,6 +58,9 @@ func parseArgs(argv []string) Op {
 		if v == "--unset" || v == "-u" {
 			return UnsetOp{}
 		}
+		if v == "--version" || v == "-v" {
+			return VersionOp{}
+		}
 
 		if new, old, ok := parseRenameSyntax(v); ok {
 			return RenameOp{New: new, Old: old}
