@@ -51,8 +51,8 @@ func switchNamespace(kc *kubeconfig.Kubeconfig, ns string) (string, error) {
 		return "", errors.New("current-context is not set")
 	}
 	curNS, err := kc.NamespaceOfContext(ctx)
-	if ctx == "" {
-		return "", errors.New("failed to get current namespace")
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get current namespace")
 	}
 
 	f := NewNSFile(ctx)
