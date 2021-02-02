@@ -176,15 +176,15 @@ This command will set up bash/zsh/fish completion scripts automatically.
 
 #### Manual
 
-Since `kubectx`/`kubens` are written in Bash, you should be able to install
-them to any POSIX environment that has Bash installed.
+Since `kubectx`/`kubens` are written in Go, you can install them using the `go`
+commandline compiler.
 
-- Download the `kubectx`, and `kubens` scripts.
+- Get a binary distribution on [the golang website](https://golang.org/dl/) or install it through your favourite package manager.
+- Define `GOPATH` environment variable (defaults to `$HOME/go`)
+- Install the binaries using the go compiler
 - Either:
-  - save them all to somewhere in your `PATH`,
-  - or save them to a directory, then create symlinks to `kubectx`/`kubens` from
-    somewhere in your `PATH`, like `/usr/local/bin`
-- Make `kubectx` and `kubens` executable (`chmod +x ...`)
+  - add `$GOPATH/bin` to your path
+  - or copy/symlink the resuling binaries from somewhere in your `PATH`, like `/usr/local/bin`
 - Install bash/zsh/fish [completion scripts](completion/).
   - For zsh:
     The completion scripts have to be in a path that belongs to `$fpath`. Either link or copy them to an existing folder.
@@ -221,9 +221,10 @@ them to any POSIX environment that has Bash installed.
 Example installation steps:
 
 ``` bash
-sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
-sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
-sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+go get github.com/ahmetb/kubectx/cmd/kubectx
+go get github.com/ahmetb/kubectx/cmd/kubens
+sudo ln -s $GOPATH/bin/kubectx /usr/local/bin/kubectx
+sudo ln -s $GOPATH/bin/kubens /usr/local/bin/kubens
 ```
 
 -----
