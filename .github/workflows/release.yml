@@ -26,9 +26,9 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v1
       with:
-        go-version: 1.15
+        go-version: 1.16
     - name: GoReleaser
-      uses: goreleaser/goreleaser-action@v1
+      uses: goreleaser/goreleaser-action@v2
       with:
         version: latest
         args: release --rm-dist
