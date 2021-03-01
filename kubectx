@@ -108,6 +108,7 @@ save_context() {
 }
 
 switch_context() {
+  echo "${1}" > $HOME/.kube-context
   $KUBECTL config use-context "${1}"
 }
 
