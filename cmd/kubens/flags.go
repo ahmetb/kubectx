@@ -45,6 +45,9 @@ func parseArgs(argv []string) Op {
 		if v == "--help" || v == "-h" {
 			return HelpOp{}
 		}
+		if v == "--version" || v == "-V" {
+			return VersionOp{}
+		}
 		if v == "--current" || v == "-c" {
 			return CurrentOp{}
 		}
