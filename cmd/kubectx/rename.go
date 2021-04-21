@@ -1,3 +1,17 @@
+// Copyright 2021 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
 import (
@@ -46,11 +60,11 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 	}
 
 	if !kc.ContextExists(op.Old) {
-		return errors.Errorf("context %q not found, can't rename it", op.Old)
+		return errors.Errorf("context \"%s\" not found, can't rename it", op.Old)
 	}
 
 	if kc.ContextExists(op.New) {
-		printer.Warning(stderr, "context %q exists, overwriting it.", op.New)
+		printer.Warning(stderr, "context \"%s\" exists, overwriting it.", op.New)
 		if err := kc.DeleteContextEntry(op.New); err != nil {
 			return errors.Wrap(err, "failed to delete new context to overwrite it")
 		}

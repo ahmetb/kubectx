@@ -143,11 +143,16 @@ sudo port install kubectx
 
 ### apt (Debian)
 
-Available as a Debian package for [Debian Buster (testing)](https://packages.debian.org/buster/kubectx), [Sid (unstable)](https://packages.debian.org/sid/kubectx) (_note: if you are unfamiliar with Debian release process and how to enable testing/unstable repos, check the [Debian Wiki](https://wiki.debian.org/DebianReleases)_):
-
 ``` bash
 sudo apt install kubectx
 ```
+Newer versions might be available on repos like
+[Debian Buster (testing)](https://packages.debian.org/buster/kubectx),
+[Sid (unstable)](https://packages.debian.org/sid/kubectx)
+(_if you are unfamiliar with the Debian release process and how to enable
+testing/unstable repos, check out the
+[Debian Wiki](https://wiki.debian.org/DebianReleases)_):
+
 
 ### pacman (Arch Linux)
 
