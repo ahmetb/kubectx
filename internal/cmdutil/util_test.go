@@ -28,12 +28,12 @@ func Test_homeDir(t *testing.T) {
 		want string
 	}{
 		{
-			name: "XDG_CACHE_HOME precedence",
+			name: "don't use XDG_CACHE_HOME as homedir",
 			envs: []env{
 				{"XDG_CACHE_HOME", "xdg"},
 				{"HOME", "home"},
 			},
-			want: "xdg",
+			want: "home",
 		},
 		{
 			name: "HOME over USERPROFILE",
@@ -46,7 +46,6 @@ func Test_homeDir(t *testing.T) {
 		{
 			name: "only USERPROFILE available",
 			envs: []env{
-				{"XDG_CACHE_HOME", ""},
 				{"HOME", ""},
 				{"USERPROFILE", "up"},
 			},
@@ -55,7 +54,6 @@ func Test_homeDir(t *testing.T) {
 		{
 			name: "none available",
 			envs: []env{
-				{"XDG_CACHE_HOME", ""},
 				{"HOME", ""},
 				{"USERPROFILE", ""},
 			},
