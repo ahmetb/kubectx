@@ -2,13 +2,15 @@
 
 # bats setup function
 setup() {
-  export XDG_CACHE_HOME="$(mktemp -d)"
-  export KUBECONFIG="${XDG_CACHE_HOME}/config"
+  TEMP_HOME="$(mktemp -d)"
+  export TEMP_HOME
+  export HOME=$TEMP_HOME
+  export KUBECONFIG="${TEMP_HOME}/config"
 }
 
 # bats teardown function
 teardown() {
-  rm -rf "$XDG_CACHE_HOME"
+  rm -rf "$TEMP_HOME"
 }
 
 use_config() {
