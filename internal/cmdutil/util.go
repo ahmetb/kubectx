@@ -21,9 +21,6 @@ import (
 )
 
 func HomeDir() string {
-	if v := os.Getenv("XDG_CACHE_HOME"); v != "" {
-		return v
-	}
 	home := os.Getenv("HOME")
 	if home == "" {
 		home = os.Getenv("USERPROFILE") // windows
