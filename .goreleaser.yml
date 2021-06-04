@@ -33,8 +33,6 @@ builds:
     - arm
     - arm64
     - ppc64le
-    - s390x
-    - riscv64
   goarm: [6, 7]
 - id: kubens
   main: ./cmd/kubens
@@ -51,8 +49,6 @@ builds:
     - arm
     - arm64
     - ppc64le
-    - s390x
-    - riscv64
   goarm: [6, 7]
 archives:
 - id: kubectx-archive
