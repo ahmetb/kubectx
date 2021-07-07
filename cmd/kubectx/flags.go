@@ -42,7 +42,11 @@ func parseArgs(argv []string) Op {
 
 	if argv[0] == "-d" {
 		if len(argv) == 1 {
-			return UnsupportedOp{Err: fmt.Errorf("'-d' needs arguments")}
+			if cmdutil.IsInteractiveMode(os.Stdout) {
+				return InteractiveDeleteOp{SelfCmd: os.Args[0]}
+			} else {
+				return UnsupportedOp{Err: fmt.Errorf("'-d' needs arguments")}
+			}
 		}
 		return DeleteOp{Contexts: argv[1:]}
 	}
