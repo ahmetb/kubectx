@@ -282,5 +282,5 @@ Disclaimer: This is not an official Google product.
 
 #### Stargazers over time
 
-[![Stargazers over time](https://starcharts.herokuapp.com/ahmetb/kubectx.svg)](https://starcharts.herokuapp.com/ahmetb/kubectx)
+[![Stargazers over time](https://starchart.cc/ahmetb/kubectx.svg)](https://starchart.cc/ahmetb/kubectx)
 ![Google Analytics](https://ga-beacon.appspot.com/UA-2609286-17/kubectx/README?pixel)
