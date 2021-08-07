@@ -32,6 +32,7 @@ import (
 
 type InteractiveSwitchOp struct {
 	SelfCmd string
+	Picker  string
 }
 
 // TODO(ahmetb) This method is heavily repetitive vs kubectx/fzf.go.
@@ -47,15 +48,24 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	}
 	defer kc.Close()
 
-	cmd := exec.Command("fzf", "--ansi", "--no-preview")
+	var cmd *exec.Cmd
+	var defaultCmd string
+
+	if op.Picker == "fzf" {
+		cmd = exec.Command("fzf", "--ansi", "--no-preview")
+		defaultCmd = "FZF_DEFAULT_COMMAND"
+	} else {
+		cmd = exec.Command("sk", "--ansi")
+		defaultCmd = "SKIM_DEFAULT_COMMAND"
+	}
+	cmd.Env = append(os.Environ(),
+		fmt.Sprintf("%s=%s", defaultCmd, op.SelfCmd),
+		fmt.Sprintf("%s=1", env.EnvForceColor))
 	var out bytes.Buffer
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = stderr
 	cmd.Stdout = &out
 
-	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", op.SelfCmd),
-		fmt.Sprintf("%s=1", env.EnvForceColor))
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); !ok {
 			return err

@@ -28,17 +28,30 @@ func isTerminal(fd *os.File) bool {
 	return isatty.IsTerminal(fd.Fd())
 }
 
-// fzfInstalled determines if fzf(1) is in PATH.
-func fzfInstalled() bool {
-	v, _ := exec.LookPath("fzf")
-	if v != "" {
-		return true
-	}
-	return false
+// pickerInstalled determines if picker(fzf or sk) is in PATH.
+func pickerInstalled(p string) bool {
+	v, _ := exec.LookPath(p)
+	return v != ""
 }
 
-// IsInteractiveMode determines if we can do choosing with fzf.
-func IsInteractiveMode(stdout *os.File) bool {
-	v := os.Getenv(env.EnvFZFIgnore)
-	return v == "" && isTerminal(stdout) && fzfInstalled()
+// IsInteractiveMode determines the picker and whether we can do interactive choosing
+// with it.
+func IsInteractiveMode(stdout *os.File) (string, bool) {
+	p := fuzzyPicker()
+	if p == "fzf" {
+		v := os.Getenv(env.EnvFZFIgnore)
+		return p, v == "" && isTerminal(stdout) && pickerInstalled(p)
+	}
+	// if picker is sk
+	v := os.Getenv(env.EnvSKIgnore)
+	return p, v == "" && isTerminal(stdout) && pickerInstalled(p)
+}
+
+func fuzzyPicker() string {
+	p := os.Getenv(env.EnvPicker)
+	if p == "sk" {
+		return p
+	}
+	// for now it only supports fzf and sk.
+	return "fzf"
 }
