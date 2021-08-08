@@ -27,7 +27,7 @@ import (
 // HelpOp describes printing help.
 type HelpOp struct{}
 
-func (_ HelpOp) Run(stdout, _ io.Writer) error {
+func (HelpOp) Run(stdout, _ io.Writer) error {
 	return printUsage(stdout)
 }
 
