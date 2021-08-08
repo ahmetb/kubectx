@@ -231,14 +231,19 @@ sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
 ### Interactive mode
 
 If you want `kubectx` and `kubens` commands to present you an interactive menu
-with fuzzy searching, you just need to [install
+with fuzzy searching, you can do in either of two ways 
+
+* [Install
 `fzf`](https://github.com/junegunn/fzf) in your PATH.
+ * OR [Install `sk`](https://github.com/lotabout/skim) in your PATH and set environment variable `PICKER` to `sk`
 
 ![kubectx interactive search with fzf](img/kubectx-interactive.gif)
 
 If you have `fzf` installed, but want to opt out of using this feature, set the environment variable `KUBECTX_IGNORE_FZF=1`.
 
-If you want to keep `fzf` interactive mode but need the default behavior of the command, you can do it using Unix composability:
+> Note: skim support in kubectx and kubens is only in go binary.
+
+If you want to keep `fzf` or `sk` interactive mode but need the default behavior of the command, you can do it using Unix composability:
 ```
 kubectx | cat
 ```
