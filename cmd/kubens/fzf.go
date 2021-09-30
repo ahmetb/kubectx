@@ -32,6 +32,7 @@ import (
 
 type InteractiveSwitchOp struct {
 	SelfCmd string
+	Target  string
 }
 
 // TODO(ahmetb) This method is heavily repetitive vs kubectx/fzf.go.
@@ -47,7 +48,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	}
 	defer kc.Close()
 
-	cmd := exec.Command("fzf", "--ansi", "--no-preview")
+	cmd := exec.Command("fzf", "--ansi", "--no-preview", "-q", op.Target, "-1")
 	var out bytes.Buffer
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = stderr

@@ -32,6 +32,7 @@ import (
 
 type InteractiveSwitchOp struct {
 	SelfCmd string
+	Target  string
 }
 
 type InteractiveDeleteOp struct {
@@ -50,7 +51,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	}
 	kc.Close()
 
-	cmd := exec.Command("fzf", "--ansi", "--no-preview")
+	cmd := exec.Command("fzf", "--ansi", "--no-preview", "-q", op.Target, "-1")
 	var out bytes.Buffer
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = stderr

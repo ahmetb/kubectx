@@ -51,8 +51,17 @@ func parseArgs(argv []string) Op {
 		if v == "--current" || v == "-c" {
 			return CurrentOp{}
 		}
+		if argv[0] == "-" {
+			return SwitchOp{Target: "-"}
+		}
 		if strings.HasPrefix(v, "-") && v != "-" {
 			return UnsupportedOp{Err: fmt.Errorf("unsupported option '%s'", v)}
+		}
+		if cmdutil.IsInteractiveMode(os.Stdout) {
+			return InteractiveSwitchOp{
+				SelfCmd: os.Args[0],
+				Target:  argv[0],
+			}
 		}
 		return SwitchOp{Target: argv[0]}
 	}

@@ -65,13 +65,20 @@ func parseArgs(argv []string) Op {
 		if v == "--unset" || v == "-u" {
 			return UnsetOp{}
 		}
-
+		if argv[0] == "-" {
+			return SwitchOp{Target: "-"}
+		}
 		if new, old, ok := parseRenameSyntax(v); ok {
 			return RenameOp{New: new, Old: old}
 		}
-
 		if strings.HasPrefix(v, "-") && v != "-" {
 			return UnsupportedOp{Err: fmt.Errorf("unsupported option '%s'", v)}
+		}
+		if cmdutil.IsInteractiveMode(os.Stdout) {
+			return InteractiveSwitchOp{
+				SelfCmd: os.Args[0],
+				Target:  argv[0],
+			}
 		}
 		return SwitchOp{Target: argv[0]}
 	}
