@@ -2,6 +2,7 @@
 
 ![Latest GitHub release](https://img.shields.io/github/release/ahmetb/kubectx.svg)
 ![GitHub stars](https://img.shields.io/github/stars/ahmetb/kubectx.svg?label=github%20stars)
+![Homebrew downloads](https://img.shields.io/homebrew/installs/dy/kubectx?label=macOS%20installs)
 [![Go implementation (CI)](https://github.com/ahmetb/kubectx/workflows/Go%20implementation%20(CI)/badge.svg)](https://github.com/ahmetb/kubectx/actions?query=workflow%3A"Go+implementation+(CI)")
 ![Proudly written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4.svg)
 
