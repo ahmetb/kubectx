@@ -107,6 +107,8 @@ There are several installation options:
   - Arch Linux
   - Homebrew
   - Manual installation
+- Windows
+  - Chocolatey
 
 ### Kubectl Plugins (macOS and Linux)
 
@@ -225,6 +227,15 @@ Example installation steps:
 sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
 sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
 sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+```
+
+### Windows
+
+#### Chocolatey
+Available as packages on [Chocolatey](https://chocolatey.org/why-chocolatey)
+
+```pwsh
+choco install kubens kubectx
 ```
 
 -----
