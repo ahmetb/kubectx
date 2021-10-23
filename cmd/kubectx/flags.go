@@ -34,16 +34,18 @@ func (op UnsupportedOp) Run(_, _ io.Writer) error {
 // and decides which operation should be taken.
 func parseArgs(argv []string) Op {
 	if len(argv) == 0 {
-		if cmdutil.IsInteractiveMode(os.Stdout) {
-			return InteractiveSwitchOp{SelfCmd: os.Args[0]}
+		picker, interactive := cmdutil.IsInteractiveMode(os.Stdout)
+		if interactive {
+			return InteractiveSwitchOp{SelfCmd: os.Args[0], Picker: picker}
 		}
 		return ListOp{}
 	}
 
 	if argv[0] == "-d" {
 		if len(argv) == 1 {
-			if cmdutil.IsInteractiveMode(os.Stdout) {
-				return InteractiveDeleteOp{SelfCmd: os.Args[0]}
+			picker, interactive := cmdutil.IsInteractiveMode(os.Stdout)
+			if interactive {
+				return InteractiveDeleteOp{SelfCmd: os.Args[0], Picker: picker}
 			} else {
 				return UnsupportedOp{Err: fmt.Errorf("'-d' needs arguments")}
 			}

@@ -15,23 +15,19 @@
 package main
 
 import (
-	"bytes"
-	"fmt"
 	"io"
-	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
-	"github.com/ahmetb/kubectx/internal/env"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
 )
 
 type InteractiveSwitchOp struct {
 	SelfCmd string
+	Picker  string
 }
 
 // TODO(ahmetb) This method is heavily repetitive vs kubectx/fzf.go.
@@ -46,20 +42,9 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 		return errors.Wrap(err, "kubeconfig error")
 	}
 	defer kc.Close()
-
-	cmd := exec.Command("fzf", "--ansi", "--no-preview")
-	var out bytes.Buffer
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = stderr
-	cmd.Stdout = &out
-
-	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", op.SelfCmd),
-		fmt.Sprintf("%s=1", env.EnvForceColor))
-	if err := cmd.Run(); err != nil {
-		if _, ok := err.(*exec.ExitError); !ok {
-			return err
-		}
+	out, err := cmdutil.InteractiveSearch(op.Picker, op.SelfCmd, stderr)
+	if err != nil {
+		return err
 	}
 	choice := strings.TrimSpace(out.String())
 	if choice == "" {

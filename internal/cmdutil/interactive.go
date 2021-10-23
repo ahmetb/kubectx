@@ -15,6 +15,9 @@
 package cmdutil
 
 import (
+	"bytes"
+	"fmt"
+	"io"
 	"os"
 	"os/exec"
 
@@ -28,17 +31,59 @@ func isTerminal(fd *os.File) bool {
 	return isatty.IsTerminal(fd.Fd())
 }
 
-// fzfInstalled determines if fzf(1) is in PATH.
-func fzfInstalled() bool {
-	v, _ := exec.LookPath("fzf")
-	if v != "" {
-		return true
-	}
-	return false
+// pickerInstalled determines if picker(fzf or sk) is in PATH.
+func pickerInstalled(p string) bool {
+	v, _ := exec.LookPath(p)
+	return v != ""
 }
 
-// IsInteractiveMode determines if we can do choosing with fzf.
-func IsInteractiveMode(stdout *os.File) bool {
-	v := os.Getenv(env.EnvFZFIgnore)
-	return v == "" && isTerminal(stdout) && fzfInstalled()
+// IsInteractiveMode determines the picker and whether we can do interactive choosing
+// with it.
+func IsInteractiveMode(stdout *os.File) (string, bool) {
+	p := fuzzyPicker()
+	if p == "fzf" {
+		v := os.Getenv(env.EnvFZFIgnore)
+		return p, v == "" && isTerminal(stdout) && pickerInstalled(p)
+	}
+	// if picker is sk
+	v := os.Getenv(env.EnvSKIgnore)
+	return p, v == "" && isTerminal(stdout) && pickerInstalled(p)
+}
+
+// fuzzyPicker picks up picker (fzf or sk) from env `PICKER`. If EnvPicker is not
+// set or has value other than sk then it by default picks fzf.
+func fuzzyPicker() string {
+	p := os.Getenv(env.EnvPicker)
+	if p == "sk" {
+		return p
+	}
+	// for now it only supports fzf and sk.
+	return "fzf"
+}
+
+// InteractiveSearch launches fuzzy search either (fzf or sk) basis the picker.
+func InteractiveSearch(picker, selfCmd string, stderr io.Writer) (bytes.Buffer, error) {
+
+	var defaultCmd string
+	if picker == "fzf" {
+		defaultCmd = "FZF_DEFAULT_COMMAND"
+	} else {
+		defaultCmd = "SKIM_DEFAULT_COMMAND"
+	}
+
+	cmd := exec.Command(picker, "--ansi")
+	cmd.Env = append(os.Environ(),
+		fmt.Sprintf("%s=%s", defaultCmd, selfCmd),
+		fmt.Sprintf("%s=1", env.EnvForceColor))
+	var out bytes.Buffer
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = stderr
+	cmd.Stdout = &out
+
+	if err := cmd.Run(); err != nil {
+		if _, ok := err.(*exec.ExitError); !ok {
+			return out, err
+		}
+	}
+	return out, nil
 }

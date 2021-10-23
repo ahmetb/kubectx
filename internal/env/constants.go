@@ -29,4 +29,12 @@ const (
 
 	// EnvDebug describes the internal environment variable for more verbose logging.
 	EnvDebug = `DEBUG`
+
+	// EnvPicker describes the environment variable for fuzzy support, It can value
+	// fzf or sk. If this is not set then fzf is taken as default picker.
+	EnvPicker = `PICKER`
+
+	// EnvSKIgnore describes the environment variable to disable interactive context
+	// selection when skim is installed
+	EnvSKIgnore = `KUBECTX_IGNORE_SK`
 )

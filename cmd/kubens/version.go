@@ -14,7 +14,7 @@ var (
 // VersionOps describes printing version string.
 type VersionOp struct{}
 
-func (_ VersionOp) Run(stdout, _ io.Writer) error {
+func (VersionOp) Run(stdout, _ io.Writer) error {
 	_, err := fmt.Fprintf(stdout, "%s\n", version)
 	return errors.Wrap(err, "write error")
 }
