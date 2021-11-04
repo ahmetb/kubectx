@@ -2,7 +2,8 @@
 
 ![Latest GitHub release](https://img.shields.io/github/release/ahmetb/kubectx.svg)
 ![GitHub stars](https://img.shields.io/github/stars/ahmetb/kubectx.svg?label=github%20stars)
-![Travis (.org) branch](https://img.shields.io/travis/ahmetb/kubectx/master.svg)
+![Homebrew downloads](https://img.shields.io/homebrew/installs/dy/kubectx?label=macOS%20installs)
+[![Go implementation (CI)](https://github.com/ahmetb/kubectx/workflows/Go%20implementation%20(CI)/badge.svg)](https://github.com/ahmetb/kubectx/actions?query=workflow%3A"Go+implementation+(CI)")
 ![Proudly written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4.svg)
 
 This repository provides both `kubectx` and `kubens` tools.
@@ -291,5 +292,5 @@ Disclaimer: This is not an official Google product.
 
 #### Stargazers over time
 
-[![Stargazers over time](https://starcharts.herokuapp.com/ahmetb/kubectx.svg)](https://starcharts.herokuapp.com/ahmetb/kubectx)
+[![Stargazers over time](https://starchart.cc/ahmetb/kubectx.svg)](https://starchart.cc/ahmetb/kubectx)
 ![Google Analytics](https://ga-beacon.appspot.com/UA-2609286-17/kubectx/README?pixel)

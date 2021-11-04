@@ -34,6 +34,10 @@ type InteractiveSwitchOp struct {
 	SelfCmd string
 }
 
+type InteractiveDeleteOp struct {
+	SelfCmd string
+}
+
 func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	// parse kubeconfig just to see if it can be loaded
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
@@ -69,5 +73,56 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 		return errors.Wrap(err, "failed to switch context")
 	}
 	printer.Success(stderr, "Switched to context \"%s\".", printer.SuccessColor.Sprint(name))
+	return nil
+}
+
+func (op InteractiveDeleteOp) Run(_, stderr io.Writer) error {
+	// parse kubeconfig just to see if it can be loaded
+	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
+	if err := kc.Parse(); err != nil {
+		if cmdutil.IsNotFoundErr(err) {
+			printer.Warning(stderr, "kubeconfig file not found")
+			return nil
+		}
+		return errors.Wrap(err, "kubeconfig error")
+	}
+	kc.Close()
+
+	if len(kc.ContextNames()) == 0 {
+		return errors.New("no contexts found in config")
+	}
+
+	cmd := exec.Command("fzf", "--ansi", "--no-preview")
+	var out bytes.Buffer
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = stderr
+	cmd.Stdout = &out
+
+	cmd.Env = append(os.Environ(),
+		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", op.SelfCmd),
+		fmt.Sprintf("%s=1", env.EnvForceColor))
+	if err := cmd.Run(); err != nil {
+		if _, ok := err.(*exec.ExitError); !ok {
+			return err
+		}
+	}
+
+	choice := strings.TrimSpace(out.String())
+	if choice == "" {
+		return errors.New("you did not choose any of the options")
+	}
+
+	name, wasActiveContext, err := deleteContext(choice)
+	if err != nil {
+		return errors.Wrap(err, "failed to delete context")
+	}
+
+	if wasActiveContext {
+		printer.Warning(stderr, "You deleted the current context. Use \"%s\" to select a new context.",
+			selfName())
+	}
+
+	printer.Success(stderr, `Deleted context %s.`, printer.SuccessColor.Sprint(name))
+
 	return nil
 }
