@@ -1,6 +1,6 @@
 module github.com/ahmetb/kubectx
 
-go 1.14
+go 1.17
 
 require (
 	facette.io/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
