@@ -47,7 +47,7 @@ jobs:
     - name: Run unit tests
       run: go test ./...
     - name: Build with Goreleaser
-      uses: goreleaser/goreleaser-action@v1
+      uses: goreleaser/goreleaser-action@v2
       with:
         version: latest
         args: release --snapshot --skip-publish --rm-dist
