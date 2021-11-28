@@ -262,7 +262,7 @@ export KUBECTX_CURRENT_BGCOLOR=$(tput setab 7) # white background
 ```
 
 Colors in the output can be disabled by setting the
-[`NO_COLOR`](http://no-color.org/) environment variable.
+[`NO_COLOR`](https://no-color.org/) environment variable.
 
 -----
 
