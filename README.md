@@ -25,7 +25,7 @@ Here's a **`kubectx`** demo:
 ### Examples
 
 ```sh
-# switch to anoter cluster that's in kubeconfig
+# switch to another cluster that's in kubeconfig
 $ kubectx minikube
 Switched to context "minikube".
 
