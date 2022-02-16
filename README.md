@@ -191,10 +191,11 @@ link or copy them to an existing folder.
 Example with [`oh-my-zsh`](https://github.com/ohmyzsh/ohmyzsh):
 
 ```bash
-mkdir -p ~/.oh-my-zsh/completions
-chmod -R 755 ~/.oh-my-zsh/completions
-ln -s /opt/kubectx/completion/_kubectx.zsh ~/.oh-my-zsh/completions/_kubectx.zsh
-ln -s /opt/kubectx/completion/_kubens.zsh ~/.oh-my-zsh/completions/_kubens.zsh
+mkdir -p ~/.oh-my-zsh/custom/completions
+chmod -R 755 ~/.oh-my-zsh/custom/completions
+ln -s /opt/kubectx/completion/_kubectx.zsh ~/.oh-my-zsh/custom/completions/_kubectx.zsh
+ln -s /opt/kubectx/completion/_kubens.zsh ~/.oh-my-zsh/custom/completions/_kubens.zsh
+echo "fpath=($ZSH/custom/completions $fpath)" >> ~/.zshrc
 ```
 
 If completion doesn't work, add `autoload -U compinit && compinit` to your
