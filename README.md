@@ -77,6 +77,7 @@ this new Go implementation by downloading the binaries from the [**Releases page
 - [with MacPorts (macOS)](#macports-macos)
 - [with apt (Debian)](#apt-debian)
 - [with pacman (Arch Linux)](#pacman-arch-linux)
+- [with Choco (Windows)](#windows-installation-using-choco)
 - [manually (macOS & Linux)](#manual-installation-macos-and-linux)
 
 If you like to add context/namespace information to your shell prompt (`$PS1`),
@@ -140,6 +141,12 @@ Available as official Arch Linux package. Install it via:
 sudo pacman -S kubectx
 ```
 
+### Windows Installation (using Choco)
+
+Available as packages on [Chocolatey](https://chocolatey.org/why-chocolatey)
+```pwsh
+choco install kubens kubectx
+```
 
 ### Manual Installation (macOS and Linux)
 
