@@ -77,7 +77,7 @@ this new Go implementation by downloading the binaries from the [**Releases page
 - [with MacPorts (macOS)](#macports-macos)
 - [with apt (Debian)](#apt-debian)
 - [with pacman (Arch Linux)](#pacman-arch-linux)
-- [with Choco (Windows)](#windows-installation-using-choco)
+- [with Chocolatey (Windows)](#windows-installation-using-choco)
 - [manually (macOS & Linux)](#manual-installation-macos-and-linux)
 
 If you like to add context/namespace information to your shell prompt (`$PS1`),
