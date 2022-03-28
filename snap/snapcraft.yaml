@@ -1,0 +1,41 @@
+name: kubectx
+base: core20
+version: '0.9.4'
+summary: 'kubectx + kubens: Power tools for kubectl'
+description: |
+  kubectx is a tool to switch between contexts (clusters) on kubectl faster.
+  kubens is a tool to switch between Kubernetes namespaces (and configure them for kubectl) easily.
+grade: stable
+confinement: strict
+
+plugs:
+  dot-kube-config:
+    interface: personal-files
+    write: [$HOME/.kube/config]
+
+apps:
+  kubectx:
+    command: bin/kubectx
+    completer: completion/kubectx.bash
+    plugs:
+      - dot-kube-config
+    environment:
+      HOME: $SNAP_REAL_HOME
+  kubens:
+    command: bin/kubens
+    completer: completion/kubens.bash
+    plugs:
+    - dot-kube-config
+    environment:
+      HOME: $SNAP_REAL_HOME
+
+parts:
+  kubectx-kubens:
+    source: .
+    plugin: go
+  completion:
+    plugin: dump
+    source: .
+    stage:
+      - completion/kubectx.bash
+      - completion/kubens.bash
