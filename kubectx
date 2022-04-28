@@ -21,7 +21,11 @@
 set -eou pipefail
 IFS=$'\n\t'
 
-SELF_CMD="$0"
+if [[ -z "${@:-}" ]] ; then
+  SELF_CMD="${0}" 
+else
+  SELF_CMD="${0} ${@}"
+fi
 
 KUBECTX="${XDG_CACHE_HOME:-$HOME/.kube}/kubectx"
 
@@ -34,18 +38,19 @@ usage() {
 
   cat <<EOF
 USAGE:
-  $SELF                       : list the contexts
-  $SELF <NAME>                : switch to context <NAME>
-  $SELF -                     : switch to the previous context
-  $SELF -c, --current         : show the current context name
-  $SELF <NEW_NAME>=<NAME>     : rename context <NAME> to <NEW_NAME>
-  $SELF <NEW_NAME>=.          : rename current-context to <NEW_NAME>
-  $SELF -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
-                                  (this command won't delete the user/cluster entry
-                                  that is used by the context)
-  $SELF -u, --unset           : unset the current context
+  $SELF                           : list the contexts
+  $SELF <NAME>                    : switch to context <NAME>
+  $SELF -                         : switch to the previous context
+  $SELF -c, --current             : show the current context name
+  $SELF -s <STRING> [<STRING...>] : search for contexts that contain <STRING>
+  $SELF <NEW_NAME>=<NAME>         : rename context <NAME> to <NEW_NAME>
+  $SELF <NEW_NAME>=.              : rename current-context to <NEW_NAME>
+  $SELF -d <NAME> [<NAME...>]     : delete context <NAME> ('.' for current-context)
+                                      (this command won't delete the user/cluster entry
+                                      that is used by the context)
+  $SELF -u, --unset               : unset the current context
 
-  $SELF -h,--help             : show this message
+  $SELF -h,--help                 : show this message
 EOF
 }
 
@@ -60,6 +65,46 @@ current_context() {
 
 get_contexts() {
   $KUBECTL config get-contexts -o=name | sort -n
+}
+
+search_for_contexts() {
+  grep_cmd='grep'
+  IFS=', ' read -r -a args <<< ${@}
+  for arg in ${args[@]}; do
+    grep_cmd=${grep_cmd}' -e '${arg}
+  done
+  $KUBECTL config get-contexts -o=name | sort -n | eval ${grep_cmd} || true
+}
+
+list_searched_for_contexts() {
+  search_args=${@}
+  set -u pipefail
+  local cur ctx_list
+  cur="$(current_context)" || exit_err "error getting current context"
+  ctx_list=$(search_for_contexts ${search_args}) || exit_err "error getting context list"
+
+  local yellow darkbg normal
+  yellow=$(tput setaf 3 || true)
+  darkbg=$(tput setab 0 || true)
+  normal=$(tput sgr0 || true)
+
+  local cur_ctx_fg cur_ctx_bg
+  cur_ctx_fg=${KUBECTX_CURRENT_FGCOLOR:-$yellow}
+  cur_ctx_bg=${KUBECTX_CURRENT_BGCOLOR:-$darkbg}
+
+  for c in $ctx_list; do
+  if [[ -n "${_KUBECTX_FORCE_COLOR:-}" || \
+       -t 1 && -z "${NO_COLOR:-}" ]]; then
+    # colored output mode
+    if [[ "${c}" = "${cur}" ]]; then
+      echo "${cur_ctx_bg}${cur_ctx_fg}${c}${normal}"
+    else
+      echo "${c}"
+    fi
+  else
+    echo "${c}"
+  fi
+  done
 }
 
 list_contexts() {
@@ -216,6 +261,17 @@ main() {
       exit 1
     fi
     delete_contexts "${@:2}"
+  elif [[ "${1}" == "-s" ]]; then
+    if [[ "$#" -lt 2 ]]; then
+      echo "error: missing context ARG" >&2
+      usage
+      exit 1
+    fi
+    if [[ -t 1 &&  -z "${KUBECTX_IGNORE_FZF:-}" && "$(type fzf &>/dev/null; echo $?)" -eq 0 ]]; then
+      choose_context_interactive
+    else
+      list_searched_for_contexts "${@:2}"
+    fi
   elif [[ "$#" -gt 1 ]]; then
     echo "error: too many arguments" >&2
     usage
