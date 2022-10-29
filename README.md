@@ -109,7 +109,7 @@ If you use [Homebrew](https://brew.sh/) you can install like this:
 brew install kubectx
 ```
 
-This command will set up bash/zsh/fish completion scripts automatically.
+This command will set up bash/zsh/fish completion scripts automatically. Make sure you [configure your shell](https://docs.brew.sh/Shell-Completion) to load completions for installed Homebrew formulas.
 
 
 ### MacPorts (macOS)
