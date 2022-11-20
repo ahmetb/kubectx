@@ -54,6 +54,6 @@ jobs:
     - name: Setup BATS framework
       run: sudo npm install -g bats
     - name: kubectx (Go) integration tests
-      run: COMMAND=./dist/kubectx_linux_amd64/kubectx bats test/kubectx.bats
+      run: COMMAND=./dist/kubectx_linux_amd64_v1/kubectx bats test/kubectx.bats
     - name: kubens (Go) integration tests
-      run: COMMAND=./dist/kubens_linux_amd64/kubens bats test/kubens.bats
+      run: COMMAND=./dist/kubens_linux_amd64_v1/kubens bats test/kubens.bats
