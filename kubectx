@@ -224,8 +224,6 @@ main() {
       usage "missing context NAME"
     fi
     delete_contexts "${@:2}"
-  elif [[ "$#" -gt 1 ]]; then
-    usage "too many arguments"
   elif [[ "$#" -eq 1 ]]; then
     if [[ "${1}" == "-" ]]; then
       swap_context
@@ -246,8 +244,7 @@ main() {
       set_context "${1}"
     fi
   else
-    usage
-    exit 1
+    usage "too many arguments"
   fi
 }
 
