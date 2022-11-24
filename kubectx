@@ -26,6 +26,10 @@ SELF_CMD="$0"
 KUBECTX="${XDG_CACHE_HOME:-$HOME/.kube}/kubectx"
 
 usage() {
+  if [ -n "$1" ] ; then
+    err "$1"
+  fi
+
   local SELF
   SELF="kubectx"
   if [[ "$(basename "$0")" == kubectl-* ]]; then # invoked as plugin
@@ -47,11 +51,22 @@ USAGE:
 
   $SELF -h,--help             : show this message
 EOF
+  if [ -n "$1" ] ; then
+    exit 1
+  fi
 }
 
 exit_err() {
-   echo >&2 "${1}"
+   err "${1}"
    exit 1
+}
+
+err() {
+   warn "error: ${1}"
+}
+
+warn() {
+   echo >&2 "${1}"
 }
 
 current_context() {
@@ -117,11 +132,9 @@ choose_context_interactive() {
     FZF_DEFAULT_COMMAND="${SELF_CMD}" \
     fzf --ansi --no-preview || true)"
   if [[ -z "${choice}" ]]; then
-    echo 2>&1 "error: you did not choose any of the options"
-    exit 1
-  else
-    set_context "${choice}"
+    exit_err "you did not choose any of the options"
   fi
+  set_context "${choice}"
 }
 
 set_context() {
@@ -139,8 +152,7 @@ swap_context() {
   local ctx
   ctx="$(read_context)"
   if [[ -z "${ctx}" ]]; then
-    echo "error: No previous context found." >&2
-    exit 1
+    exit_err "No previous context found."
   fi
   set_context "${ctx}"
 }
@@ -158,12 +170,11 @@ rename_context() {
   fi
 
   if ! context_exists "${old_name}"; then
-    echo "error: Context \"${old_name}\" not found, can't rename it." >&2
-    exit 1
+    exit_err "Context \"${old_name}\" not found, can't rename it."
   fi
 
   if context_exists "${new_name}"; then
-    echo "Context \"${new_name}\" exists, deleting..." >&2
+    warn "Context \"${new_name}\" exists, deleting..."
     $KUBECTL config delete-context "${new_name}" 1>/dev/null 2>&1
   fi
 
@@ -182,12 +193,12 @@ delete_context() {
   if [[ "${ctx}" == "." ]]; then
     ctx="$(current_context)" || exit_err "error getting current context"
   fi
-  echo "Deleting context \"${ctx}\"..." >&2
+  warn "Deleting context \"${ctx}\"..."
   $KUBECTL config delete-context "${ctx}"
 }
 
 unset_context() {
-  echo "Unsetting current context." >&2
+  warn "Unsetting current context."
   $KUBECTL config unset current-context
 }
 
@@ -198,8 +209,7 @@ main() {
     elif hash kubectl.exe  2>/dev/null; then
       KUBECTL=kubectl.exe
     else
-      echo >&2 "kubectl is not installed"
-      exit 1
+      exit_err "kubectl is not installed"
     fi
   fi
 
@@ -211,15 +221,11 @@ main() {
     fi
   elif [[ "${1}" == "-d" ]]; then
     if [[ "$#" -lt 2 ]]; then
-      echo "error: missing context NAME" >&2
-      usage
-      exit 1
+      usage "missing context NAME"
     fi
     delete_contexts "${@:2}"
   elif [[ "$#" -gt 1 ]]; then
-    echo "error: too many arguments" >&2
-    usage
-    exit 1
+    usage "too many arguments"
   elif [[ "$#" -eq 1 ]]; then
     if [[ "${1}" == "-" ]]; then
       swap_context
@@ -233,9 +239,7 @@ main() {
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
       usage
     elif [[ "${1}" =~ ^-(.*) ]]; then
-      echo "error: unrecognized flag \"${1}\"" >&2
-      usage
-      exit 1
+      usage "unrecognized flag \"${1}\""
     elif [[ "${1}" =~ (.+)=(.+) ]]; then
       rename_context "${BASH_REMATCH[2]}" "${BASH_REMATCH[1]}"
     else
