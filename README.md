@@ -33,10 +33,9 @@ Switched to context "minikube".
 $ kubectx -
 Switched to context "oregon".
 
-# create an alias for the context
+# rename context
 $ kubectx dublin=gke_ahmetb_europe-west1-b_dublin
-Context "dublin" set.
-Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
+Context "gke_ahmetb_europe-west1-b_dublin" renamed to "dublin".
 
 # change the active namespace on kubectl
 $ kubens kube-system
