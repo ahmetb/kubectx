@@ -14,7 +14,7 @@
 
 package kubeconfig
 
-import "gopkg.in/yaml.v3"
+import "sigs.k8s.io/kustomize/kyaml/yaml"
 
 const (
 	defaultNamespace = "default"
