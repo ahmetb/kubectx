@@ -18,7 +18,7 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
+	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 type ReadWriteResetCloser interface {
