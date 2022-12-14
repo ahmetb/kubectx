@@ -16,7 +16,7 @@ package kubeconfig
 
 import (
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
+	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
 func (k *Kubeconfig) contextsNode() (*yaml.Node, error) {
