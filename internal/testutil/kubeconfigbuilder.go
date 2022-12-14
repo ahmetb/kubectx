@@ -46,7 +46,9 @@ func (k *Kubeconfig) WithCtxs(c ...*Context) *Kubeconfig        { (*k)["contexts
 func (k *Kubeconfig) ToYAML(t *testing.T) string {
 	t.Helper()
 	var v strings.Builder
-	if err := yaml.NewEncoder(&v).Encode(*k); err != nil {
+	enc := yaml.NewEncoder(&v)
+	enc.SetIndent(0)
+	if err := enc.Encode(*k); err != nil {
 		t.Fatalf("failed to encode mock kubeconfig: %v", err)
 	}
 	return v.String()
