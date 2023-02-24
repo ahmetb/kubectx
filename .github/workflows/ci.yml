@@ -43,7 +43,7 @@ jobs:
     - name: Ensure gofmt
       run: test -z "$(gofmt -s -d .)"
     - name: Ensure go.mod is already tidied
-      run: go mod tidy && git diff --no-patch --exit-code
+      run: go mod tidy && git diff --exit-code
     - name: Run unit tests
       run: go test ./...
     - name: Build with Goreleaser
