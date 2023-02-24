@@ -78,6 +78,7 @@ this new Go implementation by downloading the binaries from the [**Releases page
 - [with apt (Debian)](#apt-debian)
 - [with pacman (Arch Linux)](#pacman-arch-linux)
 - [with Chocolatey (Windows)](#windows-installation-using-chocolatey)
+- [with winget (Windows)](#windows-installation-using-winget)
 - [manually (macOS & Linux)](#manual-installation-macos-and-linux)
 
 If you like to add context/namespace information to your shell prompt (`$PS1`),
@@ -146,6 +147,14 @@ sudo pacman -S kubectx
 Available as packages on [Chocolatey](https://chocolatey.org/why-chocolatey)
 ```pwsh
 choco install kubens kubectx
+```
+
+### Windows Installation (using winget)
+
+Available as packages on [winget](https://learn.microsoft.com/en-us/windows/package-manager/)
+```pwsh
+winget install --id ahmetb.kubectx
+winget install --id ahmetb.kubens
 ```
 
 ### Manual Installation (macOS and Linux)
