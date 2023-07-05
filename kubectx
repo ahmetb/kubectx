@@ -113,9 +113,11 @@ switch_context() {
 
 choose_context_interactive() {
   local choice
+	local FZF='fzf'
+	[[ -n "${TMUX-}" ]] && FZF="fzf-tmux"
   choice="$(_KUBECTX_FORCE_COLOR=1 \
     FZF_DEFAULT_COMMAND="${SELF_CMD}" \
-    fzf --ansi --no-preview || true)"
+    ${FZF} --ansi --no-preview || true)"
   if [[ -z "${choice}" ]]; then
     echo 2>&1 "error: you did not choose any of the options"
     exit 1

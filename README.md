@@ -50,7 +50,8 @@ Active namespace is "default".
 
 If you have [`fzf`](https://github.com/junegunn/fzf) installed, you can also
 **interactively** select a context or cluster, or fuzzy-search by typing a few
-characters. To learn more, read [interactive mode &rarr;](#interactive-mode)
+characters. To learn more, read [interactive mode &rarr;](#interactive-mode).
+Additionally, if you are running under [`TMUX`](https://github.com/tmux/tmux), `fzf-tmux` will be used.
 
 Both `kubectx` and `kubens` support <kbd>Tab</kbd> completion on bash/zsh/fish
 shells to help with long context names. You don't have to remember full context
@@ -196,7 +197,7 @@ Depending on your setup, you might or might not need to call `compinit` or
 `autoload -U compinit && compinit` in your `~/.zshrc` after you load the Plugins
 file. If you use [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh), load the
 completions before you load `oh-my-zsh` because `oh-my-zsh` will call
-`compinit`. 
+`compinit`.
 
 #### Completion scripts for plain `zsh`
 
