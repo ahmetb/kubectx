@@ -56,7 +56,7 @@ archives:
     kubectx_{{ .Tag }}_{{ .Os }}_
     {{- with .Arch -}}
       {{- if (eq . "386") -}}i386
-      {{- elif (eq . "amd64") -}}x86_64
+      {{- else if (eq . "amd64") -}}x86_64
       {{- else -}}{{- . -}}
       {{- end -}} 
     {{ end }}
@@ -76,7 +76,7 @@ archives:
     kubens_{{ .Tag }}_{{ .Os }}_
     {{- with .Arch -}}
       {{- if (eq . "386") -}}i386
-      {{- elif (eq . "amd64") -}}x86_64
+      {{- else if (eq . "amd64") -}}x86_64
       {{- else -}}{{- . -}}
       {{- end -}}
     {{ end }}
