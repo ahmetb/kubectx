@@ -53,7 +53,13 @@ builds:
 archives:
 - id: kubectx-archive
   name_template: |-
-    kubectx_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
+    kubectx_{{ .Tag }}_{{ .Os }}_
+    {{- with .Arch -}}
+      {{- if (eq . "386") -}}i386
+      {{- elif (eq . "amd64") -}}x86_64
+      {{- else -}}{{- . -}}
+      {{- end -}} 
+    {{ end }}
     {{- with .Arm -}}
       {{- if (eq . "6") -}}hf
       {{- else -}}v{{- . -}}
@@ -61,9 +67,6 @@ archives:
     {{- end -}}
   builds:
     - kubectx
-  replacements:
-    386: i386
-    amd64: x86_64
   format_overrides:
     - goos: windows
       format: zip
