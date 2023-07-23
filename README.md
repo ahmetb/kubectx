@@ -70,27 +70,15 @@ this new Go implementation by downloading the binaries from the [**Releases page
 &rarr;**](https://github.com/ahmetb/kubectx/releases)
 
 **Installation options:**
-
-- [`kubectx` + `kubens`: Power tools for kubectl](#kubectx--kubens-power-tools-for-kubectl)
-  - [What are `kubectx` and `kubens`?](#what-are-kubectx-and-kubens)
-    - [Examples](#examples)
-  - [Installation](#installation)
-    - [Kubectl Plugins (macOS and Linux)](#kubectl-plugins-macos-and-linux)
-    - [Homebrew (macOS and Linux)](#homebrew-macos-and-linux)
-    - [MacPorts (macOS)](#macports-macos)
-    - [apt (Debian)](#apt-debian)
-    - [pacman (Arch Linux)](#pacman-arch-linux)
-    - [Windows Installation (using Chocolatey)](#windows-installation-using-chocolatey)
-    - [Windows Installation (using Scoop)](#windows-installation-using-scoop)
-    - [Windows Installation (using winget)](#windows-installation-using-winget)
-    - [Manual Installation (macOS and Linux)](#manual-installation-macos-and-linux)
-      - [Completion scripts for `zsh` with antibody](#completion-scripts-for-zsh-with-antibody)
-      - [Completion scripts for plain `zsh`](#completion-scripts-for-plain-zsh)
-      - [Completion scripts for `bash`](#completion-scripts-for-bash)
-      - [Completion scripts for `fish`](#completion-scripts-for-fish)
-    - [Interactive mode](#interactive-mode)
-    - [Customizing colors](#customizing-colors)
-      - [Stargazers over time](#stargazers-over-time)
+- [as kubectl plugins (macOS & Linux)](#kubectl-plugins-macos-and-linux)
+- [with Homebrew (macOS & Linux)](#homebrew-macos-and-linux)
+- [with MacPorts (macOS)](#macports-macos)
+- [with apt (Debian)](#apt-debian)
+- [with pacman (Arch Linux)](#pacman-arch-linux)
+- [with Chocolatey (Windows)](#windows-installation-using-chocolatey)
+- [Windows Installation (using Scoop)](#windows-installation-using-scoop)
+- [with winget (Windows)](#windows-installation-using-winget)
+- [manually (macOS & Linux)](#manual-installation-macos-and-linux)
 
 If you like to add context/namespace information to your shell prompt (`$PS1`),
 you can try out [kube-ps1].
