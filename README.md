@@ -70,6 +70,7 @@ this new Go implementation by downloading the binaries from the [**Releases page
 &rarr;**](https://github.com/ahmetb/kubectx/releases)
 
 **Installation options:**
+
 - [as kubectl plugins (macOS & Linux)](#kubectl-plugins-macos-and-linux)
 - [with Homebrew (macOS & Linux)](#homebrew-macos-and-linux)
 - [with MacPorts (macOS)](#macports-macos)
