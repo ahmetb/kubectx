@@ -151,7 +151,7 @@ choco install kubens kubectx
 
 ### Windows Installation (using Scoop)
 
-Available as packages on [Scoop](https://scoop.sh/y)
+Available as packages on [Scoop](https://scoop.sh/)
 ```pwsh
 scoop bucket add main
 scoop install main/kubens main/kubectx
