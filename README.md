@@ -77,6 +77,7 @@ this new Go implementation by downloading the binaries from the [**Releases page
 - [with apt (Debian)](#apt-debian)
 - [with pacman (Arch Linux)](#pacman-arch-linux)
 - [with Chocolatey (Windows)](#windows-installation-using-chocolatey)
+- [Windows Installation (using Scoop)](#windows-installation-using-scoop)
 - [with winget (Windows)](#windows-installation-using-winget)
 - [manually (macOS & Linux)](#manual-installation-macos-and-linux)
 
@@ -146,6 +147,14 @@ sudo pacman -S kubectx
 Available as packages on [Chocolatey](https://chocolatey.org/why-chocolatey)
 ```pwsh
 choco install kubens kubectx
+```
+
+### Windows Installation (using Scoop)
+
+Available as packages on [Scoop](https://scoop.sh/)
+```pwsh
+scoop bucket add main
+scoop install main/kubens main/kubectx
 ```
 
 ### Windows Installation (using winget)
