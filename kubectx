@@ -124,6 +124,19 @@ choose_context_interactive() {
   fi
 }
 
+delete_contexts_interactive() {
+  local choice
+  choice="$(_KUBECTX_FORCE_COLOR=1 \
+    FZF_DEFAULT_COMMAND="${SELF_CMD}" \
+    fzf --ansi --no-preview || true)"
+  if [[ -z "${choice}" ]]; then
+    echo 2>&1 "error: you did not choose any of the options"
+    exit 1
+  else
+    delete_contexts "${choice}"
+  fi
+}
+
 set_context() {
   local prev
   prev="$(current_context)" || exit_err "error getting current context"
@@ -211,9 +224,7 @@ main() {
     fi
   elif [[ "${1}" == "-d" ]]; then
     if [[ "$#" -lt 2 ]]; then
-      echo "error: missing context NAME" >&2
-      usage
-      exit 1
+      delete_contexts_interactive
     fi
     delete_contexts "${@:2}"
   elif [[ "$#" -gt 1 ]]; then
