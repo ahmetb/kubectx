@@ -43,6 +43,10 @@ func printUsage(out io.Writer) error {
   %PROG% -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
   %SPAC%                         (this command won't delete the user/cluster entry
   %SPAC%                          referenced by the context entry)
+  %PROG% -D <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
+  %SPAC%                         (this command also deletes the user/cluster entry
+  %SPAC%                          referenced by the context entry, if it is no
+  %SPAC%                          longer referenced by any other context entry)
   %PROG% -h,--help             : show this message
   %PROG% -V,--version          : show version`
 	help = strings.ReplaceAll(help, "%PROG%", selfName())
