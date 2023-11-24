@@ -27,6 +27,14 @@ get_context() {
   kubectl config current-context
 }
 
+get_user() {
+  kubectl config get-users | grep "${1}"
+}
+
+get_cluster() {
+  kubectl config get-clusters | grep "${1}"
+}
+
 switch_context() {
   kubectl config use-context "${1}"
 }

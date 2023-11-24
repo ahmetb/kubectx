@@ -230,6 +230,28 @@ load common
   [[ "$output" = "user2@cluster1" ]]
 }
 
+@test "delete context including referenced user and cluster" {
+  use_config config1
+
+  run ${COMMAND} -D "user1@cluster1"
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [[ -z "$(get_user user1)" ]]
+  [[ -z "$(get_cluster cluster1)" ]]
+
+}
+
+@test "delete context retain referenced cluster" {
+  use_config config2
+
+  run ${COMMAND} -D "user1@cluster1"
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [[ -z "$(get_user user1)" ]]
+  [[ -n "$(get_user user2)" ]]
+  [[ -n "$(get_cluster cluster1)" ]]
+}
+
 @test "unset selected context" {
   use_config config2
 
