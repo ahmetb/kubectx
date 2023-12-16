@@ -27,6 +27,12 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: '1.20'
+    - name: Install Snapcraft
+      uses: samuelmeuli/action-snapcraft@v1
+    - name: Setup Snapcraft
+      run: |
+        mkdir -p $HOME/.cache/snapcraft/download
+        mkdir -p $HOME/.cache/snapcraft/stage-packages
     - name: GoReleaser
       uses: goreleaser/goreleaser-action@v2
       with:
@@ -42,3 +48,7 @@ jobs:
       uses: rajatjindal/krew-release-bot@v0.0.38
       with:
         krew_template_file: .krew/ns.yaml
+    - name: Publish Snaps to the Snap Store (stable channel)
+      run: for snap in $(ls dist/*.snap); do snapcraft upload --release=stable $snap; done
+      env:
+        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
