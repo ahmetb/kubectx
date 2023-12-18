@@ -51,4 +51,4 @@ jobs:
     - name: Publish Snaps to the Snap Store (stable channel)
       run: for snap in $(ls dist/*.snap); do snapcraft upload --release=stable $snap; done
       env:
-        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
+        SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
