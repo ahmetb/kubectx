@@ -31,6 +31,7 @@ jobs:
       uses: samuelmeuli/action-snapcraft@v1
     - name: Setup Snapcraft
       run: |
+        # https://github.com/goreleaser/goreleaser/issues/1715
         mkdir -p $HOME/.cache/snapcraft/download
         mkdir -p $HOME/.cache/snapcraft/stage-packages
     - name: GoReleaser
