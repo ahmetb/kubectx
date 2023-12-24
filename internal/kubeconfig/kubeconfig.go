@@ -35,8 +35,8 @@ type Loader interface {
 type Kubeconfig struct {
 	loader Loader
 
-	f        ReadWriteResetCloser
-	rootNode *yaml.Node
+	f      ReadWriteResetCloser
+	config *yaml.RNode
 }
 
 func (k *Kubeconfig) WithLoader(l Loader) *Kubeconfig {
@@ -65,15 +65,19 @@ func (k *Kubeconfig) Parse() error {
 	if err := yaml.NewDecoder(f).Decode(&v); err != nil {
 		return errors.Wrap(err, "failed to decode")
 	}
-	k.rootNode = v.Content[0]
-	if k.rootNode.Kind != yaml.MappingNode {
+	k.config = yaml.NewRNode(&v)
+	if k.config.YNode().Kind != yaml.MappingNode {
 		return errors.New("kubeconfig file is not a map document")
 	}
 	return nil
 }
 
 func (k *Kubeconfig) Bytes() ([]byte, error) {
-	return yaml.Marshal(k.rootNode)
+	str, err := k.config.String()
+	if err != nil {
+		return nil, err
+	}
+	return []byte(str), nil
 }
 
 func (k *Kubeconfig) Save() error {
@@ -82,5 +86,5 @@ func (k *Kubeconfig) Save() error {
 	}
 	enc := yaml.NewEncoder(k.f)
 	enc.SetIndent(0)
-	return enc.Encode(k.rootNode)
+	return enc.Encode(k.config.YNode())
 }
