@@ -33,10 +33,9 @@ Switched to context "minikube".
 $ kubectx -
 Switched to context "oregon".
 
-# create an alias for the context
+# rename context
 $ kubectx dublin=gke_ahmetb_europe-west1-b_dublin
-Context "dublin" set.
-Aliased "gke_ahmetb_europe-west1-b_dublin" as "dublin".
+Context "gke_ahmetb_europe-west1-b_dublin" renamed to "dublin".
 
 # change the active namespace on kubectl
 $ kubens kube-system
@@ -78,6 +77,8 @@ this new Go implementation by downloading the binaries from the [**Releases page
 - [with apt (Debian)](#apt-debian)
 - [with pacman (Arch Linux)](#pacman-arch-linux)
 - [with Chocolatey (Windows)](#windows-installation-using-chocolatey)
+- [Windows Installation (using Scoop)](#windows-installation-using-scoop)
+- [with winget (Windows)](#windows-installation-using-winget)
 - [manually (macOS & Linux)](#manual-installation-macos-and-linux)
 
 If you like to add context/namespace information to your shell prompt (`$PS1`),
@@ -148,6 +149,22 @@ Available as packages on [Chocolatey](https://chocolatey.org/why-chocolatey)
 choco install kubens kubectx
 ```
 
+### Windows Installation (using Scoop)
+
+Available as packages on [Scoop](https://scoop.sh/)
+```pwsh
+scoop bucket add main
+scoop install main/kubens main/kubectx
+```
+
+### Windows Installation (using winget)
+
+Available as packages on [winget](https://learn.microsoft.com/en-us/windows/package-manager/)
+```pwsh
+winget install --id ahmetb.kubectx
+winget install --id ahmetb.kubens
+```
+
 ### Manual Installation (macOS and Linux)
 
 Since `kubectx` and `kubens` are written in Bash, you should be able to install
@@ -198,10 +215,11 @@ link or copy them to an existing folder.
 Example with [`oh-my-zsh`](https://github.com/ohmyzsh/ohmyzsh):
 
 ```bash
-mkdir -p ~/.oh-my-zsh/completions
-chmod -R 755 ~/.oh-my-zsh/completions
-ln -s /opt/kubectx/completion/_kubectx.zsh ~/.oh-my-zsh/completions/_kubectx.zsh
-ln -s /opt/kubectx/completion/_kubens.zsh ~/.oh-my-zsh/completions/_kubens.zsh
+mkdir -p ~/.oh-my-zsh/custom/completions
+chmod -R 755 ~/.oh-my-zsh/custom/completions
+ln -s /opt/kubectx/completion/_kubectx.zsh ~/.oh-my-zsh/custom/completions/_kubectx.zsh
+ln -s /opt/kubectx/completion/_kubens.zsh ~/.oh-my-zsh/custom/completions/_kubens.zsh
+echo "fpath=($ZSH/custom/completions $fpath)" >> ~/.zshrc
 ```
 
 If completion doesn't work, add `autoload -U compinit && compinit` to your

@@ -25,7 +25,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.17
+        go-version: '1.20'
     - id: go-cache-paths
       run: |
         echo "::set-output name=go-build::$(go env GOCACHE)"
@@ -43,7 +43,7 @@ jobs:
     - name: Ensure gofmt
       run: test -z "$(gofmt -s -d .)"
     - name: Ensure go.mod is already tidied
-      run: go mod tidy && git diff --no-patch --exit-code
+      run: go mod tidy && git diff --exit-code
     - name: Run unit tests
       run: go test ./...
     - name: Build with Goreleaser
@@ -54,6 +54,6 @@ jobs:
     - name: Setup BATS framework
       run: sudo npm install -g bats
     - name: kubectx (Go) integration tests
-      run: COMMAND=./dist/kubectx_linux_amd64/kubectx bats test/kubectx.bats
+      run: COMMAND=./dist/kubectx_linux_amd64_v1/kubectx bats test/kubectx.bats
     - name: kubens (Go) integration tests
-      run: COMMAND=./dist/kubens_linux_amd64/kubens bats test/kubens.bats
+      run: COMMAND=./dist/kubens_linux_amd64_v1/kubens bats test/kubens.bats
