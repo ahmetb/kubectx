@@ -15,7 +15,8 @@
 package kubeconfig
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
@@ -24,60 +25,34 @@ func (k *Kubeconfig) DeleteContextEntry(deleteName string) error {
 	if err != nil {
 		return err
 	}
-
-	i := -1
-	for j, ctxNode := range contexts.Content {
-		nameNode := valueOf(ctxNode, "name")
-		if nameNode != nil && nameNode.Kind == yaml.ScalarNode && nameNode.Value == deleteName {
-			i = j
-			break
-		}
-	}
-	if i >= 0 {
-		copy(contexts.Content[i:], contexts.Content[i+1:])
-		contexts.Content[len(contexts.Content)-1] = nil
-		contexts.Content = contexts.Content[:len(contexts.Content)-1]
+	if err := contexts.PipeE(
+		yaml.ElementSetter{
+			Keys:   []string{"name"},
+			Values: []string{deleteName},
+		},
+	); err != nil {
+		return err
 	}
 	return nil
 }
 
 func (k *Kubeconfig) ModifyCurrentContext(name string) error {
-	currentCtxNode := valueOf(k.rootNode, "current-context")
-	if currentCtxNode != nil {
-		currentCtxNode.Value = name
-		return nil
+	if err := k.config.PipeE(yaml.SetField("current-context", yaml.NewScalarRNode(name))); err != nil {
+		return err
 	}
-
-	// if current-context field doesn't exist, create new field
-	keyNode := &yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Value: "current-context",
-		Tag:   "!!str"}
-	valueNode := &yaml.Node{
-		Kind:  yaml.ScalarNode,
-		Value: name,
-		Tag:   "!!str"}
-	k.rootNode.Content = append(k.rootNode.Content, keyNode, valueNode)
 	return nil
 }
 
 func (k *Kubeconfig) ModifyContextName(old, new string) error {
-	contexts, err := k.contextsNode()
+	context, err := k.config.Pipe(yaml.Lookup("contexts", "[name="+old+"]"))
 	if err != nil {
 		return err
 	}
-
-	var changed bool
-	for _, contextNode := range contexts.Content {
-		nameNode := valueOf(contextNode, "name")
-		if nameNode.Kind == yaml.ScalarNode && nameNode.Value == old {
-			nameNode.Value = new
-			changed = true
-			break
-		}
+	if context == nil {
+		return errors.New("\"contexts\" entry is nil")
 	}
-	if !changed {
-		return errors.New("no changes were made")
+	if err := context.PipeE(yaml.SetField("name", yaml.NewScalarRNode(new))); err != nil {
+		return err
 	}
 	return nil
 }
