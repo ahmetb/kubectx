@@ -14,7 +14,11 @@
 
 package kubeconfig
 
-import "gopkg.in/yaml.v3"
+import (
+	"errors"
+
+	"gopkg.in/yaml.v3"
+)
 
 const (
 	defaultNamespace = "default"
@@ -73,5 +77,33 @@ func (k *Kubeconfig) SetNamespace(ctxName string, ns string) error {
 			Tag:   "!!str",
 		}, ctxBodyNode)
 	}
+	return nil
+}
+
+func (k *Kubeconfig) UnsetNamespace(ctxName string) error {
+	ctxNode, err := k.contextNode(ctxName)
+	if err != nil {
+		return err
+	}
+
+	ctxBodyNode := valueOf(ctxNode, "context")
+	if ctxBodyNode == nil {
+		return errors.New("invalid context key")
+	}
+
+	newKVParis := []*yaml.Node{}
+	if ctxBodyNode.Kind == yaml.MappingNode {
+		for i := 0; i < len(ctxBodyNode.Content); i++ {
+			ch := ctxBodyNode.Content[i]
+			if ch.Kind == yaml.ScalarNode && ch.Value == "namespace" {
+				// Skip the value belonging to `namespace` key
+				i++
+				continue
+			}
+			newKVParis = append(newKVParis, ch)
+		}
+	}
+
+	ctxBodyNode.Content = newKVParis
 	return nil
 }
