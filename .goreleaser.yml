@@ -29,6 +29,7 @@ builds:
     - windows
   goarch:
     - amd64
+    - 386
     - arm
     - arm64
     - ppc64le
@@ -45,6 +46,7 @@ builds:
     - windows
   goarch:
     - amd64
+    - 386
     - arm
     - arm64
     - ppc64le
