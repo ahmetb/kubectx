@@ -50,7 +50,7 @@ jobs:
       uses: goreleaser/goreleaser-action@v2
       with:
         version: latest
-        args: release --snapshot --skip-publish --rm-dist
+        args: release --snapshot --skip publish,snapcraft --clean
     - name: Setup BATS framework
       run: sudo npm install -g bats
     - name: kubectx (Go) integration tests
