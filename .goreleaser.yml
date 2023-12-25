@@ -98,3 +98,20 @@ release:
   extra_files:
     - glob: ./kubens
     - glob: ./kubectx
+snapcrafts:
+  - id: kubectx
+    name: kubectx
+    summary: 'kubectx + kubens: Power tools for kubectl'
+    description: |
+      kubectx is a tool to switch between contexts (clusters) on kubectl faster.
+      kubens is a tool to switch between Kubernetes namespaces (and configure them for kubectl) easily.
+    grade: stable
+    confinement: classic
+    base: core20
+    apps:
+      kubectx:
+        command: kubectx
+        completer: completion/kubectx.bash
+      kubens:
+        command: kubens
+        completer: completion/kubens.bash
