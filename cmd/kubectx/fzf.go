@@ -36,6 +36,7 @@ type InteractiveSwitchOp struct {
 
 type InteractiveDeleteOp struct {
 	SelfCmd string
+	Cascade bool
 }
 
 func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
@@ -112,7 +113,7 @@ func (op InteractiveDeleteOp) Run(_, stderr io.Writer) error {
 		return errors.New("you did not choose any of the options")
 	}
 
-	name, wasActiveContext, err := deleteContext(choice)
+	name, wasActiveContext, err := deleteContext(choice, op.Cascade)
 	if err != nil {
 		return errors.Wrap(err, "failed to delete context")
 	}

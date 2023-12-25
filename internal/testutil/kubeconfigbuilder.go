@@ -21,15 +21,31 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type Context struct {
+type ContextObj struct {
 	Name    string `yaml:"name,omitempty"`
 	Context struct {
 		Namespace string `yaml:"namespace,omitempty"`
+		User      string `yaml:"user,omitempty"`
+		Cluster   string `yaml:"cluster,omitempty"`
 	} `yaml:"context,omitempty"`
 }
 
-func Ctx(name string) *Context           { return &Context{Name: name} }
-func (c *Context) Ns(ns string) *Context { c.Context.Namespace = ns; return c }
+func Ctx(name string) *ContextObj                        { return &ContextObj{Name: name} }
+func (c *ContextObj) Ns(ns string) *ContextObj           { c.Context.Namespace = ns; return c }
+func (c *ContextObj) User(user string) *ContextObj       { c.Context.User = user; return c }
+func (c *ContextObj) Cluster(cluster string) *ContextObj { c.Context.Cluster = cluster; return c }
+
+type UserObj struct {
+	Name string `yaml:"name,omitempty"`
+}
+
+func User(name string) *UserObj { return &UserObj{Name: name} }
+
+type ClusterObj struct {
+	Name string `yaml:"name,omitempty"`
+}
+
+func Cluster(name string) *ClusterObj { return &ClusterObj{Name: name} }
 
 type Kubeconfig map[string]interface{}
 
@@ -41,7 +57,9 @@ func KC() *Kubeconfig {
 
 func (k *Kubeconfig) Set(key string, v interface{}) *Kubeconfig { (*k)[key] = v; return k }
 func (k *Kubeconfig) WithCurrentCtx(s string) *Kubeconfig       { (*k)["current-context"] = s; return k }
-func (k *Kubeconfig) WithCtxs(c ...*Context) *Kubeconfig        { (*k)["contexts"] = c; return k }
+func (k *Kubeconfig) WithCtxs(c ...*ContextObj) *Kubeconfig     { (*k)["contexts"] = c; return k }
+func (k *Kubeconfig) WithUsers(u ...*UserObj) *Kubeconfig       { (*k)["users"] = u; return k }
+func (k *Kubeconfig) WithClusters(c ...*ClusterObj) *Kubeconfig { (*k)["clusters"] = c; return k }
 
 func (k *Kubeconfig) ToYAML(t *testing.T) string {
 	t.Helper()

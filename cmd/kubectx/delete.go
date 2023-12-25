@@ -26,13 +26,14 @@ import (
 // DeleteOp indicates intention to delete contexts.
 type DeleteOp struct {
 	Contexts []string // NAME or '.' to indicate current-context.
+	Cascade  bool     // Whether to delete (orphaned-only) users and clusters referenced in the contexts.
 }
 
 // deleteContexts deletes context entries one by one.
 func (op DeleteOp) Run(_, stderr io.Writer) error {
 	for _, ctx := range op.Contexts {
 		// TODO inefficency here. we open/write/close the same file many times.
-		deletedName, wasActiveContext, err := deleteContext(ctx)
+		deletedName, wasActiveContext, err := deleteContext(ctx, op.Cascade)
 		if err != nil {
 			return errors.Wrapf(err, "error deleting context \"%s\"", deletedName)
 		}
@@ -48,7 +49,9 @@ func (op DeleteOp) Run(_, stderr io.Writer) error {
 
 // deleteContext deletes a context entry by NAME or current-context
 // indicated by ".".
-func deleteContext(name string) (deleteName string, wasActiveContext bool, err error) {
+// The cascade flag determines whether to also delete the user and/or cluster entries referenced in the context,
+// if they became orphaned by this deletion (i.e., not referenced by any other contexts).
+func deleteContext(name string, cascade bool) (deleteName string, wasActiveContext bool, err error) {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
@@ -59,18 +62,72 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 	// resolve "." to a real name
 	if name == "." {
 		if cur == "" {
-			return deleteName, false, errors.New("can't use '.' as the no active context is set")
+			return deleteName, false, errors.New("can't use '.' as no active context is set")
 		}
-		wasActiveContext = true
 		name = cur
 	}
+
+	wasActiveContext = name == cur
 
 	if !kc.ContextExists(name) {
 		return name, false, errors.New("context does not exist")
 	}
 
+	if cascade {
+		err = deleteContextUser(name, kc)
+		if err != nil {
+			return name, wasActiveContext, errors.Wrap(err, "failed to delete user for deleted context")
+		}
+
+		err = deleteContextCluster(name, kc)
+		if err != nil {
+			return name, wasActiveContext, errors.Wrap(err, "failed to delete cluster for deleted context")
+		}
+	}
+
 	if err := kc.DeleteContextEntry(name); err != nil {
 		return name, false, errors.Wrap(err, "failed to modify yaml doc")
 	}
+
 	return name, wasActiveContext, errors.Wrap(kc.Save(), "failed to save modified kubeconfig file")
+}
+
+func deleteContextUser(contextName string, kc *kubeconfig.Kubeconfig) error {
+	userName, err := kc.UserOfContext(contextName)
+	if err != nil {
+		return errors.Wrap(err, "user not set for context")
+	}
+
+	refCount, err := kc.CountUserReferences(userName)
+	if err != nil {
+		return errors.Wrap(err, "failed to retrieve reference count for user entry")
+	}
+
+	if refCount == 1 {
+		if err := kc.DeleteUserEntry(userName); err != nil {
+			return errors.Wrap(err, "failed to modify yaml doc")
+		}
+	}
+
+	return nil
+}
+
+func deleteContextCluster(contextName string, kc *kubeconfig.Kubeconfig) error {
+	clusterName, err := kc.ClusterOfContext(contextName)
+	if err != nil {
+		return errors.Wrap(err, "cluster not set for context")
+	}
+
+	refCount, err := kc.CountClusterReferences(clusterName)
+	if err != nil {
+		return errors.Wrap(err, "failed to retrieve reference count for cluster entry")
+	}
+
+	if refCount == 1 {
+		if err := kc.DeleteClusterEntry(clusterName); err != nil {
+			return errors.Wrap(err, "failed to modify yaml doc")
+		}
+	}
+
+	return nil
 }

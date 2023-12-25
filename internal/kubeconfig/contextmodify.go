@@ -25,19 +25,7 @@ func (k *Kubeconfig) DeleteContextEntry(deleteName string) error {
 		return err
 	}
 
-	i := -1
-	for j, ctxNode := range contexts.Content {
-		nameNode := valueOf(ctxNode, "name")
-		if nameNode != nil && nameNode.Kind == yaml.ScalarNode && nameNode.Value == deleteName {
-			i = j
-			break
-		}
-	}
-	if i >= 0 {
-		copy(contexts.Content[i:], contexts.Content[i+1:])
-		contexts.Content[len(contexts.Content)-1] = nil
-		contexts.Content = contexts.Content[:len(contexts.Content)-1]
-	}
+	deleteNamedChildNode(contexts, deleteName)
 	return nil
 }
 

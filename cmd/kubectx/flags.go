@@ -40,15 +40,16 @@ func parseArgs(argv []string) Op {
 		return ListOp{}
 	}
 
-	if argv[0] == "-d" {
+	if argv[0] == "-d" || argv[0] == "-D" {
+		cascade := argv[0] == "-D"
 		if len(argv) == 1 {
 			if cmdutil.IsInteractiveMode(os.Stdout) {
-				return InteractiveDeleteOp{SelfCmd: os.Args[0]}
+				return InteractiveDeleteOp{SelfCmd: os.Args[0], Cascade: cascade}
 			} else {
 				return UnsupportedOp{Err: fmt.Errorf("'-d' needs arguments")}
 			}
 		}
-		return DeleteOp{Contexts: argv[1:]}
+		return DeleteOp{Contexts: argv[1:], Cascade: cascade}
 	}
 
 	if len(argv) == 1 {
