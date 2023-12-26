@@ -15,8 +15,6 @@
 package kubeconfig
 
 import (
-	"strings"
-
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
@@ -27,11 +25,7 @@ func (k *Kubeconfig) GetCurrentContext() string {
 	if err != nil {
 		return ""
 	}
-	str, err := v.String()
-	if err != nil {
-		return ""
-	}
-	return strings.TrimSpace(str)
+	return yaml.GetValue(v)
 }
 
 func (k *Kubeconfig) UnsetCurrentContext() error {

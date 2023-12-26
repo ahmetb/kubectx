@@ -15,8 +15,6 @@
 package kubeconfig
 
 import (
-	"strings"
-
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
@@ -33,11 +31,7 @@ func (k *Kubeconfig) NamespaceOfContext(contextName string) (string, error) {
 	if namespace == nil || err != nil {
 		return defaultNamespace, err
 	}
-	nsStr, err := namespace.String()
-	if nsStr == "" || err != nil {
-		return defaultNamespace, err
-	}
-	return strings.TrimSpace(nsStr), nil
+	return yaml.GetValue(namespace), nil
 }
 
 func (k *Kubeconfig) SetNamespace(ctxName string, ns string) error {
