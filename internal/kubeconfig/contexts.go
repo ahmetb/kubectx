@@ -33,7 +33,11 @@ func (k *Kubeconfig) contextsNode() (*yaml.RNode, error) {
 }
 
 func (k *Kubeconfig) contextNode(name string) (*yaml.RNode, error) {
-	context, err := k.config.Pipe(yaml.Lookup("contexts", "[name="+name+"]"))
+	contexts, err := k.contextsNode()
+	if err != nil {
+		return nil, err
+	}
+	context, err := contexts.Pipe(yaml.Lookup("[name=" + name + "]"))
 	if err != nil {
 		return nil, err
 	}
