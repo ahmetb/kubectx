@@ -46,6 +46,15 @@ Active namespace is "kube-system".
 $ kubens -
 Context "test" set.
 Active namespace is "default".
+
+# change the active namespace even if it doesn't exist
+$ kubens not-found-namespace --force
+Context "test" set.
+Active namespace is "not-found-namespace".
+---
+$ kubens not-found-namespace --f
+Context "test" set.
+Active namespace is "not-found-namespace".
 ```
 
 If you have [`fzf`](https://github.com/junegunn/fzf) installed, you can also

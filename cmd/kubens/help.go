@@ -35,6 +35,8 @@ func printUsage(out io.Writer) error {
 	help := `USAGE:
   %PROG%                    : list the namespaces in the current context
   %PROG% <NAME>             : change the active namespace of current context
+  %PROG% <NAME> --force     : force change the active namespace of current context (even if it doesn't exist)
+  %PROG% <NAME> --f     : force change the active namespace of current context (even if it doesn't exist)
   %PROG% -                  : switch to the previous namespace in this context
   %PROG% -c, --current      : show the current namespace
   %PROG% -h,--help          : show this message

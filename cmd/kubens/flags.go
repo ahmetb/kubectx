@@ -33,15 +33,23 @@ func (op UnsupportedOp) Run(_, _ io.Writer) error {
 // parseArgs looks at flags (excl. executable name, i.e. argv[0])
 // and decides which operation should be taken.
 func parseArgs(argv []string) Op {
-	if len(argv) == 0 {
+	n := len(argv)
+
+	if n == 0 {
 		if cmdutil.IsInteractiveMode(os.Stdout) {
 			return InteractiveSwitchOp{SelfCmd: os.Args[0]}
 		}
 		return ListOp{}
 	}
 
-	if len(argv) == 1 {
+	if n == 1 || n == 2 {
 		v := argv[0]
+		force := false
+
+		if n == 2 {
+			force = argv[1] == "--force" || argv[1] == "-f"
+		}
+
 		if v == "--help" || v == "-h" {
 			return HelpOp{}
 		}
@@ -54,7 +62,7 @@ func parseArgs(argv []string) Op {
 		if strings.HasPrefix(v, "-") && v != "-" {
 			return UnsupportedOp{Err: fmt.Errorf("unsupported option '%s'", v)}
 		}
-		return SwitchOp{Target: argv[0]}
+		return SwitchOp{Target: argv[0], Force: force}
 	}
 	return UnsupportedOp{Err: fmt.Errorf("too many arguments")}
 }
