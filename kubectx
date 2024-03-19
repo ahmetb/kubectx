@@ -23,7 +23,8 @@ IFS=$'\n\t'
 
 SELF_CMD="$0"
 
-KUBECTX="${XDG_CACHE_HOME:-$HOME/.kube}/kubectx"
+[ -v KUBECTX_DIR ] && KUBECTX_DIR=${KUBECTX_DIR}/.kube/kubectx
+KUBECTX="${KUBECTX_DIR:-${XDG_CACHE_HOME:-$HOME/.kube}/kubectx}"
 
 usage() {
   local SELF
