@@ -1,0 +1,28 @@
+#!/bin/bash
+
+__kubectl_debug()
+{
+    if [[ -n ${BASH_COMP_DEBUG_FILE:-} ]]; then
+        echo "$*" >> "${BASH_COMP_DEBUG_FILE}"
+    fi
+}
+
+_kube_namespaces()
+{
+  local args lastArgs;
+
+  args=("${@:1}")
+  __kubectl_debug "arguments list ${args[*]}"
+  len=${#args[@]}
+  __kubectl_debug "arguments len is $len"
+  if [[ $len -gt 0 ]]; then
+    lastArgs="${args[$((len-1))]}"
+  else
+    lastArgs=""
+  fi
+  __kubectl_debug "arguments last args on which completion will be done $lastArgs"
+  COMPREPLY=("$(compgen -W "- $(kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}')" -- $lastArgs )");
+}
+
+_kube_namespaces "$@"
+echo "${COMPREPLY[*]}"
