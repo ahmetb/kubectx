@@ -214,7 +214,7 @@ load common
   run ${COMMAND}
   echo "$output"
   [ "$status" -eq 0 ]
-  [[ "$output" = "" ]]
+  [[ "$output" = "warning: No kubectl context found" ]]
 }
 
 @test "delete several contexts including a non existent one" {
@@ -241,4 +241,12 @@ load common
 
   run ${COMMAND} -c
   [ "$status" -ne 0 ]
+}
+
+@test "display msg on empty context" {
+  use_config config3
+  run ${COMMAND}
+  echo "$output"
+  [ "$status" -eq 0 ]
+  [[ "$output" = "warning: No kubectl context found" ]]
 }

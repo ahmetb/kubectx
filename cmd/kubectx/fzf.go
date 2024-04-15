@@ -41,11 +41,18 @@ type InteractiveDeleteOp struct {
 func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	// parse kubeconfig just to see if it can be loaded
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
+
 	if err := kc.Parse(); err != nil {
 		if cmdutil.IsNotFoundErr(err) {
 			printer.Warning(stderr, "kubeconfig file not found")
 			return nil
 		}
+		return errors.Wrap(err, "kubeconfig error")
+	}
+
+	ctxs := kc.ContextNames()
+	if ctxs == nil {
+		err := printer.Warning(stderr, "No kubectl context found")
 		return errors.Wrap(err, "kubeconfig error")
 	}
 	kc.Close()
