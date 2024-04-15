@@ -14,18 +14,20 @@
 
 package kubeconfig
 
+import (
+	"sigs.k8s.io/kustomize/kyaml/yaml"
+)
+
 // GetCurrentContext returns "current-context" value in given
 // kubeconfig object Node, or returns "" if not found.
 func (k *Kubeconfig) GetCurrentContext() string {
-	v := valueOf(k.rootNode, "current-context")
-	if v == nil {
+	v, err := k.config.Pipe(yaml.Get("current-context"))
+	if err != nil {
 		return ""
 	}
-	return v.Value
+	return yaml.GetValue(v)
 }
 
 func (k *Kubeconfig) UnsetCurrentContext() error {
-	curCtxValNode := valueOf(k.rootNode, "current-context")
-	curCtxValNode.Value = ""
-	return nil
+	return k.config.PipeE(yaml.SetField("current-context", yaml.NewStringRNode("")))
 }
