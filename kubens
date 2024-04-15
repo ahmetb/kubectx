@@ -23,7 +23,8 @@ IFS=$'\n\t'
 
 SELF_CMD="$0"
 
-KUBENS_DIR="${XDG_CACHE_HOME:-$HOME/.kube}/kubens"
+[ -v KUBENS_DIR ] && KUBENS_DIR=${KUBENS_DIR}/.kube/kubectx
+KUBENS_DIR="${KUBENS_DIR:-${XDG_CACHE_HOME:-$HOME/.kube}/kubectx}"
 
 usage() {
   local SELF
