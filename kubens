@@ -26,6 +26,10 @@ SELF_CMD="$0"
 KUBENS_DIR="${XDG_CACHE_HOME:-$HOME/.kube}/kubens"
 
 usage() {
+  if [ -n "$1" ] ; then
+    err "$1"
+  fi
+
   local SELF
   SELF="kubens"
   if [[ "$(basename "$0")" == kubectl-* ]]; then # invoked as plugin
@@ -40,11 +44,22 @@ USAGE:
   $SELF -c, --current      : show the current namespace
   $SELF -h,--help          : show this message
 EOF
+  if [ -n "$1" ] ; then
+    exit 1
+  fi
 }
 
 exit_err() {
-   echo >&2 "${1}"
+   err "${1}"
    exit 1
+}
+
+err() {
+   warn "error: ${1}"
+}
+
+warn() {
+   echo >&2 "${1}"
 }
 
 current_namespace() {
@@ -101,7 +116,7 @@ save_namespace() {
 switch_namespace() {
   local ctx="${1}"
   $KUBECTL config set-context "${ctx}" --namespace="${2}"
-  echo "Active namespace is \"${2}\".">&2
+  warn "Active namespace is \"${2}\"."
 }
 
 choose_namespace_interactive() {
@@ -109,8 +124,7 @@ choose_namespace_interactive() {
   # "$FZF_DEFAULT_COMMAND failed", so try to see if we can list namespaces
   # locally first
   if [[ -z "$(list_namespaces)" ]]; then
-    echo >&2 "error: could not list namespaces (is the cluster accessible?)"
-    exit 1
+    exit_err "could not list namespaces (is the cluster accessible?)"
   fi
 
   local choice
@@ -118,8 +132,7 @@ choose_namespace_interactive() {
     FZF_DEFAULT_COMMAND="${SELF_CMD}" \
     fzf --ansi --no-preview || true)"
   if [[ -z "${choice}" ]]; then
-    echo 2>&1 "error: you did not choose any of the options"
-    exit 1
+    exit_err "you did not choose any of the options"
   else
     set_namespace "${choice}"
   fi
@@ -137,8 +150,7 @@ set_namespace() {
       save_namespace "${ctx}" "${prev}"
     fi
   else
-    echo "error: no namespace exists with name \"${1}\".">&2
-    exit 1
+    exit_err "no namespace exists with name \"${1}\"."
   fi
 }
 
@@ -176,8 +188,7 @@ swap_namespace() {
   ctx="$(current_context)" || exit_err "error getting current context"
   ns="$(read_namespace "${ctx}")"
   if [[ -z "${ns}" ]]; then
-    echo "error: No previous namespace found for current context." >&2
-    exit 1
+    exit_err "No previous namespace found for current context."
   fi
   set_namespace "${ns}"
 }
@@ -189,8 +200,7 @@ main() {
     elif hash kubectl.exe  2>/dev/null; then
       KUBECTL=kubectl.exe
     else
-      echo >&2 "kubectl is not installed"
-      exit 1
+      exit_err "kubectl is not installed"
     fi
   fi
 
@@ -208,18 +218,14 @@ main() {
     elif [[ "${1}" == '-c' || "${1}" == '--current' ]]; then
       current_namespace
     elif [[ "${1}" =~ ^-(.*) ]]; then
-      echo "error: unrecognized flag \"${1}\"" >&2
-      usage
-      exit 1
+      usage "unrecognized flag \"${1}\""
     elif [[ "${1}" =~ (.+)=(.+) ]]; then
       alias_context "${BASH_REMATCH[2]}" "${BASH_REMATCH[1]}"
     else
       set_namespace "${1}"
     fi
   else
-    echo "error: too many flags" >&2
-    usage
-    exit 1
+    usage "too many flags"
   fi
 }
 
