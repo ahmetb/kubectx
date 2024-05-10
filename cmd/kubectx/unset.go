@@ -15,9 +15,8 @@
 package main
 
 import (
+	"fmt"
 	"io"
-
-	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
@@ -30,16 +29,18 @@ func (_ UnsetOp) Run(_, stderr io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
 	if err := kc.UnsetCurrentContext(); err != nil {
-		return errors.Wrap(err, "error while modifying current-context")
+		return fmt.Errorf("error while modifying current-context: %w", err)
 	}
 	if err := kc.Save(); err != nil {
-		return errors.Wrap(err, "failed to save kubeconfig file after modification")
+		return fmt.Errorf("failed to save kubeconfig file after modification: %w", err)
 	}
 
-	err := printer.Success(stderr, "Active context unset for kubectl.")
-	return errors.Wrap(err, "write error")
+	if err := printer.Success(stderr, "Active context unset for kubectl."); err != nil {
+		return fmt.Errorf("write error: %w", err)
+	}
+	return nil
 }

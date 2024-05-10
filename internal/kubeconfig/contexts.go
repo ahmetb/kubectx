@@ -15,7 +15,9 @@
 package kubeconfig
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -41,7 +43,7 @@ func (k *Kubeconfig) contextNode(name string) (*yaml.Node, error) {
 			return contextNode, nil
 		}
 	}
-	return nil, errors.Errorf("context with name \"%s\" not found", name)
+	return nil, fmt.Errorf("context with name \"%s\" not found", name)
 }
 
 func (k *Kubeconfig) ContextNames() []string {

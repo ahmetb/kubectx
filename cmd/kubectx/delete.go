@@ -15,9 +15,9 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"io"
-
-	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
@@ -34,7 +34,7 @@ func (op DeleteOp) Run(_, stderr io.Writer) error {
 		// TODO inefficiency here. we open/write/close the same file many times.
 		deletedName, wasActiveContext, err := deleteContext(ctx)
 		if err != nil {
-			return errors.Wrapf(err, "error deleting context \"%s\"", deletedName)
+			return fmt.Errorf("error deleting context \"%s\": %w", deletedName, err)
 		}
 		if wasActiveContext {
 			printer.Warning(stderr, "You deleted the current context. Use \"%s\" to select a new context.",
@@ -52,7 +52,7 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		return deleteName, false, errors.Wrap(err, "kubeconfig error")
+		return deleteName, false, fmt.Errorf("kubeconfig error: %w", err)
 	}
 
 	cur := kc.GetCurrentContext()
@@ -70,7 +70,10 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 	}
 
 	if err := kc.DeleteContextEntry(name); err != nil {
-		return name, false, errors.Wrap(err, "failed to modify yaml doc")
+		return name, false, fmt.Errorf("failed to modify yaml doc: %w", err)
 	}
-	return name, wasActiveContext, errors.Wrap(kc.Save(), "failed to save modified kubeconfig file")
+	if err := kc.Save(); err != nil {
+		return name, false, fmt.Errorf("failed to save modified kubeconfig file: %w", err)
+	}
+	return name, wasActiveContext, nil
 }
