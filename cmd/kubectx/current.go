@@ -15,10 +15,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
-
-	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 )
@@ -30,13 +29,15 @@ func (_op CurrentOp) Run(stdout, _ io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
 	v := kc.GetCurrentContext()
 	if v == "" {
 		return errors.New("current-context is not set")
 	}
-	_, err := fmt.Fprintln(stdout, v)
-	return errors.Wrap(err, "write error")
+	if _, err := fmt.Fprintln(stdout, v); err != nil {
+		return fmt.Errorf("write error: %w", err)
+	}
+	return nil
 }

@@ -20,8 +20,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // HelpOp describes printing help.
@@ -43,8 +41,10 @@ func printUsage(out io.Writer) error {
 	// TODO this replace logic is duplicated between this and kubectx
 	help = strings.ReplaceAll(help, "%PROG%", selfName())
 
-	_, err := fmt.Fprintf(out, "%s\n", help)
-	return errors.Wrap(err, "write error")
+	if _, err := fmt.Fprintf(out, "%s\n", help); err != nil {
+		return fmt.Errorf("write error: %w", err)
+	}
+	return nil
 }
 
 // selfName guesses how the user invoked the program.

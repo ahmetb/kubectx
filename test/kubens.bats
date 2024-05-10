@@ -95,7 +95,7 @@ load common
   run ${COMMAND} -
   echo "$output"
   [[ "$status" -eq 1 ]]
-  [[ "$output" = *"No previous namespace found for current context"* ]]
+  [[ "$output" = *"no previous namespace found for current context"* ]]
 }
 
 @test "switch to namespace when current context is empty" {

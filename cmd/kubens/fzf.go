@@ -16,15 +16,14 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"os/exec"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/env"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
@@ -39,11 +38,11 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	// parse kubeconfig just to see if it can be loaded
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	if err := kc.Parse(); err != nil {
-		if cmdutil.IsNotFoundErr(err) {
+		if errors.Is(err, fs.ErrNotExist) {
 			printer.Warning(stderr, "kubeconfig file not found")
 			return nil
 		}
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 	defer kc.Close()
 
@@ -67,7 +66,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	}
 	name, err := switchNamespace(kc, choice)
 	if err != nil {
-		return errors.Wrap(err, "failed to switch namespace")
+		return fmt.Errorf("failed to switch namespace: %w", err)
 	}
 	printer.Success(stderr, "Active namespace is \"%s\".", printer.SuccessColor.Sprint(name))
 	return nil
