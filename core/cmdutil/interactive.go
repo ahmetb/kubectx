@@ -15,22 +15,30 @@
 package cmdutil
 
 import (
-	"io"
-	"strings"
+	"os"
+	"os/exec"
 
-	"github.com/ahmetb/kubectx/internal/printer"
+	"github.com/mattn/go-isatty"
+
+	"github.com/ahmetb/kubectx/core/env"
 )
 
-func PrintDeprecatedEnvWarnings(out io.Writer, vars []string) {
-	for _, vv := range vars {
-		parts := strings.SplitN(vv, "=", 2)
-		if len(parts) != 2 {
-			continue
-		}
-		key := parts[0]
+// isTerminal determines if given fd is a TTY.
+func isTerminal(fd *os.File) bool {
+	return isatty.IsTerminal(fd.Fd())
+}
 
-		if key == `KUBECTX_CURRENT_FGCOLOR` || key == `KUBECTX_CURRENT_BGCOLOR` {
-			printer.Warning(out, "%s environment variable is now deprecated", key)
-		}
+// fzfInstalled determines if fzf(1) is in PATH.
+func fzfInstalled() bool {
+	v, _ := exec.LookPath("fzf")
+	if v != "" {
+		return true
 	}
+	return false
+}
+
+// IsInteractiveMode determines if we can do choosing with fzf.
+func IsInteractiveMode(stdout *os.File) bool {
+	v := os.Getenv(env.EnvFZFIgnore)
+	return v == "" && isTerminal(stdout) && fzfInstalled()
 }

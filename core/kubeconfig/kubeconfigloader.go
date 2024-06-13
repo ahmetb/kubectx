@@ -15,7 +15,7 @@
 package kubeconfig
 
 import (
-	"github.com/ahmetb/kubectx/internal/cmdutil"
+	"github.com/ahmetb/kubectx/core/cmdutil"
 	"os"
 	"path/filepath"
 

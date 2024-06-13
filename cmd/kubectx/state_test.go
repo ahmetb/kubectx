@@ -20,7 +20,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ahmetb/kubectx/internal/testutil"
+	"github.com/ahmetb/kubectx/core/testutil"
 )
 
 func Test_readLastContext_nonExistingFile(t *testing.T) {

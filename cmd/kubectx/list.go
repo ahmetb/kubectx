@@ -21,9 +21,9 @@ import (
 	"facette.io/natsort"
 	"github.com/pkg/errors"
 
-	"github.com/ahmetb/kubectx/internal/cmdutil"
-	"github.com/ahmetb/kubectx/internal/kubeconfig"
-	"github.com/ahmetb/kubectx/internal/printer"
+	"github.com/ahmetb/kubectx/core/cmdutil"
+	"github.com/ahmetb/kubectx/core/kubeconfig"
+	"github.com/ahmetb/kubectx/core/printer"
 )
 
 // ListOp describes listing contexts.

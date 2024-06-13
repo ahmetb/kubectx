@@ -19,8 +19,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ahmetb/kubectx/internal/kubeconfig"
-	"github.com/ahmetb/kubectx/internal/printer"
+	"github.com/ahmetb/kubectx/core/kubeconfig"
+	"github.com/ahmetb/kubectx/core/printer"
 )
 
 // UnsetOp indicates intention to remove current-context preference.

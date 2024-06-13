@@ -15,13 +15,13 @@
 package kubeconfig
 
 import (
-	"github.com/ahmetb/kubectx/internal/cmdutil"
+	"github.com/ahmetb/kubectx/core/cmdutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/ahmetb/kubectx/internal/testutil"
+	"github.com/ahmetb/kubectx/core/testutil"
 )
 
 func Test_kubeconfigPath(t *testing.T) {

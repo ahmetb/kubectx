@@ -23,8 +23,8 @@ import (
 	errors2 "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/ahmetb/kubectx/internal/kubeconfig"
-	"github.com/ahmetb/kubectx/internal/printer"
+	"github.com/ahmetb/kubectx/core/kubeconfig"
+	"github.com/ahmetb/kubectx/core/printer"
 )
 
 type SwitchOp struct {

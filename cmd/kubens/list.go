@@ -26,8 +26,8 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/ahmetb/kubectx/internal/kubeconfig"
-	"github.com/ahmetb/kubectx/internal/printer"
+	"github.com/ahmetb/kubectx/core/kubeconfig"
+	"github.com/ahmetb/kubectx/core/printer"
 )
 
 type ListOp struct{}

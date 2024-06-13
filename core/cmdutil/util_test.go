@@ -17,7 +17,7 @@ package cmdutil
 import (
 	"testing"
 
-	"github.com/ahmetb/kubectx/internal/testutil"
+	"github.com/ahmetb/kubectx/core/testutil"
 )
 
 func Test_homeDir(t *testing.T) {

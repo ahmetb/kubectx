@@ -19,7 +19,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/ahmetb/kubectx/internal/testutil"
+	"github.com/ahmetb/kubectx/core/testutil"
 )
 
 func TestKubeconfig_DeleteContextEntry_errors(t *testing.T) {

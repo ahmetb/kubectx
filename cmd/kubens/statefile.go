@@ -22,7 +22,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/ahmetb/kubectx/internal/cmdutil"
+	"github.com/ahmetb/kubectx/core/cmdutil"
 )
 
 var defaultDir = filepath.Join(cmdutil.HomeDir(), ".kube", "kubens")

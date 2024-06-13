@@ -19,7 +19,7 @@ import (
 
 	"github.com/fatih/color"
 
-	"github.com/ahmetb/kubectx/internal/env"
+	"github.com/ahmetb/kubectx/core/env"
 )
 
 var (

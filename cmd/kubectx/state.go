@@ -21,7 +21,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ahmetb/kubectx/internal/cmdutil"
+	"github.com/ahmetb/kubectx/core/cmdutil"
 )
 
 func kubectxPrevCtxFile() (string, error) {

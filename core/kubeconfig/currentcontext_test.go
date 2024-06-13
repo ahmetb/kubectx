@@ -17,7 +17,7 @@ package kubeconfig
 import (
 	"testing"
 
-	"github.com/ahmetb/kubectx/internal/testutil"
+	"github.com/ahmetb/kubectx/core/testutil"
 )
 
 func TestKubeconfig_GetCurrentContext(t *testing.T) {

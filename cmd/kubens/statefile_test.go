@@ -21,7 +21,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ahmetb/kubectx/internal/testutil"
+	"github.com/ahmetb/kubectx/core/testutil"
 )
 
 func TestNSFile(t *testing.T) {

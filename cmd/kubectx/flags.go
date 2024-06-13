@@ -20,7 +20,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ahmetb/kubectx/internal/cmdutil"
+	"github.com/ahmetb/kubectx/core/cmdutil"
 )
 
 // UnsupportedOp indicates an unsupported flag.
