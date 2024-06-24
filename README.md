@@ -52,7 +52,7 @@ $ kubens not-found-namespace --force
 Context "test" set.
 Active namespace is "not-found-namespace".
 ---
-$ kubens not-found-namespace --f
+$ kubens not-found-namespace -f
 Context "test" set.
 Active namespace is "not-found-namespace".
 ```

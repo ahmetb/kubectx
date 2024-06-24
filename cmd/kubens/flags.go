@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
@@ -47,7 +48,7 @@ func parseArgs(argv []string) Op {
 		force := false
 
 		if n == 2 {
-			force = argv[1] == "--force" || argv[1] == "-f"
+			force = slices.Contains([]string{"-f", "--force"}, argv[1])
 		}
 
 		if v == "--help" || v == "-h" {
