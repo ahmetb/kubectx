@@ -43,27 +43,42 @@ func parseArgs(argv []string) Op {
 		return ListOp{}
 	}
 
-	if n == 1 || n == 2 {
+	if n == 1 {
 		v := argv[0]
-		force := false
-
-		if n == 2 {
-			force = slices.Contains([]string{"-f", "--force"}, argv[1])
-		}
-
-		if v == "--help" || v == "-h" {
+		switch v {
+		case "--help", "-h":
 			return HelpOp{}
-		}
-		if v == "--version" || v == "-V" {
+		case "--version", "-V":
 			return VersionOp{}
-		}
-		if v == "--current" || v == "-c" {
+		case "--current", "-c":
 			return CurrentOp{}
+		default:
+			return getSwitchOp(v, false)
 		}
-		if strings.HasPrefix(v, "-") && v != "-" {
-			return UnsupportedOp{Err: fmt.Errorf("unsupported option '%s'", v)}
+	} else if n == 2 {
+		// {namespace} -f|--force
+		name := argv[0]
+		force := slices.Contains([]string{"-f", "--force"}, argv[1])
+
+		if !force {
+			if !slices.Contains([]string{"-f", "--force"}, argv[0]) {
+				return UnsupportedOp{Err: fmt.Errorf("unsupported arguments %q", argv)}
+			}
+
+			// -f|--force {namespace}
+			force = true
+			name = argv[1]
 		}
-		return SwitchOp{Target: argv[0], Force: force}
+
+		return getSwitchOp(name, force)
 	}
+
 	return UnsupportedOp{Err: fmt.Errorf("too many arguments")}
+}
+
+func getSwitchOp(v string, force bool) Op {
+	if strings.HasPrefix(v, "-") && v != "-" {
+		return UnsupportedOp{Err: fmt.Errorf("unsupported option %q", v)}
+	}
+	return SwitchOp{Target: v, Force: force}
 }
