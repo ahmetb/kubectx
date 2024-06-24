@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
@@ -33,28 +34,51 @@ func (op UnsupportedOp) Run(_, _ io.Writer) error {
 // parseArgs looks at flags (excl. executable name, i.e. argv[0])
 // and decides which operation should be taken.
 func parseArgs(argv []string) Op {
-	if len(argv) == 0 {
+	n := len(argv)
+
+	if n == 0 {
 		if cmdutil.IsInteractiveMode(os.Stdout) {
 			return InteractiveSwitchOp{SelfCmd: os.Args[0]}
 		}
 		return ListOp{}
 	}
 
-	if len(argv) == 1 {
+	if n == 1 {
 		v := argv[0]
-		if v == "--help" || v == "-h" {
+		switch v {
+		case "--help", "-h":
 			return HelpOp{}
-		}
-		if v == "--version" || v == "-V" {
+		case "--version", "-V":
 			return VersionOp{}
-		}
-		if v == "--current" || v == "-c" {
+		case "--current", "-c":
 			return CurrentOp{}
+		default:
+			return getSwitchOp(v, false)
 		}
-		if strings.HasPrefix(v, "-") && v != "-" {
-			return UnsupportedOp{Err: fmt.Errorf("unsupported option '%s'", v)}
+	} else if n == 2 {
+		// {namespace} -f|--force
+		name := argv[0]
+		force := slices.Contains([]string{"-f", "--force"}, argv[1])
+
+		if !force {
+			if !slices.Contains([]string{"-f", "--force"}, argv[0]) {
+				return UnsupportedOp{Err: fmt.Errorf("unsupported arguments %q", argv)}
+			}
+
+			// -f|--force {namespace}
+			force = true
+			name = argv[1]
 		}
-		return SwitchOp{Target: argv[0]}
+
+		return getSwitchOp(name, force)
 	}
+
 	return UnsupportedOp{Err: fmt.Errorf("too many arguments")}
+}
+
+func getSwitchOp(v string, force bool) Op {
+	if strings.HasPrefix(v, "-") && v != "-" {
+		return UnsupportedOp{Err: fmt.Errorf("unsupported option %q", v)}
+	}
+	return SwitchOp{Target: v, Force: force}
 }
