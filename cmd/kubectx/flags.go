@@ -45,7 +45,7 @@ func parseArgs(argv []string) Op {
 			if len(argv) > 1 {
 				return InteractiveSwitchOp{SelfCmd: os.Args[0], Query: argv[1]}
 			} else {
-				return UnsupportedOp{Err: fmt.Errorf("'-q' needs arguments")}
+				return UnsupportedOp{Err: fmt.Errorf("'-q' needs an argument")}
 			}
 		} else {
 			return UnsupportedOp{Err: fmt.Errorf("'-q' only works in interactive mode")}
