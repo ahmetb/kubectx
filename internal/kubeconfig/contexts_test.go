@@ -33,8 +33,27 @@ func TestKubeconfig_ContextNames(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ctx := kc.ContextNames()
+	ctx := kc.ContextNames(nil)
 	expected := []string{"abc", "def", "ghi"}
+	if diff := cmp.Diff(expected, ctx); diff != "" {
+		t.Fatalf("%s", diff)
+	}
+}
+
+func TestKubeconfig_ContextNames_Filtered(t *testing.T) {
+	tl := WithMockKubeconfigLoader(
+		testutil.KC().WithCtxs(
+			testutil.Ctx("abc").Ns("ns1"),
+			testutil.Ctx("def"),
+			testutil.Ctx("ghi").Ns("ns2"),
+		).Set("field1", map[string]string{"bar": "zoo"}).ToYAML(t))
+	kc := new(Kubeconfig).WithLoader(tl)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+
+	ctx := kc.ContextNames(map[string]string{"namespace": "ns2"})
+	expected := []string{"ghi"}
 	if diff := cmp.Diff(expected, ctx); diff != "" {
 		t.Fatalf("%s", diff)
 	}
@@ -46,7 +65,7 @@ func TestKubeconfig_ContextNames_noContextsEntry(t *testing.T) {
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
 	}
-	ctx := kc.ContextNames()
+	ctx := kc.ContextNames(nil)
 	var expected []string = nil
 	if diff := cmp.Diff(expected, ctx); diff != "" {
 		t.Fatalf("%s", diff)
@@ -59,7 +78,7 @@ func TestKubeconfig_ContextNames_nonArrayContextsEntry(t *testing.T) {
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
 	}
-	ctx := kc.ContextNames()
+	ctx := kc.ContextNames(nil)
 	var expected []string = nil
 	if diff := cmp.Diff(expected, ctx); diff != "" {
 		t.Fatalf("%s", diff)

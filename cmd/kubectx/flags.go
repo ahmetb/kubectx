@@ -40,6 +40,16 @@ func parseArgs(argv []string) Op {
 		return ListOp{}
 	}
 
+	if argv[0] == "--list" || argv[0] == "-l" {
+		if len(argv) == 1 {
+			return ListOp{}
+		}
+		if filters, ok := parseFilterSyntax(argv[1:]); ok {
+			return ListOp{Filters: filters}
+		}
+		return UnsupportedOp{Err: fmt.Errorf("'-l' filters must use A=B format")}
+	}
+
 	if argv[0] == "-d" {
 		if len(argv) == 1 {
 			if cmdutil.IsInteractiveMode(os.Stdout) {

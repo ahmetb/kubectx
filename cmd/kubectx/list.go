@@ -17,6 +17,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"facette.io/natsort"
 	"github.com/pkg/errors"
@@ -27,9 +28,29 @@ import (
 )
 
 // ListOp describes listing contexts.
-type ListOp struct{}
+type ListOp struct {
+	Filters map[string]string
+}
 
-func (_ ListOp) Run(stdout, stderr io.Writer) error {
+// parseFilterSyntax parses multiple A=B form into a map[A]=B and returns
+// whether it is parsed correctly.
+func parseFilterSyntax(v []string) (map[string]string, bool) {
+	m := make(map[string]string)
+	for _, vv := range v {
+		s := strings.Split(vv, "=")
+		if len(s) != 2 {
+			return nil, false
+		}
+		key, value := s[0], s[1]
+		if key == "" || value == "" {
+			return nil, false
+		}
+		m[key] = value
+	}
+	return m, true
+}
+
+func (op ListOp) Run(stdout, stderr io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
@@ -40,7 +61,7 @@ func (_ ListOp) Run(stdout, stderr io.Writer) error {
 		return errors.Wrap(err, "kubeconfig error")
 	}
 
-	ctxs := kc.ContextNames()
+	ctxs := kc.ContextNames(op.Filters)
 	natsort.Sort(ctxs)
 
 	cur := kc.GetCurrentContext()

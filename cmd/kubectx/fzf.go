@@ -88,7 +88,7 @@ func (op InteractiveDeleteOp) Run(_, stderr io.Writer) error {
 	}
 	kc.Close()
 
-	if len(kc.ContextNames()) == 0 {
+	if len(kc.ContextNames(nil)) == 0 {
 		return errors.New("no contexts found in config")
 	}
 

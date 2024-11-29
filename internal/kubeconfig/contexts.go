@@ -44,7 +44,7 @@ func (k *Kubeconfig) contextNode(name string) (*yaml.Node, error) {
 	return nil, errors.Errorf("context with name \"%s\" not found", name)
 }
 
-func (k *Kubeconfig) ContextNames() []string {
+func (k *Kubeconfig) ContextNames(filters map[string]string) []string {
 	contexts := valueOf(k.rootNode, "contexts")
 	if contexts == nil {
 		return nil
@@ -54,8 +54,19 @@ func (k *Kubeconfig) ContextNames() []string {
 	}
 
 	var ctxNames []string
+ctxLoop:
 	for _, ctx := range contexts.Content {
 		nameVal := valueOf(ctx, "name")
+		for k, v := range filters {
+			ctxVal := valueOf(ctx, "context")
+			if ctxVal == nil {
+				continue ctxLoop
+			}
+			vVal := valueOf(ctxVal, k)
+			if vVal == nil || vVal.Value != v {
+				continue ctxLoop
+			}
+		}
 		if nameVal != nil {
 			ctxNames = append(ctxNames, nameVal.Value)
 		}
@@ -64,7 +75,7 @@ func (k *Kubeconfig) ContextNames() []string {
 }
 
 func (k *Kubeconfig) ContextExists(name string) bool {
-	ctxNames := k.ContextNames()
+	ctxNames := k.ContextNames(nil)
 	for _, v := range ctxNames {
 		if v == name {
 			return true
