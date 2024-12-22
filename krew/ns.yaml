@@ -1,0 +1,34 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: ns
+spec:
+  homepage: https://github.com/ahmetb/kubectx
+  shortDescription: Switch between Kubernetes namespaces
+  version: v0.9.5-1
+  description: |
+    Also known as "kubens", a utility to set your current namespace and switch
+    between them.
+  caveats: |
+    If fzf is installed on your machine, you can interactively choose
+    between the entries using the arrow keys, or by fuzzy searching
+    as you type.
+  platforms:
+  - selector:
+      matchExpressions:
+      - key: os
+        operator: In
+        values:
+        - darwin
+        - linux
+    uri: https://github.com/RouxAntoine/kubectx/archive/v0.9.5-1.tar.gz
+    sha256: c94392fba8dfc5c8075161246749ef71c18f45da82759084664eb96027970004
+    bin: kubens
+    files:
+    - from: kubectx-*/kubens
+      to: .
+    - from: kubectx-*/LICENSE
+      to: .
+    - from: kubectx-*/completion/plugins/kubectl_complete-ns
+      to: completion
+
