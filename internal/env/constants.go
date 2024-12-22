@@ -19,7 +19,7 @@ const (
 	// interactive context selection when fzf is installed.
 	EnvFZFIgnore = "KUBECTX_IGNORE_FZF"
 
-	// EnvForceColor describes the environment variable to disable color usage
+	// EnvNoColor describes the environment variable to disable color usage
 	// when printing current context in a list.
 	EnvNoColor = `NO_COLOR`
 
