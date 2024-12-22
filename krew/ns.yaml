@@ -15,20 +15,58 @@ spec:
     as you type.
   platforms:
   - selector:
-      matchExpressions:
-      - key: os
-        operator: In
-        values:
-        - darwin
-        - linux
-    uri: https://github.com/RouxAntoine/kubectx/archive/v0.9.5-1.tar.gz
-    sha256: c94392fba8dfc5c8075161246749ef71c18f45da82759084664eb96027970004
-    bin: kubens
+      matchLabels:
+        os: linux
+        arch: amd64
+    uri: https://github.com/RouxAntoine/kubectx/releases/download/v0.9.5-1/kubectx_v0.9.5-1_linux_x86_64.tar.gz
+    sha256:
+    bin: kubectx
     files:
-    - from: kubectx-*/kubens
-      to: .
-    - from: kubectx-*/LICENSE
-      to: .
-    - from: kubectx-*/completion/plugins/kubectl_complete-ns
-      to: completion
-
+      - from: kubens
+        to: .
+      - from: LICENSE
+        to: .
+      - from: completion/plugins/kubectl_complete-ns
+        to: completion
+  - selector:
+      matchLabels:
+        os: linux
+        arch: arm64
+    uri: https://github.com/RouxAntoine/kubectx/releases/download/v0.9.5-1/kubectx_v0.9.5-1_linux_arm64.tar.gz
+    sha256:
+    bin: kubectx
+    files:
+      - from: kubens
+        to: .
+      - from: LICENSE
+        to: .
+      - from: completion/plugins/kubectl_complete-ns
+        to: completion
+  - selector:
+      matchLabels:
+        os: darwin
+        arch: amd64
+    uri: https://github.com/RouxAntoine/kubectx/releases/download/v0.9.5-1/kubectx_v0.9.5-1_darwin_x86_64.tar.gz
+    sha256:
+    bin: kubectx
+    files:
+      - from: kubens
+        to: .
+      - from: LICENSE
+        to: .
+      - from: completion/plugins/kubectl_complete-ns
+        to: completion
+  - selector:
+      matchLabels:
+        os: darwin
+        arch: arm64
+    uri: https://github.com/RouxAntoine/kubectx/releases/download/v0.9.5-1/kubectx_v0.9.5-1_darwin_arm64.tar.gz
+    sha256:
+    bin: kubectx
+    files:
+      - from: kubens
+        to: .
+      - from: LICENSE
+        to: .
+      - from: completion/plugins/kubectl_complete-ns
+        to: completion
