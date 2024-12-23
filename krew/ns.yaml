@@ -5,7 +5,7 @@ metadata:
 spec:
   homepage: https://github.com/ahmetb/kubectx
   shortDescription: Switch between Kubernetes namespaces
-  version: v0.9.5-1
+  version: v0.9.5-2
   description: |
     Also known as "kubens", a utility to set your current namespace and switch
     between them.
@@ -18,55 +18,63 @@ spec:
       matchLabels:
         os: linux
         arch: amd64
-    uri: https://github.com/RouxAntoine/kubectx/releases/download/v0.9.5-1/kubectx_v0.9.5-1_linux_x86_64.tar.gz
+    uri: https://github.com/RouxAntoine/kubectx/releases/download/v0.9.5-2/kubens_v0.9.5-2_linux_x86_64.tar.gz
     sha256:
-    bin: kubectx
+    bin: kubens.sh
     files:
+      - from: kubens.sh
+        to: .
       - from: kubens
         to: .
       - from: LICENSE
         to: .
       - from: completion/plugins/kubectl_complete-ns
-        to: completion
+        to: completion/kubectl_complete-ns
   - selector:
       matchLabels:
         os: linux
         arch: arm64
-    uri: https://github.com/RouxAntoine/kubectx/releases/download/v0.9.5-1/kubectx_v0.9.5-1_linux_arm64.tar.gz
+    uri: https://github.com/RouxAntoine/kubectx/releases/download/v0.9.5-2/kubens_v0.9.5-2_linux_arm64.tar.gz
     sha256:
-    bin: kubectx
+    bin: kubens.sh
     files:
+      - from: kubens.sh
+        to: .
       - from: kubens
         to: .
       - from: LICENSE
         to: .
       - from: completion/plugins/kubectl_complete-ns
-        to: completion
+        to: completion/kubectl_complete-ns
   - selector:
       matchLabels:
         os: darwin
         arch: amd64
-    uri: https://github.com/RouxAntoine/kubectx/releases/download/v0.9.5-1/kubectx_v0.9.5-1_darwin_x86_64.tar.gz
+    uri: https://github.com/RouxAntoine/kubectx/releases/download/v0.9.5-2/kubens_v0.9.5-2_darwin_x86_64.tar.gz
     sha256:
-    bin: kubectx
+    bin: kubens.sh
     files:
+      - from: kubens.sh
+        to: .
       - from: kubens
         to: .
       - from: LICENSE
         to: .
       - from: completion/plugins/kubectl_complete-ns
-        to: completion
+        to: completion/kubectl_complete-ns
   - selector:
       matchLabels:
         os: darwin
         arch: arm64
-    uri: https://github.com/RouxAntoine/kubectx/releases/download/v0.9.5-1/kubectx_v0.9.5-1_darwin_arm64.tar.gz
+    uri: https://github.com/RouxAntoine/kubectx/releases/download/v0.9.5-2/kubens_v0.9.5-2_darwin_arm64.tar.gz
     sha256:
-    bin: kubectx
+    bin: kubens.sh
     files:
+      - from: kubens.sh
+        to: .
       - from: kubens
         to: .
       - from: LICENSE
         to: .
       - from: completion/plugins/kubectl_complete-ns
-        to: completion
+        to: completion/kubectl_complete-ns
