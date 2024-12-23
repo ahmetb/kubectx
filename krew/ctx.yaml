@@ -30,7 +30,7 @@ spec:
       - from: LICENSE
         to: .
       - from: completion/plugins/kubectl_complete-ctx
-        to: completion/kubectl_complete-ns
+        to: completion/kubectl_complete-ctx
   - selector:
       matchLabels:
         os: linux
@@ -46,7 +46,7 @@ spec:
       - from: LICENSE
         to: .
       - from: completion/plugins/kubectl_complete-ctx
-        to: completion/kubectl_complete-ns
+        to: completion/kubectl_complete-ctx
   - selector:
       matchLabels:
         os: darwin
@@ -62,7 +62,7 @@ spec:
       - from: LICENSE
         to: .
       - from: completion/plugins/kubectl_complete-ctx
-        to: completion/kubectl_complete-ns
+        to: completion/kubectl_complete-ctx
   - selector:
       matchLabels:
         os: darwin
@@ -78,4 +78,4 @@ spec:
       - from: LICENSE
         to: .
       - from: completion/plugins/kubectl_complete-ctx
-        to: completion/kubectl_complete-ns
+        to: completion/kubectl_complete-ctx
