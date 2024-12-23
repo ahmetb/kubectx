@@ -74,7 +74,11 @@ archives:
   format_overrides:
     - goos: windows
       format: zip
-  files: ["LICENSE", "completion/plugins/kubectl_complete-ctx"]
+  files:
+    - "LICENSE"
+    - "completion/plugins/kubectl_complete-ctx"
+    - src: "kubectx"
+      dst: "kubectx.sh"
 - id: kubens-archive
   name_template: |-
     kubens_{{ .Tag }}_{{ .Os }}_
@@ -94,7 +98,11 @@ archives:
   format_overrides:
     - goos: windows
       format: zip
-  files: ["LICENSE", "completion/plugins/kubectl_complete-ns"]
+  files:
+    - "LICENSE"
+    - "completion/plugins/kubectl_complete-ns"
+    - src: "kubens"
+      dst: "kubens.sh"
 checksum:
   name_template: "checksums.txt"
   algorithm: sha256
