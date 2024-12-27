@@ -15,9 +15,8 @@
 package cmdutil
 
 import (
+	"errors"
 	"os"
-
-	"github.com/pkg/errors"
 )
 
 func HomeDir() string {

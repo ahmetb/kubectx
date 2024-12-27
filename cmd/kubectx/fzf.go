@@ -16,13 +16,12 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/env"
@@ -46,7 +45,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 			printer.Warning(stderr, "kubeconfig file not found")
 			return nil
 		}
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error, %w", err)
 	}
 	kc.Close()
 
@@ -70,7 +69,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	}
 	name, err := switchContext(choice)
 	if err != nil {
-		return errors.Wrap(err, "failed to switch context")
+		return fmt.Errorf("failed to switch context, %w", err)
 	}
 	printer.Success(stderr, "Switched to context \"%s\".", printer.SuccessColor.Sprint(name))
 	return nil
@@ -84,7 +83,7 @@ func (op InteractiveDeleteOp) Run(_, stderr io.Writer) error {
 			printer.Warning(stderr, "kubeconfig file not found")
 			return nil
 		}
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error, %w", err)
 	}
 	kc.Close()
 
@@ -114,7 +113,7 @@ func (op InteractiveDeleteOp) Run(_, stderr io.Writer) error {
 
 	name, wasActiveContext, err := deleteContext(choice)
 	if err != nil {
-		return errors.Wrap(err, "failed to delete context")
+		return fmt.Errorf("failed to delete context, %w", err)
 	}
 
 	if wasActiveContext {

@@ -16,11 +16,11 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 
-	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -36,7 +36,7 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error, %w", err)
 	}
 
 	ctx := kc.GetCurrentContext()
@@ -45,12 +45,12 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 	}
 	curNs, err := kc.NamespaceOfContext(ctx)
 	if err != nil {
-		return errors.Wrap(err, "cannot read current namespace")
+		return fmt.Errorf("cannot read current namespace, %w", err)
 	}
 
 	ns, err := queryNamespaces(kc)
 	if err != nil {
-		return errors.Wrap(err, "could not list namespaces (is the cluster accessible?)")
+		return fmt.Errorf("could not list namespaces (is the cluster accessible?), %w", err)
 	}
 
 	for _, c := range ns {
@@ -70,7 +70,7 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 
 	clientset, err := newKubernetesClientSet(kc)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize k8s REST client")
+		return nil, fmt.Errorf("failed to initialize k8s REST client, %w", err)
 	}
 
 	var out []string
@@ -83,7 +83,7 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 				Continue: next,
 			})
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to list namespaces from k8s API")
+			return nil, fmt.Errorf("failed to list namespaces from k8s API, %w", err)
 		}
 		next = list.Continue
 		for _, it := range list.Items {
@@ -99,11 +99,11 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 func newKubernetesClientSet(kc *kubeconfig.Kubeconfig) (*kubernetes.Clientset, error) {
 	b, err := kc.Bytes()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to convert in-memory kubeconfig to yaml")
+		return nil, fmt.Errorf("failed to convert in-memory kubeconfig to yaml, %w", err)
 	}
 	cfg, err := clientcmd.RESTConfigFromKubeConfig(b)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize config")
+		return nil, fmt.Errorf("failed to initialize config, %w", err)
 	}
 	return kubernetes.NewForConfig(cfg)
 }

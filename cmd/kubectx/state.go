@@ -15,11 +15,11 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 )
@@ -47,7 +47,7 @@ func readLastContext(path string) (string, error) {
 func writeLastContext(path, value string) error {
 	dir := filepath.Dir(path)
 	if err := os.MkdirAll(dir, 0755); err != nil {
-		return errors.Wrap(err, "failed to create parent directories")
+		return fmt.Errorf("failed to create parent directories, %w", err)
 	}
 	return ioutil.WriteFile(path, []byte(value), 0644)
 }

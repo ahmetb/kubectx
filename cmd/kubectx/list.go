@@ -19,7 +19,6 @@ import (
 	"io"
 
 	"facette.io/natsort"
-	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
@@ -37,7 +36,7 @@ func (_ ListOp) Run(stdout, stderr io.Writer) error {
 			printer.Warning(stderr, "kubeconfig file not found")
 			return nil
 		}
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error, %w", err)
 	}
 
 	ctxs := kc.ContextNames()

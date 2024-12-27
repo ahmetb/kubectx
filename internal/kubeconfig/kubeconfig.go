@@ -15,9 +15,10 @@
 package kubeconfig
 
 import (
+	"errors"
 	"io"
 
-	"github.com/pkg/errors"
+	"fmt"
 	"gopkg.in/yaml.v3"
 )
 
@@ -54,7 +55,7 @@ func (k *Kubeconfig) Close() error {
 func (k *Kubeconfig) Parse() error {
 	files, err := k.loader.Load()
 	if err != nil {
-		return errors.Wrap(err, "failed to load")
+		return fmt.Errorf("failed to load, %w", err)
 	}
 
 	// TODO since we don't support multiple kubeconfig files at the moment, there's just 1 file
@@ -63,7 +64,7 @@ func (k *Kubeconfig) Parse() error {
 	k.f = f
 	var v yaml.Node
 	if err := yaml.NewDecoder(f).Decode(&v); err != nil {
-		return errors.Wrap(err, "failed to decode")
+		return fmt.Errorf("failed to decode, %w", err)
 	}
 	k.rootNode = v.Content[0]
 	if k.rootNode.Kind != yaml.MappingNode {
@@ -78,7 +79,7 @@ func (k *Kubeconfig) Bytes() ([]byte, error) {
 
 func (k *Kubeconfig) Save() error {
 	if err := k.f.Reset(); err != nil {
-		return errors.Wrap(err, "failed to reset file")
+		return fmt.Errorf("failed to reset file, %w", err)
 	}
 	enc := yaml.NewEncoder(k.f)
 	enc.SetIndent(0)

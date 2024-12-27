@@ -16,10 +16,11 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"io"
 	"os"
 
-	"github.com/pkg/errors"
 	errors2 "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -36,7 +37,7 @@ func (s SwitchOp) Run(_, stderr io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error, %w", err)
 	}
 
 	toNS, err := switchNamespace(kc, s.Target, s.Force)
@@ -54,18 +55,18 @@ func switchNamespace(kc *kubeconfig.Kubeconfig, ns string, force bool) (string, 
 	}
 	curNS, err := kc.NamespaceOfContext(ctx)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to get current namespace")
+		return "", fmt.Errorf("failed to get current namespace, %w", err)
 	}
 
 	f := NewNSFile(ctx)
 	prev, err := f.Load()
 	if err != nil {
-		return "", errors.Wrap(err, "failed to load previous namespace from file")
+		return "", fmt.Errorf("failed to load previous namespace from file, %w", err)
 	}
 
 	if ns == "-" {
 		if prev == "" {
-			return "", errors.Errorf("No previous namespace found for current context (%s)", ctx)
+			return "", fmt.Errorf("no previous namespace found for current context (%s)", ctx)
 		}
 		ns = prev
 	}
@@ -73,22 +74,22 @@ func switchNamespace(kc *kubeconfig.Kubeconfig, ns string, force bool) (string, 
 	if !force {
 		ok, err := namespaceExists(kc, ns)
 		if err != nil {
-			return "", errors.Wrap(err, "failed to query if namespace exists (is cluster accessible?)")
+			return "", fmt.Errorf("failed to query if namespace exists (is cluster accessible?), %w", err)
 		}
 		if !ok {
-			return "", errors.Errorf("no namespace exists with name \"%s\"", ns)
+			return "", fmt.Errorf("no namespace exists with name \"%s\"", ns)
 		}
 	}
 
 	if err := kc.SetNamespace(ctx, ns); err != nil {
-		return "", errors.Wrapf(err, "failed to change to namespace \"%s\"", ns)
+		return "", fmt.Errorf("failed to change to namespace \"%s\", %w", ns, err)
 	}
 	if err := kc.Save(); err != nil {
-		return "", errors.Wrap(err, "failed to save kubeconfig file")
+		return "", fmt.Errorf("failed to save kubeconfig file, %w", err)
 	}
 	if curNS != ns {
 		if err := f.Save(curNS); err != nil {
-			return "", errors.Wrap(err, "failed to save the previous namespace to file")
+			return "", fmt.Errorf("failed to save the previous namespace to file, %w", err)
 		}
 	}
 	return ns, nil
@@ -102,13 +103,17 @@ func namespaceExists(kc *kubeconfig.Kubeconfig, ns string) (bool, error) {
 
 	clientset, err := newKubernetesClientSet(kc)
 	if err != nil {
-		return false, errors.Wrap(err, "failed to initialize k8s REST client")
+		return false, fmt.Errorf("failed to initialize k8s REST client, %w", err)
 	}
 
 	namespace, err := clientset.CoreV1().Namespaces().Get(context.Background(), ns, metav1.GetOptions{})
 	if errors2.IsNotFound(err) {
 		return false, nil
 	}
-	return namespace != nil, errors.Wrapf(err, "failed to query "+
-		"namespace %q from k8s API", ns)
+
+	if err != nil {
+		return false, fmt.Errorf("failed to query namespace %q from k8s API, %w", ns, err)
+	} else {
+		return namespace != nil, nil
+	}
 }
