@@ -11,7 +11,7 @@ var (
 	version = "v0.0.0+unknown" // populated by goreleaser
 )
 
-// VersionOps describes printing version string.
+// VersionOp describes printing version string.
 type VersionOp struct{}
 
 func (_ VersionOp) Run(stdout, _ io.Writer) error {
