@@ -19,14 +19,17 @@ on:
     - 'v*.*.*'
 jobs:
   goreleaser:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@master
+    - run: git fetch --tags
     - name: Setup Go
       uses: actions/setup-go@v2
       with:
-        go-version: '1.20'
+        go-version: '1.22'
     - name: Install Snapcraft
       uses: samuelmeuli/action-snapcraft@v1
     - name: Setup Snapcraft
@@ -38,7 +41,7 @@ jobs:
       uses: goreleaser/goreleaser-action@v2
       with:
         version: latest
-        args: release --rm-dist
+        args: release --clean
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Update new version for plugin 'ctx' in krew-index
