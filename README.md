@@ -88,6 +88,7 @@ this new Go implementation by downloading the binaries from the [**Releases page
 - [with Chocolatey (Windows)](#windows-installation-using-chocolatey)
 - [Windows Installation (using Scoop)](#windows-installation-using-scoop)
 - [with winget (Windows)](#windows-installation-using-winget)
+- [with Flox (macOS & Linux & Windows WSL)](#flox)
 - [manually (macOS & Linux)](#manual-installation-macos-and-linux)
 
 If you like to add context/namespace information to your shell prompt (`$PS1`),
@@ -172,6 +173,13 @@ Available as packages on [winget](https://learn.microsoft.com/en-us/windows/pack
 ```pwsh
 winget install --id ahmetb.kubectx
 winget install --id ahmetb.kubens
+```
+
+### Flox
+
+Available as packages on [Flox](https://flox.dev)
+```pwsh
+flox install kubectx
 ```
 
 ### Manual Installation (macOS and Linux)
