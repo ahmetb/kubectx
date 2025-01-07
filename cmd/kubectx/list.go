@@ -15,13 +15,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 
 	"facette.io/natsort"
-	"github.com/pkg/errors"
 
-	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
 )
@@ -33,11 +33,11 @@ func (_ ListOp) Run(stdout, stderr io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		if cmdutil.IsNotFoundErr(err) {
+		if errors.Is(err, fs.ErrNotExist) {
 			printer.Warning(stderr, "kubeconfig file not found")
 			return nil
 		}
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
 	ctxs := kc.ContextNames()

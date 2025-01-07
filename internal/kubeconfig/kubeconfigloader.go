@@ -15,11 +15,11 @@
 package kubeconfig
 
 import (
+	"errors"
+	"fmt"
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -33,15 +33,15 @@ type kubeconfigFile struct{ *os.File }
 func (*StandardKubeconfigLoader) Load() ([]ReadWriteResetCloser, error) {
 	cfgPath, err := kubeconfigPath()
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot determine kubeconfig path")
+		return nil, fmt.Errorf("cannot determine kubeconfig path: %w", err)
 	}
 
 	f, err := os.OpenFile(cfgPath, os.O_RDWR, 0)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, errors.Wrap(err, "kubeconfig file not found")
+			return nil, fmt.Errorf("kubeconfig file not found: %w", err)
 		}
-		return nil, errors.Wrap(err, "failed to open file")
+		return nil, fmt.Errorf("failed to open file: %w", err)
 	}
 
 	// TODO we'll return all kubeconfig files when we start implementing multiple kubeconfig support
@@ -50,10 +50,13 @@ func (*StandardKubeconfigLoader) Load() ([]ReadWriteResetCloser, error) {
 
 func (kf *kubeconfigFile) Reset() error {
 	if err := kf.Truncate(0); err != nil {
-		return errors.Wrap(err, "failed to truncate file")
+		return fmt.Errorf("failed to truncate file: %w", err)
 	}
 	_, err := kf.Seek(0, 0)
-	return errors.Wrap(err, "failed to seek in file")
+	if err != nil {
+		return fmt.Errorf("failed to seek in file: %w", err)
+	}
+	return nil
 }
 
 func kubeconfigPath() (string, error) {

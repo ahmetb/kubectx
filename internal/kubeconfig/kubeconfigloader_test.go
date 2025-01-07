@@ -15,7 +15,8 @@
 package kubeconfig
 
 import (
-	"github.com/ahmetb/kubectx/internal/cmdutil"
+	"errors"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -77,7 +78,7 @@ func TestStandardKubeconfigLoader_returnsNotFoundErr(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected err")
 	}
-	if !cmdutil.IsNotFoundErr(err) {
+	if !errors.Is(err, fs.ErrNotExist) {
 		t.Fatalf("expected ENOENT error; got=%v", err)
 	}
 }
