@@ -15,6 +15,7 @@
 package kubeconfig
 
 import (
+	"cmp"
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"os"
 	"path/filepath"
@@ -68,7 +69,7 @@ func kubeconfigPath() (string, error) {
 	}
 
 	// default path
-	home := cmdutil.HomeDir()
+	home := cmp.Or(os.Getenv("KUBECTX_DIR"), cmdutil.HomeDir())
 	if home == "" {
 		return "", errors.New("HOME or USERPROFILE environment variable not set")
 	}
