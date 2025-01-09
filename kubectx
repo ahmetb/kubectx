@@ -108,7 +108,11 @@ save_context() {
 }
 
 switch_context() {
-  $KUBECTL config use-context "${1}"
+  if [ "$(get_contexts | grep -c "${1}")" -eq 1 ]; then
+    $KUBECTL config use-context "$(get_contexts | grep "${1}")"
+  else
+    $KUBECTL config use-context "${1}"
+  fi
 }
 
 choose_context_interactive() {
