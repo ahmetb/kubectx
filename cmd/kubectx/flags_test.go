@@ -78,6 +78,10 @@ func Test_parseArgs_new(t *testing.T) {
 		{name: "too many args",
 			args: []string{"a", "b", "c"},
 			want: UnsupportedOp{Err: fmt.Errorf("too many arguments")}},
+		{name: "missing query",
+			args: []string{"-q"},
+			want: UnsupportedOp{Err: fmt.Errorf("'-q' only works in interactive mode")},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

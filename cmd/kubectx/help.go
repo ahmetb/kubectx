@@ -41,6 +41,7 @@ func printUsage(out io.Writer) error {
   %PROG% <NEW_NAME>=.          : rename current-context to <NEW_NAME>
   %PROG% -u, --unset           : unset the current context
   %PROG% -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
+  %PROG% -q <QUERY>            : start the finder with the given query
   %SPAC%                         (this command won't delete the user/cluster entry
   %SPAC%                          referenced by the context entry)
   %PROG% -h,--help             : show this message

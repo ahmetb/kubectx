@@ -40,6 +40,17 @@ func parseArgs(argv []string) Op {
 		return ListOp{}
 	}
 
+	if argv[0] == "-q" {
+		if cmdutil.IsInteractiveMode(os.Stdout) {
+			if len(argv) > 1 {
+				return InteractiveSwitchOp{SelfCmd: os.Args[0], Query: argv[1]}
+			} else {
+				return UnsupportedOp{Err: fmt.Errorf("'-q' needs an argument")}
+			}
+		} else {
+			return UnsupportedOp{Err: fmt.Errorf("'-q' only works in interactive mode")}
+		}
+	}
 	if argv[0] == "-d" {
 		if len(argv) == 1 {
 			if cmdutil.IsInteractiveMode(os.Stdout) {
