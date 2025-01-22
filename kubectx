@@ -227,7 +227,7 @@ main() {
       # we don't call current_context here for two reasons:
       # - it does not fail when current-context property is not set
       # - it does not return a trailing newline
-      kubectl config current-context
+      $KUBECTL config current-context
     elif [[ "${1}" == '-u' || "${1}" == '--unset' ]]; then
       unset_context
     elif [[ "${1}" == '-h' || "${1}" == '--help' ]]; then
