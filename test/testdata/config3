@@ -1,0 +1,15 @@
+# config with no context
+
+apiVersion: v1
+clusters:
+- cluster:
+    server: ""
+  name: cluster1
+contexts:
+- context:
+current-context: ""
+kind: Config
+preferences: {}
+users:
+- name: user1
+  user: {}

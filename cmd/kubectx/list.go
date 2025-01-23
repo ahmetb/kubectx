@@ -41,6 +41,10 @@ func (_ ListOp) Run(stdout, stderr io.Writer) error {
 	}
 
 	ctxs := kc.ContextNames()
+	if ctxs == nil {
+		err := printer.Warning(stderr, "No kubectl context found")
+		return errors.Wrap(err, "kubeconfig error")
+	}
 	natsort.Sort(ctxs)
 
 	cur := kc.GetCurrentContext()
