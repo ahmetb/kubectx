@@ -10,11 +10,11 @@ if [ -f "$KUBECTX" ]; then
     # show '-' only if there's a saved previous context
     local PREV=$(cat "${KUBECTX}")
 
-    _arguments \
+    _arguments >/dev/null 2>&1 \
       "-d:*: :(${all_contexts})" \
       "(- *): :(- ${all_contexts})"
 else
-    _arguments \
+    _arguments >/dev/null 2>&1 \
       "-d:*: :(${all_contexts})" \
       "(- *): :(${all_contexts})"
 fi
