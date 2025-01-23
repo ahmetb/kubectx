@@ -15,10 +15,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
-
-	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 )
@@ -29,7 +28,7 @@ func (c CurrentOp) Run(stdout, _ io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
 	ctx := kc.GetCurrentContext()
@@ -38,8 +37,11 @@ func (c CurrentOp) Run(stdout, _ io.Writer) error {
 	}
 	ns, err := kc.NamespaceOfContext(ctx)
 	if err != nil {
-		return errors.Wrapf(err, "failed to read namespace of \"%s\"", ctx)
+		return fmt.Errorf("failed to read namespace of \"%s\", %w", ctx, err)
 	}
 	_, err = fmt.Fprintln(stdout, ns)
-	return errors.Wrap(err, "write error")
+	if err != nil {
+		return fmt.Errorf("write error: %w", err)
+	}
+	return nil
 }
