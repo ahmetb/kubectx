@@ -176,8 +176,25 @@ winget install --id ahmetb.kubens
 
 ### Manual Installation (macOS and Linux)
 
-Since `kubectx` and `kubens` are written in Bash, you should be able to install
-them to any POSIX environment that has Bash installed.
+#### Latest Go version
+
+To install the latest Go version, first download the binaries from the 
+[**Releases page &rarr;**](https://github.com/ahmetb/kubectx/releases)
+
+Be sure to download both `kubectx` and `kubens` releases for your OS and CPU
+architecture.
+
+Extract the binaries somewhere in your `PATH`, like `/usr/local/bin`
+
+If you want autocompletion for your shell, you will have to clone the git
+repository, or at least download the files from the completion folder, as
+they are not included in the binary releases. You can then follow the steps
+below to setup autocompletion.
+
+#### Bash (old) version
+
+Since `kubectx` and `kubens` older versions are written in Bash, you should be
+able to install them to any POSIX environment that has Bash installed.
 
 - Download the `kubectx`, and `kubens` scripts.
 - Either:
