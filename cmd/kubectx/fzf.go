@@ -31,14 +31,23 @@ import (
 )
 
 type InteractiveSwitchOp struct {
-	SelfCmd string
+	SelfCmd  string
+	Query    string
+	FzfFlags []string
 }
 
 type InteractiveDeleteOp struct {
 	SelfCmd string
 }
 
-func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
+func (op InteractiveSwitchOp) Run(stdout io.Writer, stderr io.Writer) error {
+	if op.Query != "" {
+		op.FzfFlags = append(op.FzfFlags, "-q", op.Query)
+	}
+	return op._Run(stdout, stderr)
+}
+
+func (op InteractiveSwitchOp) _Run(_, stderr io.Writer) error {
 	// parse kubeconfig just to see if it can be loaded
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	if err := kc.Parse(); err != nil {
@@ -49,8 +58,11 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 		return errors.Wrap(err, "kubeconfig error")
 	}
 	kc.Close()
-
-	cmd := exec.Command("fzf", "--ansi", "--no-preview")
+	fzfFlags := append([]string{"--ansi", "--no-preview"}, op.FzfFlags...)
+	cmd := exec.Command(
+		"fzf",
+		fzfFlags...,
+	)
 	var out bytes.Buffer
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = stderr
