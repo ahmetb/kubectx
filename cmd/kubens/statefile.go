@@ -16,6 +16,7 @@ package main
 
 import (
 	"bytes"
+	"cmp"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -25,7 +26,7 @@ import (
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 )
 
-var defaultDir = filepath.Join(cmdutil.HomeDir(), ".kube", "kubens")
+var defaultDir = filepath.Join(cmp.Or(os.Getenv("KUBECTX_DIR"), cmdutil.HomeDir()), ".kube", "kubens")
 
 type NSFile struct {
 	dir string
