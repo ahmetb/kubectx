@@ -19,7 +19,7 @@
 [[ -n $DEBUG ]] && set -x
 
 set -eou pipefail
-IFS=$'\n\t'
+IFS=$'\n\t '
 
 SELF_CMD="$0"
 
