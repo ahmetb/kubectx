@@ -23,7 +23,7 @@ import (
 	"github.com/ahmetb/kubectx/internal/printer"
 )
 
-// UnsetOp indicates intention to remove current-context preference.
+// UnsetOp indicates intention to remove current namespace preference.
 type UnsetOp struct{}
 
 func (_ UnsetOp) Run(_, stderr io.Writer) error {
