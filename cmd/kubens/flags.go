@@ -52,6 +52,8 @@ func parseArgs(argv []string) Op {
 			return VersionOp{}
 		case "--current", "-c":
 			return CurrentOp{}
+		case "--unset", "-u":
+			return UnsetOp{}
 		default:
 			return getSwitchOp(v, false)
 		}
