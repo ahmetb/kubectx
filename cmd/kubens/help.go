@@ -40,7 +40,7 @@ func printUsage(out io.Writer) error {
   %PROG% -c, --current      : show the current namespace
   %PROG% -h,--help          : show this message
   %PROG% -V,--version       : show version
-  %PROG% -u,--unset       	: unset the current context`
+  %PROG% -u,--unset         : unset the current context`
 
 	// TODO this replace logic is duplicated between this and kubectx
 	help = strings.ReplaceAll(help, "%PROG%", selfName())
