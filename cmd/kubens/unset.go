@@ -43,7 +43,7 @@ func (_ UnsetOp) Run(_, stderr io.Writer) error {
 
 func clearNamespace(kc *kubeconfig.Kubeconfig) (string, error) {
 	ctx := kc.GetCurrentContext()
-	ns := ""
+	ns := "default"
 	if ctx == "" {
 		return "", errors.New("current-context is not set")
 	}
