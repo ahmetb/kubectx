@@ -47,6 +47,12 @@ exit_err() {
    exit 1
 }
 
+am_i_logged_in() {
+  if ! $KUBECTL auth whoami >/dev/null 2>&1 ; then
+    exit_err "You are not logged in to this context. Log in first. Aborting..."
+  fi
+}
+
 current_namespace() {
   local cur_ctx
 
@@ -100,8 +106,20 @@ save_namespace() {
 
 switch_namespace() {
   local ctx="${1}"
-  $KUBECTL config set-context "${ctx}" --namespace="${2}"
-  echo "Active namespace is \"${2}\".">&2
+  local ns="${2}"
+  local ret=0
+  local verb="get"
+  local resource="pods"
+  local perm="${verb} ${resource}"
+  if $KUBECTL -n ${ns} auth can-i ${verb} ${resource} >/dev/null 2>&1
+  then
+    $KUBECTL config set-context "${ctx}" --namespace="${ns}"
+    echo "Active namespace is \"${ns}\".">&2
+  else
+    echo "Not changing active namespace to \"${ns}\", as permission to \"${perm}\" is missing."
+    ret=1
+  fi
+  return ${ret}
 }
 
 choose_namespace_interactive() {
@@ -130,15 +148,8 @@ set_namespace() {
   ctx="$(current_context)" || exit_err "error getting current context"
   prev="$(current_namespace)" || exit_error "error getting current namespace"
 
-  if grep -q ^"${1}"\$ <(get_namespaces); then
-    switch_namespace "${ctx}" "${1}"
-
-    if [[ "${prev}" != "${1}" ]]; then
-      save_namespace "${ctx}" "${prev}"
-    fi
-  else
-    echo "error: no namespace exists with name \"${1}\".">&2
-    exit 1
+  if ! switch_namespace "${ctx}" "${1}"; then
+    echo "Failed to swich namespace to ${1}"
   fi
 }
 
@@ -188,11 +199,17 @@ main() {
       KUBECTL=kubectl
     elif hash kubectl.exe  2>/dev/null; then
       KUBECTL=kubectl.exe
+    elif hash oc  2>/dev/null; then
+      KUBECTL=oc
+    elif hash oc.exe  2>/dev/null; then
+      KUBECTL=oc.exe
     else
-      echo >&2 "kubectl is not installed"
+      echo >&2 "Neither kubectl nor oc is installed. Aborting..."
       exit 1
     fi
   fi
+
+  am_i_logged_in
 
   if [[ "$#" -eq 0 ]]; then
     if [[ -t 1 && -z ${KUBECTX_IGNORE_FZF:-} && "$(type fzf &>/dev/null; echo $?)" -eq 0 ]]; then
