@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/ahmetb/kubectx/internal/env"
 	"github.com/ahmetb/kubectx/internal/testutil"
 )
 
@@ -80,6 +81,22 @@ func Test_kubectxFilePath(t *testing.T) {
 	defer os.Setenv("HOME", origHome)
 
 	expected := filepath.Join(filepath.FromSlash("/foo/bar"), ".kube", "kubectx")
+	v, err := kubectxPrevCtxFile()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v != expected {
+		t.Fatalf("expected=\"%s\" got=\"%s\"", expected, v)
+	}
+}
+
+func Test_kubectxFilePath_tmp(t *testing.T) {
+	tmpPath := filepath.Join(os.TempDir(), "kubectx-test-config")
+	defer testutil.WithEnvVar(env.EnvTmp, tmpPath)()
+	defer testutil.WithEnvVar("HOME", "")()
+	defer testutil.WithEnvVar("USERPROFILE", "")()
+
+	expected := tmpPath + ".kubectx"
 	v, err := kubectxPrevCtxFile()
 	if err != nil {
 		t.Fatal(err)

@@ -57,6 +57,28 @@ Context "test" set.
 Active namespace is "not-found-namespace".
 ```
 
+### Temporary per-shell context
+
+You can use a temporary kubeconfig so context switches stay scoped to the current
+shell:
+
+```sh
+# auto temp kubeconfig (one per shell)
+export KUBECTX_TMP=1
+kubectx minikube
+
+# or use an explicit path
+kubectx --tmp=$HOME/.kube/config.tmp minikube
+```
+
+If you want `kubectl` in the same shell to follow the same context, set
+`KUBECONFIG` to the same temp path.
+
+Warning: when `kubectx` is invoked with `KUBECTX_TMP=1`, it uses a temp path
+derived from the parent PID, so it does not propagate to subshells. If you want
+to share a temp kubeconfig across subshells, set `KUBECTX_TMP` to an explicit
+path.
+
 If you have [`fzf`](https://github.com/junegunn/fzf) installed, you can also
 **interactively** select a context or cluster, or fuzzy-search by typing a few
 characters. To learn more, read [interactive mode &rarr;](#interactive-mode)

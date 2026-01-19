@@ -43,6 +43,7 @@ func printUsage(out io.Writer) error {
   %PROG% -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
   %SPAC%                         (this command won't delete the user/cluster entry
   %SPAC%                          referenced by the context entry)
+  %PROG% --tmp[=PATH]          : use a temporary kubeconfig for this invocation
   %PROG% -h,--help             : show this message
   %PROG% -V,--version          : show version`
 	help = strings.ReplaceAll(help, "%PROG%", selfName())

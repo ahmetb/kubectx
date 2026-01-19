@@ -22,9 +22,16 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
+	"github.com/ahmetb/kubectx/internal/kubeconfig"
 )
 
 func kubectxPrevCtxFile() (string, error) {
+	if tmpPath, ok, err := kubeconfig.TempKubeconfigPath(); err != nil {
+		return "", errors.Wrap(err, "cannot determine temp kubeconfig path")
+	} else if ok {
+		return tmpPath + ".kubectx", nil
+	}
+
 	home := cmdutil.HomeDir()
 	if home == "" {
 		return "", errors.New("HOME or USERPROFILE environment variable not set")

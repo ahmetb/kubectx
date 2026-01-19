@@ -16,6 +16,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -51,6 +53,18 @@ func Test_parseArgs_new(t *testing.T) {
 		{name: "unset long form",
 			args: []string{"--unset"},
 			want: UnsetOp{}},
+		{name: "tmp list",
+			args: []string{"--tmp"},
+			want: TmpOp{Inner: ListOp{}}},
+		{name: "tmp switch by name",
+			args: []string{"--tmp", "foo"},
+			want: TmpOp{Inner: SwitchOp{Target: "foo"}}},
+		{name: "tmp delete",
+			args: []string{"-d", "--tmp", "."},
+			want: TmpOp{Inner: DeleteOp{[]string{"."}}}},
+		{name: "tmp with explicit path",
+			args: []string{fmt.Sprintf("--tmp=%s", filepath.Join(os.TempDir(), "kubectx-test")), "foo"},
+			want: TmpOp{Inner: SwitchOp{Target: "foo"}, Value: filepath.Join(os.TempDir(), "kubectx-test")}},
 		{name: "switch by name",
 			args: []string{"foo"},
 			want: SwitchOp{Target: "foo"}},

@@ -29,4 +29,8 @@ const (
 
 	// EnvDebug describes the internal environment variable for more verbose logging.
 	EnvDebug = `DEBUG`
+
+	// EnvTmp describes the environment variable to use a temporary kubeconfig
+	// that is scoped to the current shell session.
+	EnvTmp = `KUBECTX_TMP`
 )

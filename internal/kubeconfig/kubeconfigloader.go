@@ -15,10 +15,10 @@
 package kubeconfig
 
 import (
-	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"os"
 	"path/filepath"
 
+	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/pkg/errors"
 )
 
@@ -31,9 +31,19 @@ type StandardKubeconfigLoader struct{}
 type kubeconfigFile struct{ *os.File }
 
 func (*StandardKubeconfigLoader) Load() ([]ReadWriteResetCloser, error) {
-	cfgPath, err := kubeconfigPath()
+	basePath, err := kubeconfigPath()
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot determine kubeconfig path")
+	}
+
+	cfgPath := basePath
+	if tmpPath, ok, err := TempKubeconfigPath(); err != nil {
+		return nil, errors.Wrap(err, "cannot determine temp kubeconfig path")
+	} else if ok {
+		if err := ensureTmpKubeconfig(basePath, tmpPath); err != nil {
+			return nil, errors.Wrap(err, "failed to prepare temp kubeconfig")
+		}
+		cfgPath = tmpPath
 	}
 
 	f, err := os.OpenFile(cfgPath, os.O_RDWR, 0)

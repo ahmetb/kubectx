@@ -33,47 +33,78 @@ func (op UnsupportedOp) Run(_, _ io.Writer) error {
 // parseArgs looks at flags (excl. executable name, i.e. argv[0])
 // and decides which operation should be taken.
 func parseArgs(argv []string) Op {
+	argv, tmpValue, tmpSet := stripTmpFlag(argv)
+
 	if len(argv) == 0 {
 		if cmdutil.IsInteractiveMode(os.Stdout) {
-			return InteractiveSwitchOp{SelfCmd: os.Args[0]}
+			return wrapTmpOp(InteractiveSwitchOp{SelfCmd: os.Args[0]}, tmpValue, tmpSet)
 		}
-		return ListOp{}
+		return wrapTmpOp(ListOp{}, tmpValue, tmpSet)
 	}
 
 	if argv[0] == "-d" {
 		if len(argv) == 1 {
 			if cmdutil.IsInteractiveMode(os.Stdout) {
-				return InteractiveDeleteOp{SelfCmd: os.Args[0]}
+				return wrapTmpOp(InteractiveDeleteOp{SelfCmd: os.Args[0]}, tmpValue, tmpSet)
 			} else {
-				return UnsupportedOp{Err: fmt.Errorf("'-d' needs arguments")}
+				return wrapTmpOp(UnsupportedOp{Err: fmt.Errorf("'-d' needs arguments")}, tmpValue, tmpSet)
 			}
 		}
-		return DeleteOp{Contexts: argv[1:]}
+		return wrapTmpOp(DeleteOp{Contexts: argv[1:]}, tmpValue, tmpSet)
 	}
 
 	if len(argv) == 1 {
 		v := argv[0]
 		if v == "--help" || v == "-h" {
-			return HelpOp{}
+			return wrapTmpOp(HelpOp{}, tmpValue, tmpSet)
 		}
 		if v == "--version" || v == "-V" {
-			return VersionOp{}
+			return wrapTmpOp(VersionOp{}, tmpValue, tmpSet)
 		}
 		if v == "--current" || v == "-c" {
-			return CurrentOp{}
+			return wrapTmpOp(CurrentOp{}, tmpValue, tmpSet)
 		}
 		if v == "--unset" || v == "-u" {
-			return UnsetOp{}
+			return wrapTmpOp(UnsetOp{}, tmpValue, tmpSet)
 		}
 
 		if new, old, ok := parseRenameSyntax(v); ok {
-			return RenameOp{New: new, Old: old}
+			return wrapTmpOp(RenameOp{New: new, Old: old}, tmpValue, tmpSet)
 		}
 
 		if strings.HasPrefix(v, "-") && v != "-" {
-			return UnsupportedOp{Err: fmt.Errorf("unsupported option '%s'", v)}
+			return wrapTmpOp(UnsupportedOp{Err: fmt.Errorf("unsupported option '%s'", v)}, tmpValue, tmpSet)
 		}
-		return SwitchOp{Target: argv[0]}
+		return wrapTmpOp(SwitchOp{Target: argv[0]}, tmpValue, tmpSet)
 	}
-	return UnsupportedOp{Err: fmt.Errorf("too many arguments")}
+	return wrapTmpOp(UnsupportedOp{Err: fmt.Errorf("too many arguments")}, tmpValue, tmpSet)
+}
+
+func wrapTmpOp(op Op, value string, set bool) Op {
+	if !set {
+		return op
+	}
+	return TmpOp{Inner: op, Value: value}
+}
+
+func stripTmpFlag(argv []string) ([]string, string, bool) {
+	var (
+		out      []string
+		tmpValue string
+		tmpSet   bool
+	)
+
+	for _, v := range argv {
+		if v == "--tmp" {
+			tmpSet = true
+			continue
+		}
+		if strings.HasPrefix(v, "--tmp=") {
+			tmpSet = true
+			tmpValue = strings.TrimPrefix(v, "--tmp=")
+			continue
+		}
+		out = append(out, v)
+	}
+	return out, tmpValue, tmpSet
 }
