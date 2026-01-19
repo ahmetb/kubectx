@@ -15,10 +15,12 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"os"
 
 	"github.com/ahmetb/kubectx/internal/env"
+	"github.com/ahmetb/kubectx/internal/kubeconfig"
 )
 
 // TmpOp wraps another operation with temporary kubeconfig mode.
@@ -33,5 +35,10 @@ func (op TmpOp) Run(stdout, stderr io.Writer) error {
 		value = "1"
 	}
 	_ = os.Setenv(env.EnvTmp, value)
+	if tmpPath, ok, err := kubeconfig.TempKubeconfigPath(); err == nil && ok {
+		if kc := os.Getenv("KUBECONFIG"); kc != tmpPath {
+			fmt.Fprintf(stderr, "warning: KUBECTX_TMP is set but KUBECONFIG is %q; to make kubectl follow the same temp context, run:\n  export KUBECTX_TMP=%q\n  export KUBECONFIG=%q\n", kc, tmpPath, tmpPath)
+		}
+	}
 	return op.Inner.Run(stdout, stderr)
 }
