@@ -15,7 +15,6 @@
 package kubeconfig
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -96,7 +95,7 @@ func TestTempKubeconfigPath_auto(t *testing.T) {
 	if !ok {
 		t.Fatal("expected temp kubeconfig path to be set")
 	}
-	expected := filepath.Join(dir, "kubectx", fmt.Sprintf("kubectx-%d", os.Getppid()))
+	expected := filepath.Join(dir, "kubectx", tempKubeconfigName())
 	if got != expected {
 		t.Fatalf("expected=%q, got=%q", expected, got)
 	}

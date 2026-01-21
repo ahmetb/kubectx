@@ -43,11 +43,19 @@ func TempKubeconfigPath() (string, bool, error) {
 		if dir == "" {
 			return "", false, errors.New("temporary directory not available")
 		}
-		name := fmt.Sprintf("kubectx-%d", os.Getppid())
+		name := tempKubeconfigName()
 		return filepath.Join(dir, "kubectx", name), true, nil
 	default:
 		return raw, true, nil
 	}
+}
+
+func tempKubeconfigName() string {
+	ppid := os.Getppid()
+	if ppid <= 1 {
+		ppid = os.Getpid()
+	}
+	return fmt.Sprintf("kubectx-%d", ppid)
 }
 
 func ensureTmpKubeconfig(basePath, tmpPath string) error {

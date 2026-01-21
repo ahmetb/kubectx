@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 
 	"github.com/ahmetb/kubectx/internal/env"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
@@ -37,8 +38,15 @@ func (op TmpOp) Run(stdout, stderr io.Writer) error {
 	_ = os.Setenv(env.EnvTmp, value)
 	if tmpPath, ok, err := kubeconfig.TempKubeconfigPath(); err == nil && ok {
 		if kc := os.Getenv("KUBECONFIG"); kc != tmpPath {
-			fmt.Fprintf(stderr, "warning: KUBECTX_TMP is set but KUBECONFIG is %q; to make kubectl follow the same temp context, run:\n  export KUBECTX_TMP=%q\n  export KUBECONFIG=%q\n", kc, tmpPath, tmpPath)
+			fmt.Fprint(stderr, tmpKubeconfigWarning(kc, tmpPath))
 		}
 	}
 	return op.Inner.Run(stdout, stderr)
+}
+
+func tmpKubeconfigWarning(kubeconfigValue, tmpPath string) string {
+	if runtime.GOOS == "windows" {
+		return fmt.Sprintf("warning: KUBECTX_TMP is set but KUBECONFIG is %q; to make kubectl follow the same temp context, run:\n  PowerShell:\n    $env:KUBECTX_TMP=%q\n    $env:KUBECONFIG=%q\n  cmd.exe:\n    set KUBECTX_TMP=%q\n    set KUBECONFIG=%q\n", kubeconfigValue, tmpPath, tmpPath, tmpPath, tmpPath)
+	}
+	return fmt.Sprintf("warning: KUBECTX_TMP is set but KUBECONFIG is %q; to make kubectl follow the same temp context, run:\n  export KUBECTX_TMP=%q\n  export KUBECONFIG=%q\n", kubeconfigValue, tmpPath, tmpPath)
 }
