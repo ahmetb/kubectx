@@ -94,9 +94,14 @@ func stripTmpFlag(argv []string) ([]string, string, bool) {
 		tmpSet   bool
 	)
 
-	for _, v := range argv {
+	for i := 0; i < len(argv); i++ {
+		v := argv[i]
 		if v == "--tmp" {
 			tmpSet = true
+			if i+1 < len(argv) {
+				tmpValue = argv[i+1]
+				i++
+			}
 			continue
 		}
 		if strings.HasPrefix(v, "--tmp=") {
