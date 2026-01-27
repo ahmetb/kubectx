@@ -20,19 +20,51 @@ import (
 	"io"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/tools/clientcmd"
 
+	"github.com/ahmetb/kubectx/internal/env"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
 )
 
-type ListOp struct{}
+type ListOp struct {
+	cache *kubeNsCache
+}
+
+type stringSet map[string]struct{}
+
+func (op *ListOp) LoadCache() error {
+	if op.cache != nil {
+		return nil
+	}
+
+	cache, err := newKubensCache()
+
+	if err != nil {
+		cache := make(kubeNsCache)
+		op.cache = &cache
+
+		return fmt.Errorf("failed to load cache: %w", err)
+	}
+
+	op.cache = &cache
+
+	return nil
+}
 
 func (op ListOp) Run(stdout, stderr io.Writer) error {
+	if err := op.LoadCache(); err != nil {
+		if _, ok := os.LookupEnv(env.EnvDebug); ok {
+			// print stack trace in verbose mode
+			fmt.Fprintf(color.Error, "[DEBUG] failed to load cache: %+v\n", err)
+		}
+	}
+
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
@@ -43,23 +75,48 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 	if ctx == "" {
 		return errors.New("current-context is not set")
 	}
+
+	nsSet := make(stringSet)
+
 	curNs, err := kc.NamespaceOfContext(ctx)
 	if err != nil {
 		return errors.Wrap(err, "cannot read current namespace")
 	}
 
-	ns, err := queryNamespaces(kc)
+	var namespaces []string
+
+	namespaces, exists := op.cache.Get(ctx)
+	if exists {
+		// pass the cached list for now
+		for _, ns := range namespaces {
+			nsSet[ns] = struct{}{}
+
+			if ns == curNs {
+				ns = printer.ActiveItemColor.Sprint(ns)
+			}
+
+			fmt.Fprintf(stdout, "%s\n", ns)
+		}
+	}
+
+	// now we start querying for the new list
+
+	namespaces, err = queryNamespaces(kc)
 	if err != nil {
 		return errors.Wrap(err, "could not list namespaces (is the cluster accessible?)")
 	}
 
-	for _, c := range ns {
-		s := c
-		if c == curNs {
-			s = printer.ActiveItemColor.Sprint(c)
+	for _, ns := range namespaces {
+		_, exists := nsSet[ns]
+		if exists {
+			continue
 		}
-		fmt.Fprintf(stdout, "%s\n", s)
+		// didn't have this before, append to stdin
+		fmt.Fprintf(stdout, "%s\n", ns)
 	}
+
+	op.cache.Save(ctx, namespaces)
+
 	return nil
 }
 
