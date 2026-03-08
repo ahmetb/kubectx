@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -16,5 +14,8 @@ type VersionOp struct{}
 
 func (_ VersionOp) Run(stdout, _ io.Writer) error {
 	_, err := fmt.Fprintf(stdout, "%s\n", version)
-	return errors.Wrap(err, "write error")
+	if err != nil {
+		return fmt.Errorf("write error: %w", err)
+	}
+	return nil
 }

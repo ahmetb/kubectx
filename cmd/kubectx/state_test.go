@@ -15,12 +15,9 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/ahmetb/kubectx/internal/testutil"
 )
 
 func Test_readLastContext_nonExistingFile(t *testing.T) {
@@ -34,8 +31,11 @@ func Test_readLastContext_nonExistingFile(t *testing.T) {
 }
 
 func Test_readLastContext(t *testing.T) {
-	path, cleanup := testutil.TempFile(t, "foo")
-	defer cleanup()
+	dir := t.TempDir()
+	path := filepath.Join(dir, "testfile")
+	if err := os.WriteFile(path, []byte("foo"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	s, err := readLastContext(path)
 	if err != nil {
@@ -55,10 +55,7 @@ func Test_writeLastContext_err(t *testing.T) {
 }
 
 func Test_writeLastContext(t *testing.T) {
-	dir, err := ioutil.TempDir(os.TempDir(), "state-file-test")
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 	path := filepath.Join(dir, "foo", "bar")
 
 	if err := writeLastContext(path, "ctx1"); err != nil {
@@ -75,9 +72,7 @@ func Test_writeLastContext(t *testing.T) {
 }
 
 func Test_kubectxFilePath(t *testing.T) {
-	origHome := os.Getenv("HOME")
-	os.Setenv("HOME", filepath.FromSlash("/foo/bar"))
-	defer os.Setenv("HOME", origHome)
+	t.Setenv("HOME", filepath.FromSlash("/foo/bar"))
 
 	expected := filepath.Join(filepath.FromSlash("/foo/bar"), ".kube", "kubectx")
 	v, err := kubectxPrevCtxFile()
@@ -90,12 +85,8 @@ func Test_kubectxFilePath(t *testing.T) {
 }
 
 func Test_kubectxFilePath_error(t *testing.T) {
-	origHome := os.Getenv("HOME")
-	origUserprofile := os.Getenv("USERPROFILE")
-	os.Unsetenv("HOME")
-	os.Unsetenv("USERPROFILE")
-	defer os.Setenv("HOME", origHome)
-	defer os.Setenv("USERPROFILE", origUserprofile)
+	t.Setenv("HOME", "")
+	t.Setenv("USERPROFILE", "")
 
 	_, err := kubectxPrevCtxFile()
 	if err == nil {

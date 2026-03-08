@@ -15,8 +15,6 @@
 package main
 
 import (
-	"io/ioutil"
-	"os"
 	"runtime"
 	"strings"
 	"testing"
@@ -25,11 +23,7 @@ import (
 )
 
 func TestNSFile(t *testing.T) {
-	td, err := ioutil.TempDir(os.TempDir(), "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(td)
+	td := t.TempDir()
 
 	f := NewNSFile("foo")
 	f.dir = td

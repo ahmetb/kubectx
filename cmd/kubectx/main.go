@@ -34,7 +34,7 @@ func main() {
 
 	op := parseArgs(os.Args[1:])
 	if err := op.Run(color.Output, color.Error); err != nil {
-		printer.Error(color.Error, err.Error())
+		printer.Error(color.Error, "%s", err)
 
 		if _, ok := os.LookupEnv(env.EnvDebug); ok {
 			// print stack trace in verbose mode

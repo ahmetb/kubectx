@@ -15,7 +15,10 @@
 package kubeconfig
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
+	"slices"
+
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
@@ -42,7 +45,7 @@ func (k *Kubeconfig) contextNode(name string) (*yaml.RNode, error) {
 		return nil, err
 	}
 	if context == nil {
-		return nil, errors.Errorf("context with name \"%s\" not found", name)
+		return nil, fmt.Errorf("context with name \"%s\" not found", name)
 	}
 	return context, nil
 }
@@ -60,11 +63,5 @@ func (k *Kubeconfig) ContextNames() []string {
 }
 
 func (k *Kubeconfig) ContextExists(name string) bool {
-	ctxNames := k.ContextNames()
-	for _, v := range ctxNames {
-		if v == name {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(k.ContextNames(), name)
 }

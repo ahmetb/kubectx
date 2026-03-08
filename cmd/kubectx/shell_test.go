@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"os"
 	"runtime"
 	"testing"
 
@@ -33,13 +32,7 @@ func Test_detectShell_unix(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			orig := os.Getenv("SHELL")
-			defer os.Setenv("SHELL", orig)
-
-			os.Setenv("SHELL", tt.shellEnv)
-			if tt.shellEnv == "" {
-				os.Unsetenv("SHELL")
-			}
+			t.Setenv("SHELL", tt.shellEnv)
 
 			got := detectShell()
 			if got != tt.want {
@@ -51,9 +44,7 @@ func Test_detectShell_unix(t *testing.T) {
 
 func Test_ShellOp_blockedWhenNested(t *testing.T) {
 	// Simulate being inside an isolated shell
-	orig := os.Getenv(env.EnvIsolatedShell)
-	defer os.Setenv(env.EnvIsolatedShell, orig)
-	os.Setenv(env.EnvIsolatedShell, "1")
+	t.Setenv(env.EnvIsolatedShell, "1")
 
 	op := ShellOp{Target: "some-context"}
 	var stdout, stderr bytes.Buffer
@@ -75,10 +66,7 @@ func Test_ShellOp_blockedWhenNested(t *testing.T) {
 }
 
 func Test_resolveKubectl_envVar(t *testing.T) {
-	orig := os.Getenv("KUBECTL")
-	defer os.Setenv("KUBECTL", orig)
-
-	os.Setenv("KUBECTL", "/custom/path/kubectl")
+	t.Setenv("KUBECTL", "/custom/path/kubectl")
 	got, err := resolveKubectl()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -89,9 +77,7 @@ func Test_resolveKubectl_envVar(t *testing.T) {
 }
 
 func Test_resolveKubectl_inPath(t *testing.T) {
-	orig := os.Getenv("KUBECTL")
-	defer os.Setenv("KUBECTL", orig)
-	os.Unsetenv("KUBECTL")
+	t.Setenv("KUBECTL", "")
 
 	// kubectl should be findable in PATH on most dev machines
 	got, err := resolveKubectl()
@@ -104,9 +90,7 @@ func Test_resolveKubectl_inPath(t *testing.T) {
 }
 
 func Test_checkIsolatedMode_notSet(t *testing.T) {
-	orig := os.Getenv(env.EnvIsolatedShell)
-	defer os.Setenv(env.EnvIsolatedShell, orig)
-	os.Unsetenv(env.EnvIsolatedShell)
+	t.Setenv(env.EnvIsolatedShell, "")
 
 	err := checkIsolatedMode()
 	if err != nil {
@@ -115,9 +99,7 @@ func Test_checkIsolatedMode_notSet(t *testing.T) {
 }
 
 func Test_checkIsolatedMode_set(t *testing.T) {
-	orig := os.Getenv(env.EnvIsolatedShell)
-	defer os.Setenv(env.EnvIsolatedShell, orig)
-	os.Setenv(env.EnvIsolatedShell, "1")
+	t.Setenv(env.EnvIsolatedShell, "1")
 
 	err := checkIsolatedMode()
 	if err == nil {

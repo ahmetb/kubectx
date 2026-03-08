@@ -31,7 +31,7 @@ type Context struct {
 func Ctx(name string) *Context           { return &Context{Name: name} }
 func (c *Context) Ns(ns string) *Context { c.Context.Namespace = ns; return c }
 
-type Kubeconfig map[string]interface{}
+type Kubeconfig map[string]any
 
 func KC() *Kubeconfig {
 	return &Kubeconfig{
@@ -39,9 +39,9 @@ func KC() *Kubeconfig {
 		"kind":       "Config"}
 }
 
-func (k *Kubeconfig) Set(key string, v interface{}) *Kubeconfig { (*k)[key] = v; return k }
-func (k *Kubeconfig) WithCurrentCtx(s string) *Kubeconfig       { (*k)["current-context"] = s; return k }
-func (k *Kubeconfig) WithCtxs(c ...*Context) *Kubeconfig        { (*k)["contexts"] = c; return k }
+func (k *Kubeconfig) Set(key string, v any) *Kubeconfig   { (*k)[key] = v; return k }
+func (k *Kubeconfig) WithCurrentCtx(s string) *Kubeconfig { (*k)["current-context"] = s; return k }
+func (k *Kubeconfig) WithCtxs(c ...*Context) *Kubeconfig  { (*k)["contexts"] = c; return k }
 
 func (k *Kubeconfig) ToYAML(t *testing.T) string {
 	t.Helper()

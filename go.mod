@@ -7,7 +7,6 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/google/go-cmp v0.7.0
 	github.com/mattn/go-isatty v0.0.20
-	github.com/pkg/errors v0.9.1
 	k8s.io/apimachinery v0.35.2
 	k8s.io/client-go v0.35.2
 	sigs.k8s.io/kustomize/kyaml v0.21.1
