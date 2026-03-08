@@ -38,7 +38,7 @@ jobs:
         mkdir -p $HOME/.cache/snapcraft/download
         mkdir -p $HOME/.cache/snapcraft/stage-packages
     - name: GoReleaser
-      uses: goreleaser/goreleaser-action@v2
+      uses: goreleaser/goreleaser-action@v7
       with:
         version: latest
         args: release --clean
