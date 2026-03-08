@@ -45,11 +45,11 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Update new version for plugin 'ctx' in krew-index
-      uses: rajatjindal/krew-release-bot@v0.0.38
+      uses: rajatjindal/krew-release-bot@v0.0.51
       with:
         krew_template_file: .krew/ctx.yaml
     - name: Update new version for plugin 'ns' in krew-index
-      uses: rajatjindal/krew-release-bot@v0.0.38
+      uses: rajatjindal/krew-release-bot@v0.0.51
       with:
         krew_template_file: .krew/ns.yaml
     - name: Publish Snaps to the Snap Store (stable channel)
