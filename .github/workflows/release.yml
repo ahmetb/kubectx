@@ -27,7 +27,7 @@ jobs:
       uses: actions/checkout@master
     - run: git fetch --tags
     - name: Setup Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v6
       with:
         go-version: '1.22'
     - name: Install Snapcraft
