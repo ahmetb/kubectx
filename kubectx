@@ -33,6 +33,8 @@ usage() {
   fi
 
   cat <<EOF
+Manage and switch between kubectl contexts.
+
 USAGE:
   $SELF                       : list the contexts
   $SELF <NAME>                : switch to context <NAME>
@@ -46,6 +48,8 @@ USAGE:
   $SELF -u, --unset           : unset the current context
 
   $SELF -h,--help             : show this message
+
+  (This executable is the legacy bash-based implementation, consider upgrading to Go-based implementation.)
 EOF
 }
 
