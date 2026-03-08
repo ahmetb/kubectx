@@ -33,11 +33,11 @@ func (_ UnsetOp) Run(_, stderr io.Writer) error {
 		return errors.Wrap(err, "kubeconfig error")
 	}
 
-	_, err := clearNamespace(kc)
+	ns, err := clearNamespace(kc)
 	if err != nil {
 		return err
 	}
-	err = printer.Success(stderr, "Active namespace unset for kubens.")
+	err = printer.Success(stderr, "Active namespace is \"%s\".", printer.SuccessColor.Sprint(ns))
 	return err
 }
 
