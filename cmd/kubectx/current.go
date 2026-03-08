@@ -27,6 +27,9 @@ import (
 type CurrentOp struct{}
 
 func (_op CurrentOp) Run(stdout, _ io.Writer) error {
+	if err := checkIsolatedMode(); err != nil {
+		return err
+	}
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {

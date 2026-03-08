@@ -29,6 +29,9 @@ type SwitchOp struct {
 }
 
 func (op SwitchOp) Run(_, stderr io.Writer) error {
+	if err := checkIsolatedMode(); err != nil {
+		return err
+	}
 	var newCtx string
 	var err error
 	if op.Target == "-" {

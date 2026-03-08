@@ -30,6 +30,9 @@ type DeleteOp struct {
 
 // deleteContexts deletes context entries one by one.
 func (op DeleteOp) Run(_, stderr io.Writer) error {
+	if err := checkIsolatedMode(); err != nil {
+		return err
+	}
 	for _, ctx := range op.Contexts {
 		// TODO inefficiency here. we open/write/close the same file many times.
 		deletedName, wasActiveContext, err := deleteContext(ctx)
