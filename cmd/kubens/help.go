@@ -37,6 +37,7 @@ func printUsage(out io.Writer) error {
   %PROG% -                  : switch to the previous namespace in this context
   %PROG% -c, --current      : show the current namespace
   %PROG% -h,--help          : show this message
+  %PROG% -u,--unset         : unset the namespace choice (set to 'default')
   %PROG% -V,--version       : show version`
 
 	// TODO this replace logic is duplicated between this and kubectx
