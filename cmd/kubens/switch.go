@@ -105,10 +105,21 @@ func namespaceExists(kc *kubeconfig.Kubeconfig, ns string) (bool, error) {
 		return false, errors.Wrap(err, "failed to initialize k8s REST client")
 	}
 
-	namespace, err := clientset.CoreV1().Namespaces().Get(context.Background(), ns, metav1.GetOptions{})
+	_, err = clientset.CoreV1().Namespaces().Get(context.Background(), ns, metav1.GetOptions{})
+	if err == nil {
+		return true, nil
+	}
 	if errors2.IsNotFound(err) {
 		return false, nil
 	}
-	return namespace != nil, errors.Wrapf(err, "failed to query "+
-		"namespace %q from k8s API", ns)
+	namespaces, err := clientset.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return false, errors.Wrapf(err, "failed to query namespace %q from k8s API (insufficient permissions for get and list)", ns)
+	}
+	for _, nsItem := range namespaces.Items {
+		if nsItem.Name == ns {
+			return true, nil
+		}
+	}
+	return false, nil
 }
