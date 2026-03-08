@@ -31,7 +31,7 @@ jobs:
       with:
         go-version: '1.22'
     - name: Install Snapcraft
-      uses: samuelmeuli/action-snapcraft@v1
+      uses: samuelmeuli/action-snapcraft@v3
     - name: Setup Snapcraft
       run: |
         # https://github.com/goreleaser/goreleaser/issues/1715
