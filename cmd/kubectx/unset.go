@@ -27,6 +27,9 @@ import (
 type UnsetOp struct{}
 
 func (_ UnsetOp) Run(_, stderr io.Writer) error {
+	if err := checkIsolatedMode(); err != nil {
+		return err
+	}
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {

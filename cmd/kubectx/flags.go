@@ -40,6 +40,13 @@ func parseArgs(argv []string) Op {
 		return ListOp{}
 	}
 
+	if argv[0] == "--shell" || argv[0] == "-s" {
+		if len(argv) != 2 {
+			return UnsupportedOp{Err: fmt.Errorf("'%s' requires exactly one context name argument", argv[0])}
+		}
+		return ShellOp{Target: argv[1]}
+	}
+
 	if argv[0] == "-d" {
 		if len(argv) == 1 {
 			if cmdutil.IsInteractiveMode(os.Stdout) {

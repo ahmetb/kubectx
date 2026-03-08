@@ -33,6 +33,9 @@ Switched to context "minikube".
 $ kubectx -
 Switched to context "oregon".
 
+# start an "isolated shell" that only has a single context
+$ kubectx -s minikube
+
 # rename context
 $ kubectx dublin=gke_ahmetb_europe-west1-b_dublin
 Context "gke_ahmetb_europe-west1-b_dublin" renamed to "dublin".

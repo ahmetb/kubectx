@@ -29,4 +29,6 @@ const (
 
 	// EnvDebug describes the internal environment variable for more verbose logging.
 	EnvDebug = `DEBUG`
+
+	EnvIsolatedShell = "KUBECTX_ISOLATED_SHELL"
 )
