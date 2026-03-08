@@ -53,8 +53,10 @@ func (kf *kubeconfigFile) Reset() error {
 	if err := kf.Truncate(0); err != nil {
 		return fmt.Errorf("failed to truncate file: %w", err)
 	}
-	_, err := kf.Seek(0, 0)
-	return fmt.Errorf("failed to seek in file: %w", err)
+	if _, err := kf.Seek(0, 0); err != nil {
+		return fmt.Errorf("failed to seek in file: %w", err)
+	}
+	return nil
 }
 
 func kubeconfigPath() (string, error) {
