@@ -52,6 +52,14 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
+	ctxNames, err := kc.ContextNames()
+	if err != nil {
+		return fmt.Errorf("failed to get context names: %w", err)
+	}
+	if len(ctxNames) == 0 {
+		return errors.New("no contexts found in the kubeconfig file")
+	}
+
 	cmd := exec.Command("fzf", "--ansi", "--no-preview")
 	var out bytes.Buffer
 	cmd.Stdin = os.Stdin
