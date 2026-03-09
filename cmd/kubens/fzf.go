@@ -16,6 +16,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -54,17 +55,17 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 		return fmt.Errorf("cannot read current namespace: %w", err)
 	}
 
-	done := make(chan struct{})
-	defer close(done)
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		select {
 		case <-time.After(3 * time.Second):
 			printer.Warning(stderr, `listing namespaces is taking long, switch to a namespace directly with "kubens -f <ns>"`)
-		case <-done:
+		case <-ctx.Done():
 		}
 	}()
 
-	ns, err := queryNamespaces(kc)
+	ns, err := queryNamespaces(ctx, kc)
+	cancel()
 	if err != nil {
 		return fmt.Errorf("could not list namespaces (is the cluster accessible?): %w", err)
 	}

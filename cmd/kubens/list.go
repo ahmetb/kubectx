@@ -53,17 +53,17 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 		return fmt.Errorf("cannot read current namespace: %w", err)
 	}
 
-	done := make(chan struct{})
-	defer close(done)
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		select {
 		case <-time.After(3 * time.Second):
 			printer.Warning(stderr, `listing namespaces is taking long, switch to a namespace directly with "kubens -f <ns>"`)
-		case <-done:
+		case <-ctx.Done():
 		}
 	}()
 
-	ns, err := queryNamespaces(kc)
+	ns, err := queryNamespaces(ctx, kc)
+	cancel()
 	if err != nil {
 		return fmt.Errorf("could not list namespaces (is the cluster accessible?): %w", err)
 	}
@@ -78,7 +78,7 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 	return nil
 }
 
-func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
+func queryNamespaces(ctx context.Context, kc *kubeconfig.Kubeconfig) ([]string, error) {
 	if os.Getenv("_MOCK_NAMESPACES") != "" {
 		return []string{"ns1", "ns2"}, nil
 	}
@@ -92,7 +92,7 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 	var next string
 	for {
 		list, err := clientset.CoreV1().Namespaces().List(
-			context.Background(),
+			ctx,
 			metav1.ListOptions{
 				Limit:    500,
 				Continue: next,
