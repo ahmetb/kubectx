@@ -15,9 +15,9 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"io"
-
-	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
@@ -30,7 +30,7 @@ func (_ UnsetOp) Run(_, stderr io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
 	ns, err := clearNamespace(kc)
@@ -49,10 +49,10 @@ func clearNamespace(kc *kubeconfig.Kubeconfig) (string, error) {
 	}
 
 	if err := kc.SetNamespace(ctx, ns); err != nil {
-		return "", errors.Wrapf(err, "failed to clear namespace")
+		return "", fmt.Errorf("failed to clear namespace: %w", err)
 	}
 	if err := kc.Save(); err != nil {
-		return "", errors.Wrap(err, "failed to save kubeconfig file")
+		return "", fmt.Errorf("failed to save kubeconfig file: %w", err)
 	}
 	return ns, nil
 }

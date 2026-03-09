@@ -15,9 +15,8 @@
 package cmdutil
 
 import (
+	"errors"
 	"os"
-
-	"github.com/pkg/errors"
 )
 
 func HomeDir() string {
@@ -28,8 +27,7 @@ func HomeDir() string {
 	return home
 }
 
-// IsNotFoundErr determines if the underlying error is os.IsNotExist. Right now
-// errors from github.com/pkg/errors doesn't work with os.IsNotExist.
+// IsNotFoundErr determines if the underlying error is os.IsNotExist.
 func IsNotFoundErr(err error) bool {
 	for e := err; e != nil; e = errors.Unwrap(e) {
 		if os.IsNotExist(e) {

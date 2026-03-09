@@ -43,17 +43,17 @@ func init() {
 	}
 }
 
-func Error(w io.Writer, format string, args ...interface{}) error {
-	_, err := fmt.Fprintf(w, ErrorColor.Sprint("error: ")+format+"\n", args...)
+func Error(w io.Writer, format string, args ...any) error {
+	_, err := io.WriteString(w, ErrorColor.Sprint("error: ")+fmt.Sprintf(format, args...)+"\n")
 	return err
 }
 
-func Warning(w io.Writer, format string, args ...interface{}) error {
-	_, err := fmt.Fprintf(w, WarningColor.Sprint("warning: ")+format+"\n", args...)
+func Warning(w io.Writer, format string, args ...any) error {
+	_, err := io.WriteString(w, WarningColor.Sprint("warning: ")+fmt.Sprintf(format, args...)+"\n")
 	return err
 }
 
-func Success(w io.Writer, format string, args ...interface{}) error {
-	_, err := fmt.Fprintf(w, SuccessColor.Sprint("✔ ")+fmt.Sprintf(format+"\n", args...))
+func Success(w io.Writer, format string, args ...any) error {
+	_, err := io.WriteString(w, SuccessColor.Sprint("✔ ")+fmt.Sprintf(format, args...)+"\n")
 	return err
 }

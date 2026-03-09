@@ -16,7 +16,6 @@ package main
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -45,7 +44,7 @@ func (f NSFile) path() string {
 
 // Load reads the previous namespace setting, or returns empty if not exists.
 func (f NSFile) Load() (string, error) {
-	b, err := ioutil.ReadFile(f.path())
+	b, err := os.ReadFile(f.path())
 	if err != nil {
 		if os.IsNotExist(err) {
 			return "", nil
@@ -61,7 +60,7 @@ func (f NSFile) Save(value string) error {
 	if err := os.MkdirAll(d, 0755); err != nil {
 		return err
 	}
-	return ioutil.WriteFile(f.path(), []byte(value), 0644)
+	return os.WriteFile(f.path(), []byte(value), 0644)
 }
 
 // isWindows determines if the process is running on windows OS.

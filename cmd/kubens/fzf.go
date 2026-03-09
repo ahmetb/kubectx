@@ -16,13 +16,12 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/env"
@@ -43,7 +42,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 			printer.Warning(stderr, "kubeconfig file not found")
 			return nil
 		}
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 	defer kc.Close()
 
@@ -57,7 +56,8 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", op.SelfCmd),
 		fmt.Sprintf("%s=1", env.EnvForceColor))
 	if err := cmd.Run(); err != nil {
-		if _, ok := err.(*exec.ExitError); !ok {
+		var exitErr *exec.ExitError
+		if !errors.As(err, &exitErr) {
 			return err
 		}
 	}
@@ -67,7 +67,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	}
 	name, err := switchNamespace(kc, choice, false)
 	if err != nil {
-		return errors.Wrap(err, "failed to switch namespace")
+		return fmt.Errorf("failed to switch namespace: %w", err)
 	}
 	printer.Success(stderr, "Active namespace is \"%s\".", printer.SuccessColor.Sprint(name))
 	return nil

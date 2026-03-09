@@ -15,11 +15,10 @@
 package main
 
 import (
-	"io/ioutil"
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 )
@@ -35,7 +34,7 @@ func kubectxPrevCtxFile() (string, error) {
 // readLastContext returns the saved previous context
 // if the state file exists, otherwise returns "".
 func readLastContext(path string) (string, error) {
-	b, err := ioutil.ReadFile(path)
+	b, err := os.ReadFile(path)
 	if os.IsNotExist(err) {
 		return "", nil
 	}
@@ -47,7 +46,7 @@ func readLastContext(path string) (string, error) {
 func writeLastContext(path, value string) error {
 	dir := filepath.Dir(path)
 	if err := os.MkdirAll(dir, 0755); err != nil {
-		return errors.Wrap(err, "failed to create parent directories")
+		return fmt.Errorf("failed to create parent directories: %w", err)
 	}
-	return ioutil.WriteFile(path, []byte(value), 0644)
+	return os.WriteFile(path, []byte(value), 0644)
 }

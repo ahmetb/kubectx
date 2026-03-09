@@ -8,7 +8,6 @@ import (
 	"runtime"
 
 	"github.com/fatih/color"
-	"github.com/pkg/errors"
 
 	"github.com/ahmetb/kubectx/internal/env"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
@@ -34,7 +33,7 @@ func (op ShellOp) Run(_, stderr io.Writer) error {
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
-		return errors.Wrap(err, "kubeconfig error")
+		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 	if !kc.ContextExists(op.Target) {
 		return fmt.Errorf("no context exists with the name: \"%s\"", op.Target)
@@ -44,20 +43,20 @@ func (op ShellOp) Run(_, stderr io.Writer) error {
 	// Extract minimal kubeconfig using kubectl
 	data, err := extractMinimalKubeconfig(kubectlPath, op.Target)
 	if err != nil {
-		return errors.Wrap(err, "failed to extract kubeconfig for context")
+		return fmt.Errorf("failed to extract kubeconfig for context: %w", err)
 	}
 
 	// Write to temp file
 	tmpFile, err := os.CreateTemp("", "kubectx-shell-*.yaml")
 	if err != nil {
-		return errors.Wrap(err, "failed to create temp kubeconfig file")
+		return fmt.Errorf("failed to create temp kubeconfig file: %w", err)
 	}
 	tmpPath := tmpFile.Name()
 	defer os.Remove(tmpPath)
 
 	if _, err := tmpFile.Write(data); err != nil {
 		tmpFile.Close()
-		return errors.Wrap(err, "failed to write temp kubeconfig")
+		return fmt.Errorf("failed to write temp kubeconfig: %w", err)
 	}
 	tmpFile.Close()
 
