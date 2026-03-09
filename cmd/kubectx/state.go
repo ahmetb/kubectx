@@ -24,11 +24,11 @@ import (
 )
 
 func kubectxPrevCtxFile() (string, error) {
-	home := cmdutil.HomeDir()
-	if home == "" {
+	dir := cmdutil.CacheDir()
+	if dir == "" {
 		return "", errors.New("HOME or USERPROFILE environment variable not set")
 	}
-	return filepath.Join(home, ".kube", "kubectx"), nil
+	return filepath.Join(dir, "kubectx"), nil
 }
 
 // readLastContext returns the saved previous context

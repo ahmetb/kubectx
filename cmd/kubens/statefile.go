@@ -24,7 +24,7 @@ import (
 	"github.com/ahmetb/kubectx/internal/cmdutil"
 )
 
-var defaultDir = filepath.Join(cmdutil.HomeDir(), ".kube", "kubens")
+var defaultDir = filepath.Join(cmdutil.CacheDir(), "kubens")
 
 type NSFile struct {
 	dir string

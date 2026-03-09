@@ -73,8 +73,22 @@ func Test_writeLastContext(t *testing.T) {
 
 func Test_kubectxFilePath(t *testing.T) {
 	t.Setenv("HOME", filepath.FromSlash("/foo/bar"))
+	t.Setenv("XDG_CACHE_HOME", "")
 
 	expected := filepath.Join(filepath.FromSlash("/foo/bar"), ".kube", "kubectx")
+	v, err := kubectxPrevCtxFile()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v != expected {
+		t.Fatalf("expected=\"%s\" got=\"%s\"", expected, v)
+	}
+}
+
+func Test_kubectxFilePath_xdgCacheHome(t *testing.T) {
+	t.Setenv("XDG_CACHE_HOME", filepath.FromSlash("/tmp/xdg-cache"))
+
+	expected := filepath.Join(filepath.FromSlash("/tmp/xdg-cache"), "kubectx")
 	v, err := kubectxPrevCtxFile()
 	if err != nil {
 		t.Fatal(err)
