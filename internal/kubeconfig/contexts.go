@@ -50,18 +50,25 @@ func (k *Kubeconfig) contextNode(name string) (*yaml.RNode, error) {
 	return context, nil
 }
 
-func (k *Kubeconfig) ContextNames() []string {
+func (k *Kubeconfig) ContextNames() ([]string, error) {
 	contexts, err := k.config.Pipe(yaml.Get("contexts"))
 	if err != nil {
-		return nil
+		return nil, fmt.Errorf("failed to get contexts: %w", err)
+	}
+	if contexts == nil {
+		return nil, nil
 	}
 	names, err := contexts.ElementValues("name")
 	if err != nil {
-		return nil
+		return nil, fmt.Errorf("failed to get context names: %w", err)
 	}
-	return names
+	return names, nil
 }
 
-func (k *Kubeconfig) ContextExists(name string) bool {
-	return slices.Contains(k.ContextNames(), name)
+func (k *Kubeconfig) ContextExists(name string) (bool, error) {
+	names, err := k.ContextNames()
+	if err != nil {
+		return false, err
+	}
+	return slices.Contains(names, name), nil
 }

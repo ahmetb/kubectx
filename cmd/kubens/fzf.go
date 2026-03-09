@@ -37,6 +37,7 @@ type InteractiveSwitchOp struct {
 func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	// parse kubeconfig just to see if it can be loaded
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
+	defer kc.Close()
 	if err := kc.Parse(); err != nil {
 		if cmdutil.IsNotFoundErr(err) {
 			printer.Warning(stderr, "kubeconfig file not found")
@@ -44,7 +45,6 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 		}
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
-	defer kc.Close()
 
 	cmd := exec.Command("fzf", "--ansi", "--no-preview")
 	var out bytes.Buffer
@@ -69,6 +69,6 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	if err != nil {
 		return fmt.Errorf("failed to switch namespace: %w", err)
 	}
-	printer.Success(stderr, "Active namespace is \"%s\".", printer.SuccessColor.Sprint(name))
+	_ = printer.Success(stderr, "Active namespace is \"%s\".", printer.SuccessColor.Sprint(name))
 	return nil
 }

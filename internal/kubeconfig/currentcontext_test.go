@@ -26,7 +26,10 @@ func TestKubeconfig_GetCurrentContext(t *testing.T) {
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
 	}
-	v := kc.GetCurrentContext()
+	v, err := kc.GetCurrentContext()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	expected := "foo"
 	if v != expected {
@@ -40,7 +43,10 @@ func TestKubeconfig_GetCurrentContext_missingField(t *testing.T) {
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
 	}
-	v := kc.GetCurrentContext()
+	v, err := kc.GetCurrentContext()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	expected := ""
 	if v != expected {

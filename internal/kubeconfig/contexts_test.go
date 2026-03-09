@@ -33,7 +33,10 @@ func TestKubeconfig_ContextNames(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ctx := kc.ContextNames()
+	ctx, err := kc.ContextNames()
+	if err != nil {
+		t.Fatal(err)
+	}
 	expected := []string{"abc", "def", "ghi"}
 	if diff := cmp.Diff(expected, ctx); diff != "" {
 		t.Fatalf("%s", diff)
@@ -46,7 +49,10 @@ func TestKubeconfig_ContextNames_noContextsEntry(t *testing.T) {
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
 	}
-	ctx := kc.ContextNames()
+	ctx, err := kc.ContextNames()
+	if err != nil {
+		t.Fatal(err)
+	}
 	var expected []string = nil
 	if diff := cmp.Diff(expected, ctx); diff != "" {
 		t.Fatalf("%s", diff)
@@ -59,10 +65,9 @@ func TestKubeconfig_ContextNames_nonArrayContextsEntry(t *testing.T) {
 	if err := kc.Parse(); err != nil {
 		t.Fatal(err)
 	}
-	ctx := kc.ContextNames()
-	var expected []string = nil
-	if diff := cmp.Diff(expected, ctx); diff != "" {
-		t.Fatalf("%s", diff)
+	_, err := kc.ContextNames()
+	if err == nil {
+		t.Fatal("expected error for non-array contexts entry")
 	}
 }
 
@@ -77,13 +82,15 @@ func TestKubeconfig_CheckContextExists(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if !kc.ContextExists("c1") {
+	if exists, err := kc.ContextExists("c1"); err != nil || !exists {
 		t.Fatal("c1 actually exists; reported false")
 	}
-	if !kc.ContextExists("c2") {
+	if exists, err := kc.ContextExists("c2"); err != nil || !exists {
 		t.Fatal("c2 actually exists; reported false")
 	}
-	if kc.ContextExists("c3") {
+	if exists, err := kc.ContextExists("c3"); err != nil {
+		t.Fatal(err)
+	} else if exists {
 		t.Fatal("c3 does not exist; but reported true")
 	}
 }

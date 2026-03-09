@@ -42,10 +42,16 @@ func (_ ListOp) Run(stdout, stderr io.Writer) error {
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
-	ctxs := kc.ContextNames()
+	ctxs, err := kc.ContextNames()
+	if err != nil {
+		return fmt.Errorf("failed to get context names: %w", err)
+	}
 	natsort.Sort(ctxs)
 
-	cur := kc.GetCurrentContext()
+	cur, err := kc.GetCurrentContext()
+	if err != nil {
+		return fmt.Errorf("failed to get current context: %w", err)
+	}
 	for _, c := range ctxs {
 		s := c
 		if c == cur {

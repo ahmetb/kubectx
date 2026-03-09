@@ -43,6 +43,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	}
 	// parse kubeconfig just to see if it can be loaded
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
+	defer kc.Close()
 	if err := kc.Parse(); err != nil {
 		if cmdutil.IsNotFoundErr(err) {
 			printer.Warning(stderr, "kubeconfig file not found")
@@ -50,7 +51,6 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 		}
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
-	kc.Close()
 
 	cmd := exec.Command("fzf", "--ansi", "--no-preview")
 	var out bytes.Buffer
@@ -75,7 +75,7 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	if err != nil {
 		return fmt.Errorf("failed to switch context: %w", err)
 	}
-	printer.Success(stderr, "Switched to context \"%s\".", printer.SuccessColor.Sprint(name))
+	_ = printer.Success(stderr, "Switched to context \"%s\".", printer.SuccessColor.Sprint(name))
 	return nil
 }
 
@@ -85,6 +85,7 @@ func (op InteractiveDeleteOp) Run(_, stderr io.Writer) error {
 	}
 	// parse kubeconfig just to see if it can be loaded
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
+	defer kc.Close()
 	if err := kc.Parse(); err != nil {
 		if cmdutil.IsNotFoundErr(err) {
 			printer.Warning(stderr, "kubeconfig file not found")
@@ -92,9 +93,12 @@ func (op InteractiveDeleteOp) Run(_, stderr io.Writer) error {
 		}
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
-	kc.Close()
 
-	if len(kc.ContextNames()) == 0 {
+	ctxNames, err := kc.ContextNames()
+	if err != nil {
+		return fmt.Errorf("failed to get context names: %w", err)
+	}
+	if len(ctxNames) == 0 {
 		return errors.New("no contexts found in config")
 	}
 
@@ -129,7 +133,7 @@ func (op InteractiveDeleteOp) Run(_, stderr io.Writer) error {
 			selfName())
 	}
 
-	printer.Success(stderr, `Deleted context %s.`, printer.SuccessColor.Sprint(name))
+	_ = printer.Success(stderr, `Deleted context %s.`, printer.SuccessColor.Sprint(name))
 
 	return nil
 }

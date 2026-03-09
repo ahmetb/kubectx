@@ -61,8 +61,15 @@ func switchContext(name string) (string, error) {
 		return "", fmt.Errorf("kubeconfig error: %w", err)
 	}
 
-	prev := kc.GetCurrentContext()
-	if !kc.ContextExists(name) {
+	prev, err := kc.GetCurrentContext()
+	if err != nil {
+		return "", fmt.Errorf("failed to get current context: %w", err)
+	}
+	exists, err := kc.ContextExists(name)
+	if err != nil {
+		return "", fmt.Errorf("failed to check context: %w", err)
+	}
+	if !exists {
 		return "", fmt.Errorf("no context exists with the name: \"%s\"", name)
 	}
 	if err := kc.ModifyCurrentContext(name); err != nil {

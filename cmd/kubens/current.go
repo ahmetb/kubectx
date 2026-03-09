@@ -31,7 +31,10 @@ func (c CurrentOp) Run(stdout, _ io.Writer) error {
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
-	ctx := kc.GetCurrentContext()
+	ctx, err := kc.GetCurrentContext()
+	if err != nil {
+		return fmt.Errorf("failed to get current context: %w", err)
+	}
 	if ctx == "" {
 		return errors.New("current-context is not set")
 	}
