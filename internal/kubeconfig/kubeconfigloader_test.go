@@ -15,17 +15,16 @@
 package kubeconfig
 
 import (
-	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/ahmetb/kubectx/internal/testutil"
+	"github.com/ahmetb/kubectx/internal/cmdutil"
 )
 
 func Test_kubeconfigPath(t *testing.T) {
-	defer testutil.WithEnvVar("HOME", "/x/y/z")()
+	t.Setenv("HOME", "/x/y/z")
 
 	expected := filepath.FromSlash("/x/y/z/.kube/config")
 	got, err := kubeconfigPath()
@@ -38,9 +37,9 @@ func Test_kubeconfigPath(t *testing.T) {
 }
 
 func Test_kubeconfigPath_noEnvVars(t *testing.T) {
-	defer testutil.WithEnvVar("XDG_CACHE_HOME", "")()
-	defer testutil.WithEnvVar("HOME", "")()
-	defer testutil.WithEnvVar("USERPROFILE", "")()
+	t.Setenv("XDG_CACHE_HOME", "")
+	t.Setenv("HOME", "")
+	t.Setenv("USERPROFILE", "")
 
 	_, err := kubeconfigPath()
 	if err == nil {
@@ -49,7 +48,7 @@ func Test_kubeconfigPath_noEnvVars(t *testing.T) {
 }
 
 func Test_kubeconfigPath_envOvveride(t *testing.T) {
-	defer testutil.WithEnvVar("KUBECONFIG", "foo")()
+	t.Setenv("KUBECONFIG", "foo")
 
 	v, err := kubeconfigPath()
 	if err != nil {
@@ -62,7 +61,7 @@ func Test_kubeconfigPath_envOvveride(t *testing.T) {
 
 func Test_kubeconfigPath_envOvverideDoesNotSupportPathSeparator(t *testing.T) {
 	path := strings.Join([]string{"file1", "file2"}, string(os.PathListSeparator))
-	defer testutil.WithEnvVar("KUBECONFIG", path)()
+	t.Setenv("KUBECONFIG", path)
 
 	_, err := kubeconfigPath()
 	if err == nil {
@@ -71,7 +70,7 @@ func Test_kubeconfigPath_envOvverideDoesNotSupportPathSeparator(t *testing.T) {
 }
 
 func TestStandardKubeconfigLoader_returnsNotFoundErr(t *testing.T) {
-	defer testutil.WithEnvVar("KUBECONFIG", "foo")()
+	t.Setenv("KUBECONFIG", "foo")
 	kc := new(Kubeconfig).WithLoader(DefaultLoader)
 	err := kc.Parse()
 	if err == nil {

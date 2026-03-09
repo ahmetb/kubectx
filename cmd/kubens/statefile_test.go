@@ -18,8 +18,6 @@ import (
 	"runtime"
 	"strings"
 	"testing"
-
-	"github.com/ahmetb/kubectx/internal/testutil"
 )
 
 func TestNSFile(t *testing.T) {
@@ -50,7 +48,7 @@ func TestNSFile(t *testing.T) {
 }
 
 func TestNSFile_path_windows(t *testing.T) {
-	defer testutil.WithEnvVar("_FORCE_GOOS", "windows")()
+	t.Setenv("_FORCE_GOOS", "windows")
 	fp := NewNSFile("a:b:c").path()
 
 	if expected := "a__b__c"; !strings.HasSuffix(fp, expected) {
@@ -68,7 +66,7 @@ func Test_isWindows(t *testing.T) {
 		t.Fatalf("isWindows() returned true for %s", runtime.GOOS)
 	}
 
-	defer testutil.WithEnvVar("_FORCE_GOOS", "windows")()
+	t.Setenv("_FORCE_GOOS", "windows")
 	if !isWindows() {
 		t.Fatalf("isWindows() failed to detect windows with env override.")
 	}
