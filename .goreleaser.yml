@@ -15,7 +15,7 @@
 # limitations under the License.
 
 # This is an example goreleaser.yaml file with some sane defaults.
-# Make sure to check the documentation at http://goreleaser.com
+# Make sure to check the documentation at https://goreleaser.com
 
 version: 2
 before:
@@ -69,11 +69,11 @@ archives:
       {{- else -}}v{{- . -}}
       {{- end -}}
     {{- end -}}
-  builds:
+  ids:
     - kubectx
   format_overrides:
     - goos: windows
-      format: zip
+      formats: [zip]
   files: ["LICENSE"]
 - id: kubens-archive
   name_template: |-
@@ -89,11 +89,11 @@ archives:
       {{- else -}}v{{- . -}}
       {{- end -}}
     {{- end -}}
-  builds:
+  ids:
     - kubens
   format_overrides:
     - goos: windows
-      format: zip
+      formats: [zip]
   files: ["LICENSE"]
 checksum:
   name_template: "checksums.txt"
@@ -111,7 +111,7 @@ snapcrafts:
       kubens is a tool to switch between Kubernetes namespaces (and configure them for kubectl) easily.
     grade: stable
     confinement: classic
-    base: core20
+    base: core24
     apps:
       kubectx:
         command: kubectx
