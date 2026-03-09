@@ -17,6 +17,7 @@ package cmdutil
 import (
 	"errors"
 	"os"
+	"path/filepath"
 )
 
 func HomeDir() string {
@@ -25,6 +26,19 @@ func HomeDir() string {
 		home = os.Getenv("USERPROFILE") // windows
 	}
 	return home
+}
+
+// CacheDir returns XDG_CACHE_HOME if set, otherwise $HOME/.kube,
+// matching the bash scripts' behavior: ${XDG_CACHE_HOME:-$HOME/.kube}.
+func CacheDir() string {
+	if xdg := os.Getenv("XDG_CACHE_HOME"); xdg != "" {
+		return xdg
+	}
+	home := HomeDir()
+	if home == "" {
+		return ""
+	}
+	return filepath.Join(home, ".kube")
 }
 
 // IsNotFoundErr determines if the underlying error is os.IsNotExist.

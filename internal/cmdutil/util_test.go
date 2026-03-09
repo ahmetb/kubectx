@@ -15,6 +15,7 @@
 package cmdutil
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/ahmetb/kubectx/internal/testutil"
@@ -77,4 +78,30 @@ func Test_homeDir(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCacheDir(t *testing.T) {
+	t.Run("XDG_CACHE_HOME set", func(t *testing.T) {
+		t.Setenv("XDG_CACHE_HOME", "/tmp/xdg-cache")
+		t.Setenv("HOME", "/home/user")
+		if got := CacheDir(); got != "/tmp/xdg-cache" {
+			t.Errorf("expected:%q got:%q", "/tmp/xdg-cache", got)
+		}
+	})
+	t.Run("XDG_CACHE_HOME unset, falls back to HOME/.kube", func(t *testing.T) {
+		t.Setenv("XDG_CACHE_HOME", "")
+		t.Setenv("HOME", "/home/user")
+		want := filepath.Join("/home/user", ".kube")
+		if got := CacheDir(); got != want {
+			t.Errorf("expected:%q got:%q", want, got)
+		}
+	})
+	t.Run("neither set", func(t *testing.T) {
+		t.Setenv("XDG_CACHE_HOME", "")
+		t.Setenv("HOME", "")
+		t.Setenv("USERPROFILE", "")
+		if got := CacheDir(); got != "" {
+			t.Errorf("expected:%q got:%q", "", got)
+		}
+	})
 }
