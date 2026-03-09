@@ -17,8 +17,6 @@ package cmdutil
 import (
 	"path/filepath"
 	"testing"
-
-	"github.com/ahmetb/kubectx/internal/testutil"
 )
 
 func Test_homeDir(t *testing.T) {
@@ -64,17 +62,13 @@ func Test_homeDir(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(tt *testing.T) {
-			var unsets []func()
 			for _, e := range c.envs {
-				unsets = append(unsets, testutil.WithEnvVar(e.k, e.v))
+				tt.Setenv(e.k, e.v)
 			}
 
 			got := HomeDir()
 			if got != c.want {
 				t.Errorf("expected:%q got:%q", c.want, got)
-			}
-			for _, u := range unsets {
-				u()
 			}
 		})
 	}
