@@ -35,10 +35,17 @@ func (op ShellOp) Run(_, stderr io.Writer) error {
 	if err := kc.Parse(); err != nil {
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
-	if !kc.ContextExists(op.Target) {
+	exists, err := kc.ContextExists(op.Target)
+	if err != nil {
+		return fmt.Errorf("failed to check context: %w", err)
+	}
+	if !exists {
 		return fmt.Errorf("no context exists with the name: \"%s\"", op.Target)
 	}
-	previousCtx := kc.GetCurrentContext()
+	previousCtx, err := kc.GetCurrentContext()
+	if err != nil {
+		return fmt.Errorf("failed to get current context: %w", err)
+	}
 
 	// Extract minimal kubeconfig using kubectl
 	data, err := extractMinimalKubeconfig(kubectlPath, op.Target)

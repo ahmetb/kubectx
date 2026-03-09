@@ -87,5 +87,8 @@ func (k *Kubeconfig) Save() error {
 	}
 	enc := yaml.NewEncoder(k.f)
 	enc.SetIndent(0)
-	return enc.Encode(k.config.YNode())
+	if err := enc.Encode(k.config.YNode()); err != nil {
+		return err
+	}
+	return enc.Close()
 }

@@ -44,7 +44,7 @@ func (op DeleteOp) Run(_, stderr io.Writer) error {
 				selfName())
 		}
 
-		printer.Success(stderr, `Deleted context %s.`, printer.SuccessColor.Sprint(deletedName))
+		_ = printer.Success(stderr, `Deleted context %s.`, printer.SuccessColor.Sprint(deletedName))
 	}
 	return nil
 }
@@ -58,7 +58,10 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 		return deleteName, false, fmt.Errorf("kubeconfig error: %w", err)
 	}
 
-	cur := kc.GetCurrentContext()
+	cur, err := kc.GetCurrentContext()
+	if err != nil {
+		return deleteName, false, fmt.Errorf("failed to get current context: %w", err)
+	}
 	// resolve "." to a real name
 	if name == "." {
 		if cur == "" {
@@ -68,7 +71,11 @@ func deleteContext(name string) (deleteName string, wasActiveContext bool, err e
 		name = cur
 	}
 
-	if !kc.ContextExists(name) {
+	exists, err := kc.ContextExists(name)
+	if err != nil {
+		return name, false, fmt.Errorf("failed to check context: %w", err)
+	}
+	if !exists {
 		return name, false, errors.New("context does not exist")
 	}
 

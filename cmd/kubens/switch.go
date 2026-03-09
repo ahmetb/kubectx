@@ -49,7 +49,10 @@ func (s SwitchOp) Run(_, stderr io.Writer) error {
 }
 
 func switchNamespace(kc *kubeconfig.Kubeconfig, ns string, force bool) (string, error) {
-	ctx := kc.GetCurrentContext()
+	ctx, err := kc.GetCurrentContext()
+	if err != nil {
+		return "", fmt.Errorf("failed to get current context: %w", err)
+	}
 	if ctx == "" {
 		return "", errors.New("current-context is not set")
 	}

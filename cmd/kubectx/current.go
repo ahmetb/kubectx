@@ -35,12 +35,14 @@ func (_op CurrentOp) Run(stdout, _ io.Writer) error {
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
-	v := kc.GetCurrentContext()
+	v, err := kc.GetCurrentContext()
+	if err != nil {
+		return fmt.Errorf("failed to get current context: %w", err)
+	}
 	if v == "" {
 		return errors.New("current-context is not set")
 	}
-	_, err := fmt.Fprintln(stdout, v)
-	if err != nil {
+	if _, err := fmt.Fprintln(stdout, v); err != nil {
 		return fmt.Errorf("write error: %w", err)
 	}
 	return nil

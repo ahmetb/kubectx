@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -39,7 +40,10 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
-	ctx := kc.GetCurrentContext()
+	ctx, err := kc.GetCurrentContext()
+	if err != nil {
+		return fmt.Errorf("failed to get current context: %w", err)
+	}
 	if ctx == "" {
 		return errors.New("current-context is not set")
 	}
@@ -86,6 +90,7 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 			return nil, fmt.Errorf("failed to list namespaces from k8s API: %w", err)
 		}
 		next = list.Continue
+		out = slices.Grow(out, len(list.Items))
 		for _, it := range list.Items {
 			out = append(out, it.Name)
 		}

@@ -52,16 +52,27 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
-	cur := kc.GetCurrentContext()
+	cur, err := kc.GetCurrentContext()
+	if err != nil {
+		return fmt.Errorf("failed to get current context: %w", err)
+	}
 	if op.Old == "." {
 		op.Old = cur
 	}
 
-	if !kc.ContextExists(op.Old) {
+	oldExists, err := kc.ContextExists(op.Old)
+	if err != nil {
+		return fmt.Errorf("failed to check context: %w", err)
+	}
+	if !oldExists {
 		return fmt.Errorf("context \"%s\" not found, can't rename it", op.Old)
 	}
 
-	if kc.ContextExists(op.New) {
+	newExists, err := kc.ContextExists(op.New)
+	if err != nil {
+		return fmt.Errorf("failed to check context: %w", err)
+	}
+	if newExists {
 		printer.Warning(stderr, "context \"%s\" exists, overwriting it.", op.New)
 		if err := kc.DeleteContextEntry(op.New); err != nil {
 			return fmt.Errorf("failed to delete new context to overwrite it: %w", err)
@@ -79,7 +90,7 @@ func (op RenameOp) Run(_, stderr io.Writer) error {
 	if err := kc.Save(); err != nil {
 		return fmt.Errorf("failed to save modified kubeconfig: %w", err)
 	}
-	printer.Success(stderr, "Context %s renamed to %s.",
+	_ = printer.Success(stderr, "Context %s renamed to %s.",
 		printer.SuccessColor.Sprint(op.Old),
 		printer.SuccessColor.Sprint(op.New))
 	return nil

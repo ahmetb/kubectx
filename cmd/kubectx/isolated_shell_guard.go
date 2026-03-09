@@ -19,6 +19,6 @@ func checkIsolatedMode() error {
 		return fmt.Errorf("you are in a locked single-context shell, use 'exit' to leave")
 	}
 
-	cur := kc.GetCurrentContext()
+	cur, _ := kc.GetCurrentContext()
 	return fmt.Errorf("you are in a locked single-context shell (\"%s\"), use 'exit' to leave", cur)
 }
