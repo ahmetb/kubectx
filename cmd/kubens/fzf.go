@@ -19,23 +19,19 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/ahmetb/kubectx/internal/cmdutil"
-	"github.com/ahmetb/kubectx/internal/env"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
 )
 
-type InteractiveSwitchOp struct {
-	SelfCmd string
-}
+type InteractiveSwitchOp struct{}
 
 // TODO(ahmetb) This method is heavily repetitive vs kubectx/fzf.go.
 func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
-	// parse kubeconfig just to see if it can be loaded
 	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
 	defer kc.Close()
 	if err := kc.Parse(); err != nil {
@@ -46,23 +42,48 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
-	ctxNames, err := kc.ContextNames()
+	ctx, err := kc.GetCurrentContext()
 	if err != nil {
-		return fmt.Errorf("failed to get context names: %w", err)
+		return fmt.Errorf("failed to get current context: %w", err)
 	}
-	if len(ctxNames) == 0 {
-		return errors.New("no contexts found in the kubeconfig file")
+	if ctx == "" {
+		return errors.New("current-context is not set")
+	}
+	curNs, err := kc.NamespaceOfContext(ctx)
+	if err != nil {
+		return fmt.Errorf("cannot read current namespace: %w", err)
+	}
+
+	done := make(chan struct{})
+	defer close(done)
+	go func() {
+		select {
+		case <-time.After(3 * time.Second):
+			printer.Warning(stderr, `listing namespaces is taking long, switch to a namespace directly with "kubens -f <ns>"`)
+		case <-done:
+		}
+	}()
+
+	ns, err := queryNamespaces(kc)
+	if err != nil {
+		return fmt.Errorf("could not list namespaces (is the cluster accessible?): %w", err)
+	}
+
+	var input bytes.Buffer
+	for _, c := range ns {
+		s := c
+		if c == curNs {
+			s = printer.ActiveItemColor.Sprint(c)
+		}
+		fmt.Fprintf(&input, "%s\n", s)
 	}
 
 	cmd := exec.Command("fzf", "--ansi", "--no-preview")
-	var out bytes.Buffer
-	cmd.Stdin = os.Stdin
+	cmd.Stdin = &input
 	cmd.Stderr = stderr
+	var out bytes.Buffer
 	cmd.Stdout = &out
 
-	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", op.SelfCmd),
-		fmt.Sprintf("%s=1", env.EnvForceColor))
 	if err := cmd.Run(); err != nil {
 		var exitErr *exec.ExitError
 		if !errors.As(err, &exitErr) {
