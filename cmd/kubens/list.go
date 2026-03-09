@@ -21,6 +21,7 @@ import (
 	"io"
 	"os"
 	"slices"
+	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -51,6 +52,16 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 	if err != nil {
 		return fmt.Errorf("cannot read current namespace: %w", err)
 	}
+
+	done := make(chan struct{})
+	defer close(done)
+	go func() {
+		select {
+		case <-time.After(3 * time.Second):
+			printer.Warning(stderr, `listing namespaces is taking long, switch to a namespace directly with "kubens -f <ns>"`)
+		case <-done:
+		}
+	}()
 
 	ns, err := queryNamespaces(kc)
 	if err != nil {
