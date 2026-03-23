@@ -37,3 +37,39 @@ func (t *MockKubeconfigLoader) Output() string { return t.out.String() }
 func WithMockKubeconfigLoader(kubecfg string) *MockKubeconfigLoader {
 	return &MockKubeconfigLoader{in: strings.NewReader(kubecfg)}
 }
+
+// mockFile is a single in-memory kubeconfig file for multi-file testing.
+type mockFile struct {
+	in  io.Reader
+	out bytes.Buffer
+}
+
+func (m *mockFile) Read(p []byte) (n int, err error)  { return m.in.Read(p) }
+func (m *mockFile) Write(p []byte) (n int, err error) { return m.out.Write(p) }
+func (m *mockFile) Close() error                      { return nil }
+func (m *mockFile) Reset() error                      { return nil }
+
+// MockMultiKubeconfigLoader implements Loader for testing with multiple kubeconfig files.
+type MockMultiKubeconfigLoader struct {
+	files []*mockFile
+}
+
+func (m *MockMultiKubeconfigLoader) Load() ([]ReadWriteResetCloser, error) {
+	out := make([]ReadWriteResetCloser, len(m.files))
+	for i, f := range m.files {
+		out[i] = f
+	}
+	return out, nil
+}
+
+func (m *MockMultiKubeconfigLoader) OutputOf(index int) string {
+	return m.files[index].out.String()
+}
+
+func WithMockMultiKubeconfigLoader(configs ...string) *MockMultiKubeconfigLoader {
+	files := make([]*mockFile, len(configs))
+	for i, c := range configs {
+		files[i] = &mockFile{in: strings.NewReader(c)}
+	}
+	return &MockMultiKubeconfigLoader{files: files}
+}

@@ -65,3 +65,47 @@ func TestSave(t *testing.T) {
 		t.Fatal(diff)
 	}
 }
+
+func TestParse_MultiFile(t *testing.T) {
+	cfg1 := testutil.KC().WithCurrentCtx("ctx1").WithCtxs(testutil.Ctx("ctx1")).ToYAML(t)
+	cfg2 := testutil.KC().WithCurrentCtx("ctx2").WithCtxs(testutil.Ctx("ctx2")).ToYAML(t)
+	tl := WithMockMultiKubeconfigLoader(cfg1, cfg2)
+	kc := new(Kubeconfig).WithLoader(tl)
+	defer kc.Close()
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSave_MultiFile(t *testing.T) {
+	cfg1 := testutil.KC().WithCurrentCtx("ctx1").WithCtxs(testutil.Ctx("ctx1")).ToYAML(t)
+	cfg2 := testutil.KC().WithCtxs(testutil.Ctx("ctx2")).ToYAML(t)
+	tl := WithMockMultiKubeconfigLoader(cfg1, cfg2)
+	kc := new(Kubeconfig).WithLoader(tl)
+	defer kc.Close()
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+
+	// Modify current-context (writes to first file)
+	if err := kc.ModifyCurrentContext("ctx2"); err != nil {
+		t.Fatal(err)
+	}
+	if err := kc.Save(); err != nil {
+		t.Fatal(err)
+	}
+
+	// First file should have updated current-context
+	out0 := tl.OutputOf(0)
+	expected0 := testutil.KC().WithCurrentCtx("ctx2").WithCtxs(testutil.Ctx("ctx1")).ToYAML(t)
+	if diff := cmp.Diff(expected0, out0); diff != "" {
+		t.Fatalf("file 0 diff: %s", diff)
+	}
+
+	// Second file should be unchanged
+	out1 := tl.OutputOf(1)
+	expected1 := testutil.KC().WithCtxs(testutil.Ctx("ctx2")).ToYAML(t)
+	if diff := cmp.Diff(expected1, out1); diff != "" {
+		t.Fatalf("file 1 diff: %s", diff)
+	}
+}

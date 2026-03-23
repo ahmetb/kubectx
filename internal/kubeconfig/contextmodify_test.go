@@ -178,3 +178,97 @@ func TestKubeconfig_ModifyContextName(t *testing.T) {
 		t.Fatalf("diff: %s", diff)
 	}
 }
+
+func TestKubeconfig_ModifyCurrentContext_MultiFile_WritesToFirst(t *testing.T) {
+	cfg1 := testutil.KC().WithCurrentCtx("ctx1").WithCtxs(testutil.Ctx("ctx1")).ToYAML(t)
+	cfg2 := testutil.KC().WithCurrentCtx("ctx2").WithCtxs(testutil.Ctx("ctx2")).ToYAML(t)
+	tl := WithMockMultiKubeconfigLoader(cfg1, cfg2)
+	kc := new(Kubeconfig).WithLoader(tl)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+	if err := kc.ModifyCurrentContext("ctx2"); err != nil {
+		t.Fatal(err)
+	}
+	if err := kc.Save(); err != nil {
+		t.Fatal(err)
+	}
+
+	// First file should have new current-context
+	out0 := tl.OutputOf(0)
+	expected0 := testutil.KC().WithCurrentCtx("ctx2").WithCtxs(testutil.Ctx("ctx1")).ToYAML(t)
+	if diff := cmp.Diff(expected0, out0); diff != "" {
+		t.Fatalf("file 0 diff: %s", diff)
+	}
+
+	// Second file should be unchanged
+	out1 := tl.OutputOf(1)
+	expected1 := testutil.KC().WithCurrentCtx("ctx2").WithCtxs(testutil.Ctx("ctx2")).ToYAML(t)
+	if diff := cmp.Diff(expected1, out1); diff != "" {
+		t.Fatalf("file 1 diff: %s", diff)
+	}
+}
+
+func TestKubeconfig_DeleteContextEntry_MultiFile_FromCorrectFile(t *testing.T) {
+	cfg1 := testutil.KC().WithCtxs(testutil.Ctx("c1"), testutil.Ctx("c2")).ToYAML(t)
+	cfg2 := testutil.KC().WithCtxs(testutil.Ctx("c3"), testutil.Ctx("c4")).ToYAML(t)
+	tl := WithMockMultiKubeconfigLoader(cfg1, cfg2)
+	kc := new(Kubeconfig).WithLoader(tl)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+
+	// Delete c3 which is in file 2
+	if err := kc.DeleteContextEntry("c3"); err != nil {
+		t.Fatal(err)
+	}
+	if err := kc.Save(); err != nil {
+		t.Fatal(err)
+	}
+
+	// First file should be unchanged
+	out0 := tl.OutputOf(0)
+	expected0 := testutil.KC().WithCtxs(testutil.Ctx("c1"), testutil.Ctx("c2")).ToYAML(t)
+	if diff := cmp.Diff(expected0, out0); diff != "" {
+		t.Fatalf("file 0 diff: %s", diff)
+	}
+
+	// Second file should have c3 removed
+	out1 := tl.OutputOf(1)
+	expected1 := testutil.KC().WithCtxs(testutil.Ctx("c4")).ToYAML(t)
+	if diff := cmp.Diff(expected1, out1); diff != "" {
+		t.Fatalf("file 1 diff: %s", diff)
+	}
+}
+
+func TestKubeconfig_ModifyContextName_MultiFile_InCorrectFile(t *testing.T) {
+	cfg1 := testutil.KC().WithCtxs(testutil.Ctx("c1")).ToYAML(t)
+	cfg2 := testutil.KC().WithCtxs(testutil.Ctx("c2")).ToYAML(t)
+	tl := WithMockMultiKubeconfigLoader(cfg1, cfg2)
+	kc := new(Kubeconfig).WithLoader(tl)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+
+	// Rename c2 (in file 2) to c2-new
+	if err := kc.ModifyContextName("c2", "c2-new"); err != nil {
+		t.Fatal(err)
+	}
+	if err := kc.Save(); err != nil {
+		t.Fatal(err)
+	}
+
+	// First file should be unchanged
+	out0 := tl.OutputOf(0)
+	expected0 := testutil.KC().WithCtxs(testutil.Ctx("c1")).ToYAML(t)
+	if diff := cmp.Diff(expected0, out0); diff != "" {
+		t.Fatalf("file 0 diff: %s", diff)
+	}
+
+	// Second file should have c2 renamed to c2-new
+	out1 := tl.OutputOf(1)
+	expected1 := testutil.KC().WithCtxs(testutil.Ctx("c2-new")).ToYAML(t)
+	if diff := cmp.Diff(expected1, out1); diff != "" {
+		t.Fatalf("file 1 diff: %s", diff)
+	}
+}

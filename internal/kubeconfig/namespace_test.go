@@ -92,3 +92,53 @@ func TestKubeconfig_SetNamespace(t *testing.T) {
 		t.Fatal(diff)
 	}
 }
+
+func TestKubeconfig_NamespaceOfContext_MultiFile(t *testing.T) {
+	cfg1 := testutil.KC().WithCtxs(testutil.Ctx("c1").Ns("ns1")).ToYAML(t)
+	cfg2 := testutil.KC().WithCtxs(testutil.Ctx("c2").Ns("ns2")).ToYAML(t)
+	tl := WithMockMultiKubeconfigLoader(cfg1, cfg2)
+	kc := new(Kubeconfig).WithLoader(tl)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+
+	v, err := kc.NamespaceOfContext("c2")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v != "ns2" {
+		t.Fatalf("expected=\"ns2\" got=\"%s\"", v)
+	}
+}
+
+func TestKubeconfig_SetNamespace_MultiFile(t *testing.T) {
+	cfg1 := testutil.KC().WithCtxs(testutil.Ctx("c1")).ToYAML(t)
+	cfg2 := testutil.KC().WithCtxs(testutil.Ctx("c2")).ToYAML(t)
+	tl := WithMockMultiKubeconfigLoader(cfg1, cfg2)
+	kc := new(Kubeconfig).WithLoader(tl)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+
+	// Set namespace for c2 which is in second file
+	if err := kc.SetNamespace("c2", "my-ns"); err != nil {
+		t.Fatal(err)
+	}
+	if err := kc.Save(); err != nil {
+		t.Fatal(err)
+	}
+
+	// First file should be unchanged
+	out0 := tl.OutputOf(0)
+	expected0 := testutil.KC().WithCtxs(testutil.Ctx("c1")).ToYAML(t)
+	if diff := cmp.Diff(expected0, out0); diff != "" {
+		t.Fatalf("file 0 diff: %s", diff)
+	}
+
+	// Second file should have namespace set
+	out1 := tl.OutputOf(1)
+	expected1 := testutil.KC().WithCtxs(testutil.Ctx("c2").Ns("my-ns")).ToYAML(t)
+	if diff := cmp.Diff(expected1, out1); diff != "" {
+		t.Fatalf("file 1 diff: %s", diff)
+	}
+}

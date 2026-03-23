@@ -94,3 +94,64 @@ func TestKubeconfig_CheckContextExists(t *testing.T) {
 		t.Fatal("c3 does not exist; but reported true")
 	}
 }
+
+func TestKubeconfig_ContextNames_MultiFile_Merged(t *testing.T) {
+	cfg1 := testutil.KC().WithCtxs(testutil.Ctx("a"), testutil.Ctx("b")).ToYAML(t)
+	cfg2 := testutil.KC().WithCtxs(testutil.Ctx("c"), testutil.Ctx("d")).ToYAML(t)
+	tl := WithMockMultiKubeconfigLoader(cfg1, cfg2)
+	kc := new(Kubeconfig).WithLoader(tl)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+
+	ctx, err := kc.ContextNames()
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := []string{"a", "b", "c", "d"}
+	if diff := cmp.Diff(expected, ctx); diff != "" {
+		t.Fatalf("%s", diff)
+	}
+}
+
+func TestKubeconfig_ContextNames_MultiFile_DuplicateFirstWins(t *testing.T) {
+	cfg1 := testutil.KC().WithCtxs(testutil.Ctx("a"), testutil.Ctx("shared")).ToYAML(t)
+	cfg2 := testutil.KC().WithCtxs(testutil.Ctx("shared"), testutil.Ctx("b")).ToYAML(t)
+	tl := WithMockMultiKubeconfigLoader(cfg1, cfg2)
+	kc := new(Kubeconfig).WithLoader(tl)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+
+	ctx, err := kc.ContextNames()
+	if err != nil {
+		t.Fatal(err)
+	}
+	// "shared" should appear only once
+	expected := []string{"a", "shared", "b"}
+	if diff := cmp.Diff(expected, ctx); diff != "" {
+		t.Fatalf("%s", diff)
+	}
+}
+
+func TestKubeconfig_ContextExists_MultiFile(t *testing.T) {
+	cfg1 := testutil.KC().WithCtxs(testutil.Ctx("c1")).ToYAML(t)
+	cfg2 := testutil.KC().WithCtxs(testutil.Ctx("c2")).ToYAML(t)
+	tl := WithMockMultiKubeconfigLoader(cfg1, cfg2)
+	kc := new(Kubeconfig).WithLoader(tl)
+	if err := kc.Parse(); err != nil {
+		t.Fatal(err)
+	}
+
+	if exists, err := kc.ContextExists("c1"); err != nil || !exists {
+		t.Fatal("c1 should exist")
+	}
+	if exists, err := kc.ContextExists("c2"); err != nil || !exists {
+		t.Fatal("c2 should exist (in second file)")
+	}
+	if exists, err := kc.ContextExists("c3"); err != nil {
+		t.Fatal(err)
+	} else if exists {
+		t.Fatal("c3 should not exist")
+	}
+}
