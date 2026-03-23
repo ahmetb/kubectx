@@ -29,12 +29,20 @@ type ReadWriteResetCloser interface {
 	Reset() error
 }
 
+// PathHinter is optionally implemented by ReadWriteResetCloser to indicate
+// the file path of the underlying kubeconfig file. This is used to resolve
+// relative paths (e.g. in exec credential plugins) when building a REST client.
+type PathHinter interface {
+	Path() string
+}
+
 type Loader interface {
 	Load() ([]ReadWriteResetCloser, error)
 }
 
 type fileEntry struct {
 	f      ReadWriteResetCloser
+	path   string
 	config *yaml.RNode
 }
 
@@ -83,9 +91,25 @@ func (k *Kubeconfig) Parse() error {
 			}
 			return fmt.Errorf("kubeconfig file %d is not a map document", i)
 		}
-		k.files = append(k.files, fileEntry{f: f, config: rn})
+		var p string
+		if ph, ok := f.(PathHinter); ok {
+			p = ph.Path()
+		}
+		k.files = append(k.files, fileEntry{f: f, path: p, config: rn})
 	}
 	return nil
+}
+
+// ConfigPaths returns the file paths of all loaded kubeconfig files.
+// Returns nil if the kubeconfig was not loaded from files (e.g. in tests).
+func (k *Kubeconfig) ConfigPaths() []string {
+	var paths []string
+	for _, fe := range k.files {
+		if fe.path != "" {
+			paths = append(paths, fe.path)
+		}
+	}
+	return paths
 }
 
 func (k *Kubeconfig) Bytes() ([]byte, error) {

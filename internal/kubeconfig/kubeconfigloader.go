@@ -29,7 +29,12 @@ var (
 
 type StandardKubeconfigLoader struct{}
 
-type kubeconfigFile struct{ *os.File }
+type kubeconfigFile struct {
+	*os.File
+	path string
+}
+
+func (kf *kubeconfigFile) Path() string { return kf.path }
 
 func (*StandardKubeconfigLoader) Load() ([]ReadWriteResetCloser, error) {
 	paths, err := kubeconfigPaths()
@@ -46,7 +51,7 @@ func (*StandardKubeconfigLoader) Load() ([]ReadWriteResetCloser, error) {
 			}
 			return nil, fmt.Errorf("failed to open file %q: %w", p, err)
 		}
-		files = append(files, &kubeconfigFile{f})
+		files = append(files, &kubeconfigFile{File: f, path: p})
 	}
 	if len(files) == 0 {
 		return nil, fmt.Errorf("kubeconfig file not found: %w",
