@@ -25,6 +25,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
@@ -102,11 +103,31 @@ func queryNamespaces(kc *kubeconfig.Kubeconfig) ([]string, error) {
 }
 
 func newKubernetesClientSet(kc *kubeconfig.Kubeconfig) (*kubernetes.Clientset, error) {
-	b, err := kc.Bytes()
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert in-memory kubeconfig to yaml: %w", err)
+	var cfg *rest.Config
+	var err error
+
+	if paths := kc.ConfigPaths(); len(paths) > 0 {
+		// Load from file paths so that client-go resolves relative paths
+		// (e.g. in exec credential plugins) relative to the kubeconfig directory.
+		//
+		// TODO: This re-reads and re-parses the kubeconfig files from disk via
+		// client-go, duplicating work already done by our kyaml-based loader.
+		// A better approach would be to extract the current context/cluster/user
+		// entries from the already-parsed multi-file kubeconfig and normalize
+		// relative paths in memory based on which file each entry was read from.
+		cfg, err = clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+			&clientcmd.ClientConfigLoadingRules{Precedence: paths},
+			&clientcmd.ConfigOverrides{},
+		).ClientConfig()
+	} else {
+		// Fallback for in-memory configs (e.g. tests).
+		var b []byte
+		b, err = kc.Bytes()
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert in-memory kubeconfig to yaml: %w", err)
+		}
+		cfg, err = clientcmd.RESTConfigFromKubeConfig(b)
 	}
-	cfg, err := clientcmd.RESTConfigFromKubeConfig(b)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize config: %w", err)
 	}
