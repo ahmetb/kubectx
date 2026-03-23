@@ -42,6 +42,7 @@ func printUsage(out io.Writer) error {
   %SPAC%                         (this command won't delete the user/cluster entry
   %SPAC%                          referenced by the context entry)
   %PROG% -s, --shell <NAME>    : start a shell scoped to context <NAME>
+  %PROG% -s, --shell           : interactively select a context to start a shell
   %PROG% -h,--help             : show this message
   %PROG% -V,--version          : show version`
 	help = strings.ReplaceAll(help, "%PROG%", selfName())

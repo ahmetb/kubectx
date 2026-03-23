@@ -1,22 +1,76 @@
 package main
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 
 	"github.com/fatih/color"
 
+	"github.com/ahmetb/kubectx/internal/cmdutil"
 	"github.com/ahmetb/kubectx/internal/env"
 	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
 )
 
+// InteractiveShellOp launches fzf to pick a context, then starts an isolated shell.
+type InteractiveShellOp struct {
+	SelfCmd string
+}
+
 // ShellOp indicates intention to start a scoped sub-shell for a context.
 type ShellOp struct {
 	Target string
+}
+
+func (op InteractiveShellOp) Run(_, stderr io.Writer) error {
+	if err := checkIsolatedMode(); err != nil {
+		return err
+	}
+
+	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
+	defer kc.Close()
+	if err := kc.Parse(); err != nil {
+		if cmdutil.IsNotFoundErr(err) {
+			printer.Warning(stderr, "kubeconfig file not found")
+			return nil
+		}
+		return fmt.Errorf("kubeconfig error: %w", err)
+	}
+
+	ctxNames, err := kc.ContextNames()
+	if err != nil {
+		return fmt.Errorf("failed to get context names: %w", err)
+	}
+	if len(ctxNames) == 0 {
+		return errors.New("no contexts found in the kubeconfig file")
+	}
+
+	cmd := exec.Command("fzf", "--ansi", "--no-preview")
+	var out bytes.Buffer
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = stderr
+	cmd.Stdout = &out
+
+	cmd.Env = append(os.Environ(),
+		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", op.SelfCmd),
+		fmt.Sprintf("%s=1", env.EnvForceColor))
+	if err := cmd.Run(); err != nil {
+		var exitErr *exec.ExitError
+		if !errors.As(err, &exitErr) {
+			return err
+		}
+	}
+	choice := strings.TrimSpace(out.String())
+	if choice == "" {
+		return errors.New("you did not choose any of the options")
+	}
+	return ShellOp{Target: choice}.Run(nil, stderr)
 }
 
 func (op ShellOp) Run(_, stderr io.Writer) error {
