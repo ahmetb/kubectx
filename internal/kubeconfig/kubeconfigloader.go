@@ -32,21 +32,27 @@ type StandardKubeconfigLoader struct{}
 type kubeconfigFile struct{ *os.File }
 
 func (*StandardKubeconfigLoader) Load() ([]ReadWriteResetCloser, error) {
-	cfgPath, err := kubeconfigPath()
+	paths, err := kubeconfigPaths()
 	if err != nil {
 		return nil, fmt.Errorf("cannot determine kubeconfig path: %w", err)
 	}
 
-	f, err := os.OpenFile(cfgPath, os.O_RDWR, 0)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("kubeconfig file not found: %w", err)
+	var files []ReadWriteResetCloser
+	for _, p := range paths {
+		f, err := os.OpenFile(p, os.O_RDWR, 0)
+		if err != nil {
+			if os.IsNotExist(err) {
+				continue
+			}
+			return nil, fmt.Errorf("failed to open file %q: %w", p, err)
 		}
-		return nil, fmt.Errorf("failed to open file: %w", err)
+		files = append(files, &kubeconfigFile{f})
 	}
-
-	// TODO we'll return all kubeconfig files when we start implementing multiple kubeconfig support
-	return []ReadWriteResetCloser{ReadWriteResetCloser(&kubeconfigFile{f})}, nil
+	if len(files) == 0 {
+		return nil, fmt.Errorf("kubeconfig file not found: %w",
+			&os.PathError{Op: "open", Path: paths[0], Err: os.ErrNotExist})
+	}
+	return files, nil
 }
 
 func (kf *kubeconfigFile) Reset() error {
@@ -59,21 +65,16 @@ func (kf *kubeconfigFile) Reset() error {
 	return nil
 }
 
-func kubeconfigPath() (string, error) {
+func kubeconfigPaths() ([]string, error) {
 	// KUBECONFIG env var
 	if v := os.Getenv("KUBECONFIG"); v != "" {
-		list := filepath.SplitList(v)
-		if len(list) > 1 {
-			// TODO KUBECONFIG=file1:file2 currently not supported
-			return "", errors.New("multiple files in KUBECONFIG are currently not supported")
-		}
-		return v, nil
+		return filepath.SplitList(v), nil
 	}
 
 	// default path
 	home := cmdutil.HomeDir()
 	if home == "" {
-		return "", errors.New("HOME or USERPROFILE environment variable not set")
+		return nil, errors.New("HOME or USERPROFILE environment variable not set")
 	}
-	return filepath.Join(home, ".kube", "config"), nil
+	return []string{filepath.Join(home, ".kube", "config")}, nil
 }

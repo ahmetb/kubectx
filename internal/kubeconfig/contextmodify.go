@@ -21,38 +21,38 @@ import (
 )
 
 func (k *Kubeconfig) DeleteContextEntry(deleteName string) error {
-	contexts, err := k.contextsNode()
+	_, fileIdx, err := k.contextNodeWithFileIndex(deleteName)
 	if err != nil {
 		return err
 	}
-	if err := contexts.PipeE(
+
+	contexts, err := contextsNodeOf(&k.files[fileIdx])
+	if err != nil {
+		return err
+	}
+	return contexts.PipeE(
 		yaml.ElementSetter{
 			Keys:   []string{"name"},
 			Values: []string{deleteName},
 		},
-	); err != nil {
-		return err
-	}
-	return nil
+	)
 }
 
+// ModifyCurrentContext always writes to the first file (matching kubectl behavior).
 func (k *Kubeconfig) ModifyCurrentContext(name string) error {
-	if err := k.config.PipeE(yaml.SetField("current-context", yaml.NewScalarRNode(name))); err != nil {
-		return err
+	if len(k.files) == 0 {
+		return errNoFiles
 	}
-	return nil
+	return k.files[0].config.PipeE(yaml.SetField("current-context", yaml.NewScalarRNode(name)))
 }
 
 func (k *Kubeconfig) ModifyContextName(old, new string) error {
-	context, err := k.config.Pipe(yaml.Lookup("contexts", "[name="+old+"]"))
+	context, _, err := k.contextNodeWithFileIndex(old)
 	if err != nil {
 		return err
 	}
 	if context == nil {
 		return errors.New("\"contexts\" entry is nil")
 	}
-	if err := context.PipeE(yaml.SetField("name", yaml.NewScalarRNode(new))); err != nil {
-		return err
-	}
-	return nil
+	return context.PipeE(yaml.SetField("name", yaml.NewScalarRNode(new)))
 }

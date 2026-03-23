@@ -22,8 +22,8 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-func (k *Kubeconfig) contextsNode() (*yaml.RNode, error) {
-	contexts, err := k.config.Pipe(yaml.Get("contexts"))
+func contextsNodeOf(fe *fileEntry) (*yaml.RNode, error) {
+	contexts, err := fe.config.Pipe(yaml.Get("contexts"))
 	if err != nil {
 		return nil, err
 	}
@@ -35,32 +35,61 @@ func (k *Kubeconfig) contextsNode() (*yaml.RNode, error) {
 	return contexts, nil
 }
 
+// contextNodeWithFileIndex searches for a context by name across all files.
+// Returns the context node and the index of the file that contains it.
+// Files without a valid "contexts" sequence are skipped, but if errors occur
+// during lookup they are included in the final error message.
+func (k *Kubeconfig) contextNodeWithFileIndex(name string) (*yaml.RNode, int, error) {
+	var fileErrors []error
+	for i := range k.files {
+		contexts, err := contextsNodeOf(&k.files[i])
+		if err != nil {
+			fileErrors = append(fileErrors, fmt.Errorf("file %d: %w", i, err))
+			continue
+		}
+		context, err := contexts.Pipe(yaml.Lookup("[name=" + name + "]"))
+		if err != nil {
+			fileErrors = append(fileErrors, fmt.Errorf("file %d lookup: %w", i, err))
+			continue
+		}
+		if context != nil {
+			return context, i, nil
+		}
+	}
+	if len(fileErrors) > 0 {
+		return nil, -1, fmt.Errorf("context with name %q not found (errors in files: %w)",
+			name, errors.Join(fileErrors...))
+	}
+	return nil, -1, fmt.Errorf("context with name %q not found", name)
+}
+
 func (k *Kubeconfig) contextNode(name string) (*yaml.RNode, error) {
-	contexts, err := k.contextsNode()
-	if err != nil {
-		return nil, err
-	}
-	context, err := contexts.Pipe(yaml.Lookup("[name=" + name + "]"))
-	if err != nil {
-		return nil, err
-	}
-	if context == nil {
-		return nil, fmt.Errorf("context with name \"%s\" not found", name)
-	}
-	return context, nil
+	node, _, err := k.contextNodeWithFileIndex(name)
+	return node, err
 }
 
 func (k *Kubeconfig) ContextNames() ([]string, error) {
-	contexts, err := k.config.Pipe(yaml.Get("contexts"))
-	if err != nil {
-		return nil, fmt.Errorf("failed to get contexts: %w", err)
-	}
-	if contexts == nil {
-		return nil, nil
-	}
-	names, err := contexts.ElementValues("name")
-	if err != nil {
-		return nil, fmt.Errorf("failed to get context names: %w", err)
+	seen := make(map[string]bool)
+	var names []string
+
+	for i := range k.files {
+		contexts, err := k.files[i].config.Pipe(yaml.Get("contexts"))
+		if err != nil {
+			return nil, fmt.Errorf("failed to get contexts: %w", err)
+		}
+		if contexts == nil {
+			continue
+		}
+		fileNames, err := contexts.ElementValues("name")
+		if err != nil {
+			return nil, fmt.Errorf("failed to get context names: %w", err)
+		}
+		for _, n := range fileNames {
+			if !seen[n] {
+				seen[n] = true
+				names = append(names, n)
+			}
+		}
 	}
 	return names, nil
 }

@@ -20,16 +20,25 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/yaml"
 )
 
-// GetCurrentContext returns "current-context" value in given
-// kubeconfig object Node, or returns ("", nil) if not found.
+// GetCurrentContext returns "current-context" value from the first file
+// that has a non-empty current-context, or returns ("", nil) if not found.
 func (k *Kubeconfig) GetCurrentContext() (string, error) {
-	v, err := k.config.Pipe(yaml.Get("current-context"))
-	if err != nil {
-		return "", fmt.Errorf("failed to read current-context: %w", err)
+	for _, fe := range k.files {
+		v, err := fe.config.Pipe(yaml.Get("current-context"))
+		if err != nil {
+			return "", fmt.Errorf("failed to read current-context: %w", err)
+		}
+		if s := yaml.GetValue(v); s != "" {
+			return s, nil
+		}
 	}
-	return yaml.GetValue(v), nil
+	return "", nil
 }
 
+// UnsetCurrentContext clears the current-context field in the first file.
 func (k *Kubeconfig) UnsetCurrentContext() error {
-	return k.config.PipeE(yaml.SetField("current-context", yaml.NewStringRNode("")))
+	if len(k.files) == 0 {
+		return errNoFiles
+	}
+	return k.files[0].config.PipeE(yaml.SetField("current-context", yaml.NewStringRNode("")))
 }
