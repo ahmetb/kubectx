@@ -31,4 +31,6 @@ const (
 	EnvDebug = `DEBUG`
 
 	EnvIsolatedShell = "KUBECTX_ISOLATED_SHELL"
+
+	EnvReadonlyShell = "KUBECTX_READONLY_SHELL"
 )
