@@ -1,3 +1,5 @@
+// kubens(1) is a utility to switch between Kubernetes namespaces.
+
 // Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");

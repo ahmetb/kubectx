@@ -30,21 +30,25 @@ func (_ HelpOp) Run(stdout, _ io.Writer) error {
 }
 
 func printUsage(out io.Writer) error {
-	help := `USAGE:
+	help := `Manage and switch between kubectl contexts.
+
+USAGE:
   %PROG%                       : list the contexts
   %PROG% <NAME>                : switch to context <NAME>
   %PROG% -                     : switch to the previous context
+  %PROG% -s, --shell <NAME>    : start a shell scoped to context <NAME>
+  %PROG% -s, --shell           : interactively select a context to start a shell
+  %PROG% -r, --readonly <NAME> : start a read-only shell for context <NAME>
+  %PROG% -r, --readonly        : interactively select a context for read-only shell
   %PROG% -c, --current         : show the current context name
+  %PROG% -u, --unset           : unset the current context
   %PROG% <NEW_NAME>=<NAME>     : rename context <NAME> to <NEW_NAME>
   %PROG% <NEW_NAME>=.          : rename current-context to <NEW_NAME>
-  %PROG% -u, --unset           : unset the current context
   %PROG% -d <NAME> [<NAME...>] : delete context <NAME> ('.' for current-context)
   %SPAC%                         (this command won't delete the user/cluster entry
   %SPAC%                          referenced by the context entry)
-  %PROG% -s, --shell <NAME>    : start a shell scoped to context <NAME>
-  %PROG% -s, --shell           : interactively select a context to start a shell
-  %PROG% -h,--help             : show this message
-  %PROG% -V,--version          : show version`
+  %PROG% -h, --help            : show this message
+  %PROG% -V, --version         : show version`
 	help = strings.ReplaceAll(help, "%PROG%", selfName())
 	help = strings.ReplaceAll(help, "%SPAC%", strings.Repeat(" ", len(selfName())))
 

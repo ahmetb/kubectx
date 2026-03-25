@@ -1,3 +1,5 @@
+// kubectx(1) is a utility to manage and switch between kubectl contexts.
+
 // Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");

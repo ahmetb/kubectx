@@ -30,7 +30,9 @@ func (_ HelpOp) Run(stdout, _ io.Writer) error {
 }
 
 func printUsage(out io.Writer) error {
-	help := `USAGE:
+	help := `Switch between Kubernetes namespaces.
+
+USAGE:
   %PROG%                    : list the namespaces in the current context
   %PROG% <NAME>             : change the active namespace of current context
   %PROG% <NAME> --force/-f  : force change the active namespace of current context (even if it doesn't exist)
