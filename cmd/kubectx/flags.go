@@ -40,6 +40,19 @@ func parseArgs(argv []string) Op {
 		return ListOp{}
 	}
 
+	if argv[0] == "--readonly" || argv[0] == "-r" {
+		if len(argv) == 1 {
+			if cmdutil.IsInteractiveMode(os.Stdout) {
+				return InteractiveReadonlyShellOp{SelfCmd: os.Args[0]}
+			}
+			return UnsupportedOp{Err: fmt.Errorf("'%s' requires a context name argument (or fzf for interactive mode)", argv[0])}
+		}
+		if len(argv) == 2 {
+			return ReadonlyShellOp{Target: argv[1]}
+		}
+		return UnsupportedOp{Err: fmt.Errorf("'%s' accepts at most one context name argument", argv[0])}
+	}
+
 	if argv[0] == "--shell" || argv[0] == "-s" {
 		if len(argv) == 1 {
 			if cmdutil.IsInteractiveMode(os.Stdout) {
