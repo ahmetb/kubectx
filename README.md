@@ -4,7 +4,6 @@
 ![GitHub stars](https://img.shields.io/github/stars/ahmetb/kubectx.svg?label=github%20stars)
 ![Homebrew downloads](https://img.shields.io/homebrew/installs/dy/kubectx?label=macOS%20installs)
 [![Go implementation (CI)](https://github.com/ahmetb/kubectx/workflows/Go%20implementation%20(CI)/badge.svg)](https://github.com/ahmetb/kubectx/actions?query=workflow%3A"Go+implementation+(CI)")
-![Proudly written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4.svg)
 
 This repository provides both `kubectx` and `kubens` tools.
 [Install &rarr;](#installation)
@@ -12,7 +11,7 @@ This repository provides both `kubectx` and `kubens` tools.
 ## What are `kubectx` and `kubens`?
 
 **kubectx** is a tool to switch between contexts (clusters) on kubectl
-faster.<br/>
+faster, and launch readonly shells for each context.<br/>
 **kubens** is a tool to switch between Kubernetes namespaces (and
 configure them for kubectl) easily.
 
@@ -22,42 +21,67 @@ Here's a **`kubectx`** demo:
 ...and here's a **`kubens`** demo:
 ![kubens demo GIF](img/kubens-demo.gif)
 
-### Examples
+### Usage
+
+#### kubectx
+
+Switch to another cluster that's in kubeconfig:
 
 ```sh
-# switch to another cluster that's in kubeconfig
 $ kubectx minikube
 Switched to context "minikube".
+```
 
-# switch back to previous cluster
+Switch back to previous cluster:
+
+```sh
 $ kubectx -
 Switched to context "oregon".
+```
 
-# start an "isolated shell" that only has a single context
+Start an isolated shell that only has a single context:
+
+```sh
 $ kubectx -s minikube
+```
 
-# rename context
+Start a read-only shell where write operations are blocked:
+
+```sh
+$ kubectx -r minikube
+```
+
+Rename context:
+
+```sh
 $ kubectx dublin=gke_ahmetb_europe-west1-b_dublin
 Context "gke_ahmetb_europe-west1-b_dublin" renamed to "dublin".
+```
 
-# change the active namespace on kubectl
+#### kubens
+
+Change the active namespace on kubectl:
+
+```sh
 $ kubens kube-system
 Context "test" set.
 Active namespace is "kube-system".
+```
 
-# go back to the previous namespace
+Go back to the previous namespace:
+
+```sh
 $ kubens -
 Context "test" set.
 Active namespace is "default".
+```
 
-# change the active namespace even if it doesn't exist
-$ kubens not-found-namespace --force
+Change the active namespace even if it doesn't exist:
+
+```sh
+$ kubens namespace-404 -f
 Context "test" set.
-Active namespace is "not-found-namespace".
----
-$ kubens not-found-namespace -f
-Context "test" set.
-Active namespace is "not-found-namespace".
+Active namespace is "namespace-404".
 ```
 
 If you have [`fzf`](https://github.com/junegunn/fzf) installed, you can also
