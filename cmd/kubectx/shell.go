@@ -1,20 +1,14 @@
 package main
 
 import (
-	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"runtime"
-	"strings"
 
 	"github.com/fatih/color"
 
-	"github.com/ahmetb/kubectx/internal/cmdutil"
-	"github.com/ahmetb/kubectx/internal/env"
-	"github.com/ahmetb/kubectx/internal/kubeconfig"
 	"github.com/ahmetb/kubectx/internal/printer"
 )
 
@@ -29,122 +23,29 @@ type ShellOp struct {
 }
 
 func (op InteractiveShellOp) Run(_, stderr io.Writer) error {
-	if err := checkIsolatedMode(); err != nil {
+	choice, err := fzfPickContext(op.SelfCmd, stderr)
+	if err != nil || choice == "" {
 		return err
-	}
-
-	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
-	defer kc.Close()
-	if err := kc.Parse(); err != nil {
-		if cmdutil.IsNotFoundErr(err) {
-			printer.Warning(stderr, "kubeconfig file not found")
-			return nil
-		}
-		return fmt.Errorf("kubeconfig error: %w", err)
-	}
-
-	ctxNames, err := kc.ContextNames()
-	if err != nil {
-		return fmt.Errorf("failed to get context names: %w", err)
-	}
-	if len(ctxNames) == 0 {
-		return errors.New("no contexts found in the kubeconfig file")
-	}
-
-	cmd := exec.Command("fzf", "--ansi", "--no-preview")
-	var out bytes.Buffer
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = stderr
-	cmd.Stdout = &out
-
-	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", op.SelfCmd),
-		fmt.Sprintf("%s=1", env.EnvForceColor))
-	if err := cmd.Run(); err != nil {
-		var exitErr *exec.ExitError
-		if !errors.As(err, &exitErr) {
-			return err
-		}
-	}
-	choice := strings.TrimSpace(out.String())
-	if choice == "" {
-		return errors.New("you did not choose any of the options")
 	}
 	return ShellOp{Target: choice}.Run(nil, stderr)
 }
 
 func (op ShellOp) Run(_, stderr io.Writer) error {
-	if err := checkIsolatedMode(); err != nil {
-		return err
-	}
-
-	kubectlPath, err := resolveKubectl()
-	if err != nil {
-		return err
-	}
-
-	// Verify context exists and get current context for exit message
-	kc := new(kubeconfig.Kubeconfig).WithLoader(kubeconfig.DefaultLoader)
-	defer kc.Close()
-	if err := kc.Parse(); err != nil {
-		return fmt.Errorf("kubeconfig error: %w", err)
-	}
-	exists, err := kc.ContextExists(op.Target)
-	if err != nil {
-		return fmt.Errorf("failed to check context: %w", err)
-	}
-	if !exists {
-		return fmt.Errorf("no context exists with the name: \"%s\"", op.Target)
-	}
-	previousCtx, err := kc.GetCurrentContext()
-	if err != nil {
-		return fmt.Errorf("failed to get current context: %w", err)
-	}
-
-	// Extract minimal kubeconfig using kubectl
-	data, err := extractMinimalKubeconfig(kubectlPath, op.Target)
-	if err != nil {
-		return fmt.Errorf("failed to extract kubeconfig for context: %w", err)
-	}
-
-	// Write to temp file
-	tmpFile, err := os.CreateTemp("", "kubectx-shell-*.yaml")
-	if err != nil {
-		return fmt.Errorf("failed to create temp kubeconfig file: %w", err)
-	}
-	tmpPath := tmpFile.Name()
-	defer os.Remove(tmpPath)
-
-	if _, err := tmpFile.Write(data); err != nil {
-		tmpFile.Close()
-		return fmt.Errorf("failed to write temp kubeconfig: %w", err)
-	}
-	tmpFile.Close()
-
-	// Print entry message
 	badgeColor := color.New(color.BgRed, color.FgWhite, color.Bold)
 	printer.EnableOrDisableColor(badgeColor)
-	fmt.Fprintf(stderr, "%s kubectl context is %s in this shell — type 'exit' to leave.\n",
-		badgeColor.Sprint("[ISOLATED SHELL]"), printer.WarningColor.Sprint(op.Target))
 
-	// Detect and start shell
-	shellBin := detectShell()
-	cmd := exec.Command(shellBin)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Env = append(os.Environ(),
-		"KUBECONFIG="+tmpPath,
-		env.EnvIsolatedShell+"=1",
-	)
-
-	_ = cmd.Run()
-
-	// Print exit message
-	fmt.Fprintf(stderr, "%s kubectl context is now %s.\n",
-		badgeColor.Sprint("[ISOLATED SHELL EXITED]"), printer.WarningColor.Sprint(previousCtx))
-
-	return nil
+	s := &shellSession{
+		target: op.Target,
+		printEntry: func(w io.Writer, ctxName string) {
+			fmt.Fprintf(w, "%s kubectl context is %s in this shell — type 'exit' to leave.\n",
+				badgeColor.Sprint("[ISOLATED SHELL]"), printer.WarningColor.Sprint(ctxName))
+		},
+		printExit: func(w io.Writer, prevCtx string) {
+			fmt.Fprintf(w, "%s kubectl context is now %s.\n",
+				badgeColor.Sprint("[ISOLATED SHELL EXITED]"), printer.WarningColor.Sprint(prevCtx))
+		},
+	}
+	return s.run(stderr)
 }
 
 func resolveKubectl() (string, error) {
