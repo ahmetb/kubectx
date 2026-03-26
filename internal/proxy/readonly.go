@@ -10,6 +10,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"regexp"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
@@ -17,6 +18,18 @@ import (
 
 	"github.com/ahmetb/kubectx/internal/env"
 )
+
+// nonMutatingPostPatterns match Kubernetes "review" endpoints that use POST
+// but don't create persistent resources. Patterns are anchored to known API
+// groups to prevent spoofing via custom resource names.
+var nonMutatingPostPatterns = []*regexp.Regexp{
+	regexp.MustCompile(`^/apis/authorization\.k8s\.io/[^/]+/selfsubjectaccessreviews$`),
+	regexp.MustCompile(`^/apis/authorization\.k8s\.io/[^/]+/subjectaccessreviews$`),
+	regexp.MustCompile(`^/apis/authorization\.k8s\.io/[^/]+/namespaces/[^/]+/localsubjectaccessreviews$`),
+	regexp.MustCompile(`^/apis/authorization\.k8s\.io/[^/]+/selfsubjectrulesreviews$`),
+	regexp.MustCompile(`^/apis/authentication\.k8s\.io/[^/]+/tokenreviews$`),
+	regexp.MustCompile(`^/apis/authentication\.k8s\.io/[^/]+/selfsubjectreviews$`),
+}
 
 var debugLog = func() *log.Logger {
 	if _, ok := os.LookupEnv(env.EnvDebug); ok {
@@ -103,23 +116,69 @@ func NewHandler(target *url.URL, transport http.RoundTripper) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		debugLog.Printf(">> %s %s", r.Method, r.URL.Path)
 
-		// Block protocol upgrades (exec, cp, port-forward use SPDY/WebSocket).
-		if r.Header.Get("Connection") == "Upgrade" || r.Header.Get("Upgrade") != "" {
-			debugLog.Printf("<< %s %s -> 405 (upgrade blocked)", r.Method, r.URL.Path)
-			writeBlockedResponse(w, r.Method, "[kubectx] readonly mode: operations like exec, cp, and port-forward are not allowed")
+		if reason, ok := checkRequest(r); !ok {
+			debugLog.Printf("<< %s %s -> 405 (%s)", r.Method, r.URL.Path, reason)
+			writeBlockedResponse(w, r.Method,
+				fmt.Sprintf("[kubectx] readonly mode: %s", reason))
 			return
 		}
 
-		switch r.Method {
-		case http.MethodGet, http.MethodHead, http.MethodOptions:
-			debugLog.Printf("<< %s %s -> proxied", r.Method, r.URL.Path)
-			proxy.ServeHTTP(w, r)
-		default:
-			debugLog.Printf("<< %s %s -> 405 (blocked)", r.Method, r.URL.Path)
-			writeBlockedResponse(w, r.Method,
-				fmt.Sprintf("[kubectx] readonly mode: %s requests are not allowed", r.Method))
-		}
+		debugLog.Printf("<< %s %s -> proxied", r.Method, r.URL.Path)
+		proxy.ServeHTTP(w, r)
 	})
+}
+
+// checkRequest determines whether a request should be proxied or blocked.
+// Returns ("", true) if allowed, or (reason, false) if blocked.
+func checkRequest(r *http.Request) (reason string, allowed bool) {
+	if isUpgrade(r) {
+		return "operations like exec, cp, and port-forward are not allowed", false
+	}
+	if isReadOnly(r) {
+		return "", true
+	}
+	if isNonMutatingPost(r) {
+		return "", true
+	}
+	if isDryRun(r) {
+		return "", true
+	}
+	return fmt.Sprintf("%s requests are not allowed", r.Method), false
+}
+
+// isUpgrade returns true if the request is a protocol upgrade (SPDY/WebSocket).
+func isUpgrade(r *http.Request) bool {
+	return r.Header.Get("Connection") == "Upgrade" || r.Header.Get("Upgrade") != ""
+}
+
+// isReadOnly returns true for safe HTTP methods that never modify state.
+func isReadOnly(r *http.Request) bool {
+	switch r.Method {
+	case http.MethodGet, http.MethodHead, http.MethodOptions:
+		return true
+	}
+	return false
+}
+
+// isNonMutatingPost returns true for Kubernetes "review" endpoints that use
+// POST but don't create persistent resources (e.g. SubjectAccessReview).
+// Patterns are anchored to known API groups to prevent spoofing.
+func isNonMutatingPost(r *http.Request) bool {
+	if r.Method != http.MethodPost {
+		return false
+	}
+	for _, re := range nonMutatingPostPatterns {
+		if re.MatchString(r.URL.Path) {
+			return true
+		}
+	}
+	return false
+}
+
+// isDryRun returns true if the request has ?dryRun=All, which means
+// the API server will validate but not persist the request.
+func isDryRun(r *http.Request) bool {
+	return r.URL.Query().Get("dryRun") == "All"
 }
 
 func writeBlockedResponse(w http.ResponseWriter, method, message string) {
