@@ -369,7 +369,7 @@ users:
 		"c2VjcmV0LWNh",       // CA data
 		"c2VjcmV0LWNlcnQ=",   // client cert
 		"c2VjcmV0LWtleQ==",   // client key
-		"super-secret-token",  // token
+		"super-secret-token", // token
 	}
 	for _, s := range sensitiveStrings {
 		if strings.Contains(result, s) {
