@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
@@ -148,7 +149,7 @@ func checkRequest(r *http.Request) (reason string, allowed bool) {
 
 // isUpgrade returns true if the request is a protocol upgrade (SPDY/WebSocket).
 func isUpgrade(r *http.Request) bool {
-	return r.Header.Get("Connection") == "Upgrade" || r.Header.Get("Upgrade") != ""
+	return strings.EqualFold(r.Header.Get("Connection"), "Upgrade") || r.Header.Get("Upgrade") != ""
 }
 
 // isReadOnly returns true for safe HTTP methods that never modify state.
