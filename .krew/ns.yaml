@@ -15,16 +15,90 @@ spec:
     as you type.
   platforms:
   - selector:
-      matchExpressions:
-      - key: os
-        operator: In
-        values:
-        - darwin
-        - linux
-    {{addURIAndSha "https://github.com/ahmetb/kubectx/archive/{{ .TagName }}.tar.gz" .TagName }}
+      matchLabels:
+        os: darwin
+        arch: amd64
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubens_{{ .TagName }}_darwin_x86_64.tar.gz" .TagName }}
     bin: kubens
     files:
-    - from: kubectx-*/kubens
+    - from: kubens
       to: .
-    - from: kubectx-*/LICENSE
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: darwin
+        arch: arm64
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubens_{{ .TagName }}_darwin_arm64.tar.gz" .TagName }}
+    bin: kubens
+    files:
+    - from: kubens
+      to: .
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: linux
+        arch: amd64
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubens_{{ .TagName }}_linux_x86_64.tar.gz" .TagName }}
+    bin: kubens
+    files:
+    - from: kubens
+      to: .
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: linux
+        arch: arm64
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubens_{{ .TagName }}_linux_arm64.tar.gz" .TagName }}
+    bin: kubens
+    files:
+    - from: kubens
+      to: .
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: linux
+        arch: arm
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubens_{{ .TagName }}_linux_armv7.tar.gz" .TagName }}
+    bin: kubens
+    files:
+    - from: kubens
+      to: .
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: linux
+        arch: ppc64le
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubens_{{ .TagName }}_linux_ppc64le.tar.gz" .TagName }}
+    bin: kubens
+    files:
+    - from: kubens
+      to: .
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: linux
+        arch: s390x
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubens_{{ .TagName }}_linux_s390x.tar.gz" .TagName }}
+    bin: kubens
+    files:
+    - from: kubens
+      to: .
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: windows
+        arch: amd64
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubens_{{ .TagName }}_windows_x86_64.zip" .TagName }}
+    bin: kubens.exe
+    files:
+    - from: kubens.exe
+      to: .
+    - from: LICENSE
       to: .

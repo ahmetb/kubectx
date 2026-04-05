@@ -16,16 +16,90 @@ spec:
     See https://github.com/ahmetb/kubectx for customization and details.
   platforms:
   - selector:
-      matchExpressions:
-      - key: os
-        operator: In
-        values:
-        - darwin
-        - linux
-    {{addURIAndSha "https://github.com/ahmetb/kubectx/archive/{{ .TagName }}.tar.gz" .TagName }}
+      matchLabels:
+        os: darwin
+        arch: amd64
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubectx_{{ .TagName }}_darwin_x86_64.tar.gz" .TagName }}
     bin: kubectx
     files:
-    - from: kubectx-*/kubectx
+    - from: kubectx
       to: .
-    - from: kubectx-*/LICENSE
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: darwin
+        arch: arm64
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubectx_{{ .TagName }}_darwin_arm64.tar.gz" .TagName }}
+    bin: kubectx
+    files:
+    - from: kubectx
+      to: .
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: linux
+        arch: amd64
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubectx_{{ .TagName }}_linux_x86_64.tar.gz" .TagName }}
+    bin: kubectx
+    files:
+    - from: kubectx
+      to: .
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: linux
+        arch: arm64
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubectx_{{ .TagName }}_linux_arm64.tar.gz" .TagName }}
+    bin: kubectx
+    files:
+    - from: kubectx
+      to: .
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: linux
+        arch: arm
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubectx_{{ .TagName }}_linux_armv7.tar.gz" .TagName }}
+    bin: kubectx
+    files:
+    - from: kubectx
+      to: .
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: linux
+        arch: ppc64le
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubectx_{{ .TagName }}_linux_ppc64le.tar.gz" .TagName }}
+    bin: kubectx
+    files:
+    - from: kubectx
+      to: .
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: linux
+        arch: s390x
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubectx_{{ .TagName }}_linux_s390x.tar.gz" .TagName }}
+    bin: kubectx
+    files:
+    - from: kubectx
+      to: .
+    - from: LICENSE
+      to: .
+  - selector:
+      matchLabels:
+        os: windows
+        arch: amd64
+    {{addURIAndSha "https://github.com/ahmetb/kubectx/releases/download/{{ .TagName }}/kubectx_{{ .TagName }}_windows_x86_64.zip" .TagName }}
+    bin: kubectx.exe
+    files:
+    - from: kubectx.exe
+      to: .
+    - from: LICENSE
       to: .
