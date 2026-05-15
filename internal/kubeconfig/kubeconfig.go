@@ -206,7 +206,7 @@ func (k *Kubeconfig) Save() error {
 			return fmt.Errorf("failed to reset file %d: %w", i, err)
 		}
 		enc := yaml.NewEncoder(k.files[i].f)
-		enc.SetIndent(0)
+		enc.SetIndent(2)
 		if err := enc.Encode(k.files[i].config.YNode()); err != nil {
 			return fmt.Errorf("failed to encode file %d: %w", i, err)
 		}
