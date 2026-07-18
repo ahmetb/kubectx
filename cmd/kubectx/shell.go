@@ -13,9 +13,7 @@ import (
 )
 
 // InteractiveShellOp launches fzf to pick a context, then starts an isolated shell.
-type InteractiveShellOp struct {
-	SelfCmd string
-}
+type InteractiveShellOp struct{}
 
 // ShellOp indicates intention to start a scoped sub-shell for a context.
 type ShellOp struct {
@@ -23,7 +21,7 @@ type ShellOp struct {
 }
 
 func (op InteractiveShellOp) Run(_, stderr io.Writer) error {
-	choice, err := fzfPickContext(op.SelfCmd, stderr)
+	choice, err := fzfPickContext(stderr)
 	if err != nil || choice == "" {
 		return err
 	}

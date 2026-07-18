@@ -41,7 +41,14 @@ func (_ ListOp) Run(stdout, stderr io.Writer) error {
 		}
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
+	return formatContextList(kc, stdout)
+}
 
+// formatContextList writes the sorted, current-context-highlighted list of
+// contexts from kc to w (one per line). The format mirrors what ListOp.Run
+// prints so that the interactive fzf picker shows the same list the user would
+// see from `kubectx | fzf`.
+func formatContextList(kc *kubeconfig.Kubeconfig, w io.Writer) error {
 	ctxs, err := kc.ContextNames()
 	if err != nil {
 		return fmt.Errorf("failed to get context names: %w", err)
@@ -57,7 +64,7 @@ func (_ ListOp) Run(stdout, stderr io.Writer) error {
 		if c == cur {
 			s = printer.ActiveItemColor.Sprint(c)
 		}
-		fmt.Fprintf(stdout, "%s\n", s)
+		fmt.Fprintf(w, "%s\n", s)
 	}
 	return nil
 }

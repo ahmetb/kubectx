@@ -115,7 +115,7 @@ func (s *shellSession) run(stderr io.Writer) error {
 }
 
 // fzfPickContext launches fzf for interactive context selection.
-func fzfPickContext(selfCmd string, stderr io.Writer) (string, error) {
+func fzfPickContext(stderr io.Writer) (string, error) {
 	if err := checkIsolatedMode(); err != nil {
 		return "", err
 	}
@@ -138,14 +138,18 @@ func fzfPickContext(selfCmd string, stderr io.Writer) (string, error) {
 		return "", errors.New("no contexts found in the kubeconfig file")
 	}
 
+	var in bytes.Buffer
+	if err := formatContextList(kc, &in); err != nil {
+		return "", err
+	}
+
 	cmd := exec.Command("fzf", "--ansi", "--no-preview")
 	var out bytes.Buffer
-	cmd.Stdin = os.Stdin
+	cmd.Stdin = &in
 	cmd.Stderr = stderr
 	cmd.Stdout = &out
 
 	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", selfCmd),
 		fmt.Sprintf("%s=1", env.EnvForceColor))
 	if err := cmd.Run(); err != nil {
 		var exitErr *exec.ExitError

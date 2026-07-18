@@ -35,7 +35,7 @@ func (op UnsupportedOp) Run(_, _ io.Writer) error {
 func parseArgs(argv []string) Op {
 	if len(argv) == 0 {
 		if cmdutil.IsInteractiveMode(os.Stdout) {
-			return InteractiveSwitchOp{SelfCmd: os.Args[0]}
+			return InteractiveSwitchOp{}
 		}
 		return ListOp{}
 	}
@@ -43,7 +43,7 @@ func parseArgs(argv []string) Op {
 	if argv[0] == "--readonly" || argv[0] == "-r" {
 		if len(argv) == 1 {
 			if cmdutil.IsInteractiveMode(os.Stdout) {
-				return InteractiveReadonlyShellOp{SelfCmd: os.Args[0]}
+				return InteractiveReadonlyShellOp{}
 			}
 			return UnsupportedOp{Err: fmt.Errorf("'%s' requires a context name argument (or fzf for interactive mode)", argv[0])}
 		}
@@ -56,7 +56,7 @@ func parseArgs(argv []string) Op {
 	if argv[0] == "--shell" || argv[0] == "-s" {
 		if len(argv) == 1 {
 			if cmdutil.IsInteractiveMode(os.Stdout) {
-				return InteractiveShellOp{SelfCmd: os.Args[0]}
+				return InteractiveShellOp{}
 			}
 			return UnsupportedOp{Err: fmt.Errorf("'%s' requires a context name argument (or fzf for interactive mode)", argv[0])}
 		}
@@ -69,7 +69,7 @@ func parseArgs(argv []string) Op {
 	if argv[0] == "-d" {
 		if len(argv) == 1 {
 			if cmdutil.IsInteractiveMode(os.Stdout) {
-				return InteractiveDeleteOp{SelfCmd: os.Args[0]}
+				return InteractiveDeleteOp{}
 			} else {
 				return UnsupportedOp{Err: fmt.Errorf("'-d' needs arguments")}
 			}

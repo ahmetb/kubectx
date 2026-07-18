@@ -15,9 +15,7 @@ import (
 )
 
 // InteractiveReadonlyShellOp launches fzf to pick a context, then starts a readonly shell.
-type InteractiveReadonlyShellOp struct {
-	SelfCmd string
-}
+type InteractiveReadonlyShellOp struct{}
 
 // ReadonlyShellOp starts a read-only sub-shell for a context.
 type ReadonlyShellOp struct {
@@ -25,7 +23,7 @@ type ReadonlyShellOp struct {
 }
 
 func (op InteractiveReadonlyShellOp) Run(_, stderr io.Writer) error {
-	choice, err := fzfPickContext(op.SelfCmd, stderr)
+	choice, err := fzfPickContext(stderr)
 	if err != nil || choice == "" {
 		return err
 	}

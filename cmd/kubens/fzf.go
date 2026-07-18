@@ -29,9 +29,7 @@ import (
 	"github.com/ahmetb/kubectx/internal/printer"
 )
 
-type InteractiveSwitchOp struct {
-	SelfCmd string
-}
+type InteractiveSwitchOp struct{}
 
 // TODO(ahmetb) This method is heavily repetitive vs kubectx/fzf.go.
 func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
@@ -46,22 +44,21 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
 
-	ctxNames, err := kc.ContextNames()
-	if err != nil {
-		return fmt.Errorf("failed to get context names: %w", err)
+	var in bytes.Buffer
+	if err := formatNamespaceList(kc, &in); err != nil {
+		return err
 	}
-	if len(ctxNames) == 0 {
-		return errors.New("no contexts found in the kubeconfig file")
+	if in.Len() == 0 {
+		return errors.New("no namespaces found")
 	}
 
 	cmd := exec.Command("fzf", "--ansi", "--no-preview")
 	var out bytes.Buffer
-	cmd.Stdin = os.Stdin
+	cmd.Stdin = &in
 	cmd.Stderr = stderr
 	cmd.Stdout = &out
 
 	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", op.SelfCmd),
 		fmt.Sprintf("%s=1", env.EnvForceColor))
 	if err := cmd.Run(); err != nil {
 		var exitErr *exec.ExitError

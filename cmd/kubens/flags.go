@@ -38,7 +38,7 @@ func parseArgs(argv []string) Op {
 
 	if n == 0 {
 		if cmdutil.IsInteractiveMode(os.Stdout) {
-			return InteractiveSwitchOp{SelfCmd: os.Args[0]}
+			return InteractiveSwitchOp{}
 		}
 		return ListOp{}
 	}

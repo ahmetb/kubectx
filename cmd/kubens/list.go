@@ -40,7 +40,14 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 	if err := kc.Parse(); err != nil {
 		return fmt.Errorf("kubeconfig error: %w", err)
 	}
+	return formatNamespaceList(kc, stdout)
+}
 
+// formatNamespaceList writes the sorted, current-namespace-highlighted list
+// of namespaces available in the current context to w (one per line). It
+// mirrors what ListOp.Run prints so the interactive fzf picker shows the same
+// list the user would see from `kubens | fzf`.
+func formatNamespaceList(kc *kubeconfig.Kubeconfig, w io.Writer) error {
 	ctx, err := kc.GetCurrentContext()
 	if err != nil {
 		return fmt.Errorf("failed to get current context: %w", err)
@@ -63,7 +70,7 @@ func (op ListOp) Run(stdout, stderr io.Writer) error {
 		if c == curNs {
 			s = printer.ActiveItemColor.Sprint(c)
 		}
-		fmt.Fprintf(stdout, "%s\n", s)
+		fmt.Fprintf(w, "%s\n", s)
 	}
 	return nil
 }

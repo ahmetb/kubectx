@@ -29,13 +29,9 @@ import (
 	"github.com/ahmetb/kubectx/internal/printer"
 )
 
-type InteractiveSwitchOp struct {
-	SelfCmd string
-}
+type InteractiveSwitchOp struct{}
 
-type InteractiveDeleteOp struct {
-	SelfCmd string
-}
+type InteractiveDeleteOp struct{}
 
 func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 	if err := checkIsolatedMode(); err != nil {
@@ -60,14 +56,18 @@ func (op InteractiveSwitchOp) Run(_, stderr io.Writer) error {
 		return errors.New("no contexts found in the kubeconfig file")
 	}
 
+	var in bytes.Buffer
+	if err := formatContextList(kc, &in); err != nil {
+		return err
+	}
+
 	cmd := exec.Command("fzf", "--ansi", "--no-preview")
 	var out bytes.Buffer
-	cmd.Stdin = os.Stdin
+	cmd.Stdin = &in
 	cmd.Stderr = stderr
 	cmd.Stdout = &out
 
 	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", op.SelfCmd),
 		fmt.Sprintf("%s=1", env.EnvForceColor))
 	if err := cmd.Run(); err != nil {
 		var exitErr *exec.ExitError
@@ -110,14 +110,18 @@ func (op InteractiveDeleteOp) Run(_, stderr io.Writer) error {
 		return errors.New("no contexts found in config")
 	}
 
+	var in bytes.Buffer
+	if err := formatContextList(kc, &in); err != nil {
+		return err
+	}
+
 	cmd := exec.Command("fzf", "--ansi", "--no-preview")
 	var out bytes.Buffer
-	cmd.Stdin = os.Stdin
+	cmd.Stdin = &in
 	cmd.Stderr = stderr
 	cmd.Stdout = &out
 
 	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("FZF_DEFAULT_COMMAND=%s", op.SelfCmd),
 		fmt.Sprintf("%s=1", env.EnvForceColor))
 	if err := cmd.Run(); err != nil {
 		var exitErr *exec.ExitError
