@@ -6,7 +6,7 @@ require (
 	facette.io/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
 	github.com/fatih/color v1.19.0
 	github.com/google/go-cmp v0.7.0
-	github.com/mattn/go-isatty v0.0.22
+	github.com/mattn/go-isatty v0.0.23
 	k8s.io/apimachinery v0.35.4
 	k8s.io/client-go v0.35.4
 	sigs.k8s.io/kustomize/kyaml v0.21.1
